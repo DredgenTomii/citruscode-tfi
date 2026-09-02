@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function getRole() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
+    }
+
+    // Perfil de cada usuario registrado (nombre, rol, entidad)
+    match /usuarios/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid
+                    && request.resource.data.rol == resource.data.rol; // el rol no se puede cambiar despues de creado
+      allow delete: if false;
+    }
+
+    // Productos publicados por productores
+    match /lotes/{lotId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && getRole() == 'productor'
+                    && request.resource.data.productorUid == request.auth.uid;
+      allow update: if isSignedIn() &&
+                    (resource.data.productorUid == request.auth.uid || getRole() == 'admin');
+      allow delete: if false;
+    }
+
+    // Pedidos mayoristas
+    match /pedidos/{orderId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && getRole() == 'mayorista'
+                    && request.resource.data.mayoristaUid == request.auth.uid;
+      allow update: if isSignedIn() &&
+                    (getRole() == 'admin' ||
+                     (getRole() == 'productor' && resource.data.productorUid == request.auth.uid) ||
+                     (getRole() == 'mayorista' && resource.data.mayoristaUid == request.auth.uid));
+      allow delete: if false;
+    }
+
+    // Proyectos de software a medida (solo administracion)
+    match /proyectos/{projId} {
+      allow read: if isSignedIn() && getRole() == 'admin';
+      allow create: if isSignedIn() && getRole() == 'admin';
+      allow update: if isSignedIn() && getRole() == 'admin';
+      allow delete: if false;
+    }
+
+    // Contador para numerar pedidos (CC-8841, CC-8842, ...)
+    match /meta/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && (getRole() == 'mayorista' || getRole() == 'admin');
+    }
+  }
+}
