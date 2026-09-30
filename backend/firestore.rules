@@ -9,26 +9,51 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
     }
 
+    // Correos habilitados para darse de alta como administracion.
+    // El codigo de admin del formulario es solo una comodidad de la interfaz:
+    // el control real es esta lista, que se evalua en el servidor. Aunque
+    // alguien lea el codigo en el fuente de la pagina, si su correo no esta
+    // aca Firestore rechaza la creacion del perfil con rol 'admin'.
+    function adminsHabilitados() {
+      return [
+        'tomasrecalde99@gmail.com'
+        // Agregar aca los correos del resto del grupo, separados por coma.
+      ];
+    }
+
     // Perfil de cada usuario registrado (nombre, rol, entidad)
     match /usuarios/{uid} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow create: if isSignedIn() && request.auth.uid == uid
+                    && request.resource.data.rol in ['mayorista', 'productor', 'admin']
+                    && (request.resource.data.rol != 'admin'
+                        || request.auth.token.email in adminsHabilitados());
       allow update: if isSignedIn() && request.auth.uid == uid
                     && request.resource.data.rol == resource.data.rol; // el rol no se puede cambiar despues de creado
       allow delete: if false;
     }
 
-    // Productos publicados por productores
+    // Productos publicados por productores.
+    // El dueño del lote y la administracion pueden editarlo libremente.
+    // Ademas, un mayorista puede descontar stock al confirmarse un pedido:
+    // solo se le permite bajar el stock, nunca subirlo ni tocar otros campos.
     match /lotes/{lotId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && getRole() == 'productor'
                     && request.resource.data.productorUid == request.auth.uid;
       allow update: if isSignedIn() &&
-                    (resource.data.productorUid == request.auth.uid || getRole() == 'admin');
+                    (resource.data.productorUid == request.auth.uid
+                     || getRole() == 'admin'
+                     || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+                         && request.resource.data.stock >= 0
+                         && request.resource.data.stock < resource.data.stock));
       allow delete: if false;
     }
 
     // Pedidos mayoristas
+    // El mayorista solo puede cancelar un pedido suyo u ocultarlo de su lista:
+    // no puede tocar el estado, asi no puede marcarlo como entregado para
+    // calificar sin haber comprado.
     match /pedidos/{orderId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && getRole() == 'mayorista'
@@ -36,14 +61,65 @@ service cloud.firestore {
       allow update: if isSignedIn() &&
                     (getRole() == 'admin' ||
                      (getRole() == 'productor' && resource.data.productorUid == request.auth.uid) ||
-                     (getRole() == 'mayorista' && resource.data.mayoristaUid == request.auth.uid));
+                     (getRole() == 'mayorista' && resource.data.mayoristaUid == request.auth.uid
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cancelado', 'ocultoMayorista'])));
       allow delete: if false;
     }
 
-    // Proyectos de software a medida (solo administracion)
+    // Mensajes de cada pedido entre el comprador y el productor.
+    // Solo los ven y los escriben las dos partes del pedido (la administracion
+    // puede leerlos). Los mensajes no se editan ni se borran.
+    match /pedidos/{orderId}/mensajes/{msgId} {
+      function esParte() {
+        let p = get(/databases/$(database)/documents/pedidos/$(orderId)).data;
+        return p.mayoristaUid == request.auth.uid || p.productorUid == request.auth.uid;
+      }
+      allow read: if isSignedIn() && (esParte() || getRole() == 'admin');
+      allow create: if isSignedIn() && esParte()
+                    && request.resource.data.autorUid == request.auth.uid
+                    && request.resource.data.texto is string
+                    && request.resource.data.texto.size() > 0
+                    && request.resource.data.texto.size() <= 500;
+      allow update, delete: if false;
+    }
+
+    // Calificaciones de 1 a 5 estrellas (ranking de proveedores).
+    // Una por pedido: el id del documento es el id del pedido. Solo la puede
+    // escribir el mayorista que hizo el pedido, y solo si ya fue entregado.
+    function pedidoCalificable(pedidoId) {
+      let p = get(/databases/$(database)/documents/pedidos/$(pedidoId)).data;
+      return p.mayoristaUid == request.auth.uid
+          && p.statusIdx == 4
+          && p.productorUid == request.resource.data.productorUid;
+    }
+    function calificacionValida(pedidoId) {
+      let d = request.resource.data;
+      return d.pedidoId == pedidoId
+          && d.mayoristaUid == request.auth.uid
+          && d.estrellas is int && d.estrellas >= 1 && d.estrellas <= 5
+          && d.comentario is string && d.comentario.size() <= 300;
+    }
+    match /calificaciones/{pedidoId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && getRole() == 'mayorista'
+                    && calificacionValida(pedidoId) && pedidoCalificable(pedidoId);
+      allow update: if isSignedIn() && getRole() == 'mayorista'
+                    && resource.data.mayoristaUid == request.auth.uid
+                    && calificacionValida(pedidoId) && pedidoCalificable(pedidoId);
+      allow delete: if false;
+    }
+
+    // Proyectos de software a medida.
+    // La administracion gestiona todos; un productor puede crear su propia
+    // solicitud y seguir su avance, pero no modificar la etapa ni ver las ajenas.
     match /proyectos/{projId} {
-      allow read: if isSignedIn() && getRole() == 'admin';
-      allow create: if isSignedIn() && getRole() == 'admin';
+      allow read: if isSignedIn() &&
+                  (getRole() == 'admin' || resource.data.solicitanteUid == request.auth.uid);
+      allow create: if isSignedIn() &&
+                    (getRole() == 'admin' ||
+                     (getRole() == 'productor'
+                      && request.resource.data.solicitanteUid == request.auth.uid
+                      && request.resource.data.stageIdx == 0));
       allow update: if isSignedIn() && getRole() == 'admin';
       allow delete: if false;
     }

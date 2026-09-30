@@ -25,11 +25,31 @@ eligiendo uno de los tres roles.
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Mayorista** | Explorar el catálogo, armar un pedido por volumen, seguir su estado, cancelarlo, descargar comprobantes en PDF y ver sus facturas. |
-| **Productor** | Publicar y eliminar lotes (en kg o litros), confirmar los pedidos que recibe y hacer avanzar la trazabilidad de cada lote. |
-| **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos y tablero Kanban de proyectos de software a medida. |
+| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor**, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
+| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
+| **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos, padrón de usuarios, **ranking de proveedores**, evolución de precios y tablero Kanban de proyectos de software a medida. Las tablas se exportan a CSV. |
 
-El rol de administración requiere un código de alta que no se publica en este README.
+### Funciones destacadas
+
+- **Ranking de proveedores.** El mayorista califica al productor (1 a 5 estrellas y comentario)
+  cuando el pedido llega a *Entregado*. El orden usa un promedio bayesiano: un productor con una
+  sola calificación de 5 no supera a otro con muchas calificaciones altas.
+- **Fotos de producto.** Al publicar, se genera automáticamente una foto con IA a partir del
+  nombre (Pollinations, sin texto en la imagen). El productor puede pedir otra o subir una foto
+  real, que se achica en el navegador (~100 KB) y se guarda en el propio lote.
+- **Evolución de precios.** Gráfico por producto que combina los cambios de precio publicados
+  y el precio de cada pedido realizado, con mínimo, máximo y variación.
+- **Mensajes por pedido** entre comprador y productor, en tiempo real.
+- **Mapa de recorrido** de cada lote (Leaflet + OpenStreetMap), con el avance según la
+  trazabilidad.
+- **Modo claro / oscuro** en el sitio y en el sistema, con la misma paleta de la marca.
+- **App instalable (PWA)** en computadora y Android, con manifiesto y *service worker*.
+
+El rol de administración está restringido: además del código que pide el formulario, las
+reglas de Firestore validan que el correo esté en una lista de habilitados
+(ver `adminsHabilitados()` en `backend/firestore.rules`). Aunque alguien lea el código
+fuente de la página, si su correo no está en esa lista el alta se rechaza **del lado del
+servidor**.
 
 ---
 
@@ -48,6 +68,9 @@ cliente vía SDK.
 | Seguridad | Reglas de Firestore por rol (ver `backend/firestore.rules`) |
 | PDFs | jsPDF (comprobantes de pedido y de entrega, generados en el navegador) |
 | Códigos QR | qrcodejs (QR real y escaneable en el módulo de trazabilidad) |
+| Mapas | Leaflet + mosaicos de OpenStreetMap |
+| Imágenes con IA | Pollinations (generación por URL, sin clave) |
+| App instalable | Web App Manifest + Service Worker (`sistema/sw.js`) |
 | Hosting | Netlify (deploy por arrastre de carpeta) |
 
 ### Decisiones de diseño que vale la pena mirar
@@ -64,6 +87,13 @@ cliente vía SDK.
   para que los pedidos históricos que la referencian sigan mostrándose completos.
 - **Unidades.** Los lotes se publican en kilogramos o litros y la unidad viaja con el pedido,
   de forma que los subproductos (jugo concentrado, aceite esencial) se miden correctamente.
+- **Reglas que protegen el ranking.** Solo el mayorista que hizo el pedido puede calificarlo, y
+  solo si ya fue entregado. El mayorista únicamente puede cancelar u ocultar sus pedidos (no
+  cambiar su estado), así nadie puede marcarse un pedido como entregado para calificar sin comprar.
+- **Mensajes privados.** Cada chat es una subcolección del pedido; las reglas solo dejan leer y
+  escribir a las dos partes (y leer a la administración). Los mensajes no se editan ni se borran.
+- **Probado en emulador.** Las reglas se verificaron con el emulador de Firestore y
+  `@firebase/rules-unit-testing` (32 casos entre permitidos y rechazados).
 
 ---
 
@@ -73,13 +103,22 @@ cliente vía SDK.
 .
 ├── index.html                 Sitio institucional (landing de la empresa)
 ├── sistema/
-│   └── index.html             Sistema funcional con login y roles
+│   ├── index.html             Sistema funcional con login y roles
+│   ├── manifest.webmanifest   Manifiesto de la app instalable
+│   ├── sw.js                  Service worker (instalación y apertura sin conexión)
+│   └── icon-*.png             Íconos de la app
 ├── backend/
 │   └── firestore.rules        Reglas de seguridad de la base de datos
 └── docs/
-    ├── CitrusCode_TFI_Primer_Entregable.pdf
+    ├── CitrusCode_TFI_Primer_Entregable.pdf / .docx
+    ├── CitrusCode_TFI_Entregable_Completo.pdf / .docx
+    ├── red-topologia-empresa.png
+    ├── red-arquitectura-sistema.png
     └── logo-citruscode.png
 ```
+
+Si se modifican las reglas, hay que publicarlas en la consola de Firebase
+(Firestore → Reglas → Publicar): el archivo del repositorio no se aplica solo.
 
 ---
 
@@ -119,15 +158,22 @@ propuesta.
 
 Las dejamos documentadas a propósito, porque forman parte del análisis del trabajo:
 
-- El código de alta de administración se valida en el cliente. En un sistema productivo esa
-  verificación tendría que ocurrir del lado del servidor (por ejemplo, con Cloud Functions y
-  *custom claims* de Firebase).
+- El código de administración es visible en el código fuente del cliente. Lo asumimos y lo
+  compensamos con una lista de correos habilitados validada en las reglas de Firestore, que
+  es el control que realmente importa. La solución completa sería mover la verificación a
+  Cloud Functions con *custom claims* de Firebase.
 - La facturación electrónica está **simulada**: se genera un CAE ficticio en lugar de
   consumir la API real de AFIP.
 - La trazabilidad avanza por acción manual del productor; en producción se dispararía al
   escanear el QR desde el celular en el empaque.
-- El modo Offline-First descrito en el TFI está planteado en el diseño pero no implementado
-  en este prototipo.
+- El modo Offline-First descrito en el TFI está implementado solo en parte: la app se instala y
+  abre sin conexión, pero los datos (pedidos, stock) necesitan internet.
+- El generador gratuito de imágenes limita cuántas fotos nuevas crea por persona. Mientras una
+  foto no está lista se muestra una ilustración, y el sistema la reintenta en segundo plano;
+  una vez generada, queda en caché para todos.
+- Las fotos subidas por los productores se guardan dentro del documento del lote. Con muchos
+  productos convendría moverlas a Firebase Storage.
+- El mapa ubica origen y destino por provincia (capital provincial), no por dirección exacta.
 
 ---
 
