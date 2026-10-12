@@ -133,6 +133,7 @@ cliente vía SDK.
 └── docs/
     ├── CitrusCode_TFI_Primer_Entregable.pdf / .docx
     ├── CitrusCode_TFI_Entregable_Completo.pdf / .docx
+    ├── CitrusCode_Manual_de_Usuario.pdf / .docx
     ├── red-topologia-empresa.png
     ├── red-arquitectura-sistema.png
     └── logo-citruscode.png
@@ -175,7 +176,8 @@ empresa, el análisis de mercado y FODA, misión y visión, objetivos estratégi
 organigrama, la problemática relevada del sector citrícola del NOA y la solución informática
 propuesta. La versión ampliada suma la segunda etapa del sistema (chats, cotizaciones,
 calendario de cosecha, alertas, bitácora), la administración y operación (publicación,
-respaldos, contingencia, costos), las pruebas y los manuales de usuario por rol.
+respaldos, contingencia, costos), las pruebas y los manuales de usuario por rol. El manual de
+usuario también está como documento aparte (`CitrusCode_Manual_de_Usuario`).
 
 ---
 
