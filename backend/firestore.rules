@@ -125,6 +125,76 @@ service cloud.firestore {
       }
     }
 
+    // Cotizaciones y reservas de cosecha entre un mayorista y un productor.
+    // El mayorista la pide; el productor responde con un precio o la rechaza;
+    // el mayorista la acepta (y genera el pedido) o la rechaza. Cada parte solo
+    // puede hacer los cambios de estado que le corresponden.
+    match /cotizaciones/{cotId} {
+      function esParteCot() {
+        return request.auth.uid in resource.data.participantes;
+      }
+      function soloCambia(campos) {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
+      }
+      allow read: if isSignedIn() && (esParteCot() || getRole() == 'admin');
+      allow create: if isSignedIn() && getRole() == 'mayorista'
+                    && request.resource.data.mayoristaUid == request.auth.uid
+                    && request.resource.data.participantes == [request.auth.uid, request.resource.data.productorUid]
+                    && request.resource.data.convId == request.auth.uid + '_' + request.resource.data.productorUid
+                    && get(/databases/$(database)/documents/usuarios/$(request.resource.data.productorUid)).data.rol == 'productor'
+                    && request.resource.data.estado == 'pendiente'
+                    && request.resource.data.qty is number && request.resource.data.qty > 0
+                    && request.resource.data.producto is string && request.resource.data.producto.size() <= 80
+                    && request.resource.data.origen in ['chat', 'cosecha']
+                    && !('precioOfertado' in request.resource.data);
+      allow update: if isSignedIn() && (
+        // Productor: responde con un precio o rechaza una cotización pendiente.
+        (request.auth.uid == resource.data.productorUid && resource.data.estado == 'pendiente'
+          && ((request.resource.data.estado == 'cotizada' && request.resource.data.precioOfertado is number
+               && request.resource.data.precioOfertado > 0 && soloCambia(['estado', 'precioOfertado', 'actualizado']))
+              || (request.resource.data.estado == 'rechazada' && soloCambia(['estado', 'actualizado']))))
+        ||
+        // Mayorista: cancela la que pidió, o acepta / rechaza el precio recibido.
+        (request.auth.uid == resource.data.mayoristaUid
+          && ((resource.data.estado == 'pendiente' && request.resource.data.estado == 'cancelada' && soloCambia(['estado', 'actualizado']))
+              || (resource.data.estado == 'cotizada' && request.resource.data.estado in ['aceptada', 'rechazada']
+                  && soloCambia(['estado', 'actualizado', 'pedidoId', 'numeroPedido']))))
+      );
+      allow delete: if false;
+    }
+
+    // Calendario de cosecha: cada productor anuncia sus cosechas futuras.
+    match /cosechas/{cosechaId} {
+      function cosechaValida() {
+        let d = request.resource.data;
+        return d.productorUid == request.auth.uid
+            && d.producto is string && d.producto.size() >= 3 && d.producto.size() <= 60
+            && d.desde is int && d.desde >= 0 && d.desde <= 11
+            && d.hasta is int && d.hasta >= 0 && d.hasta <= 11
+            && d.volumen is number && d.volumen > 0
+            && d.unit in ['kg', 'L']
+            && d.notas is string && d.notas.size() <= 200;
+      }
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && getRole() == 'productor' && cosechaValida();
+      allow update: if isSignedIn() && resource.data.productorUid == request.auth.uid && cosechaValida();
+      allow delete: if isSignedIn() && (resource.data.productorUid == request.auth.uid || getRole() == 'admin');
+    }
+
+    // Bitacora de actividad (auditoria). Cualquier usuario registra sus propias
+    // acciones, con su rol real y la hora del servidor; solo la administracion
+    // la lee y nadie puede editar ni borrar un registro.
+    match /bitacora/{logId} {
+      allow read: if isSignedIn() && getRole() == 'admin';
+      allow create: if isSignedIn()
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.rol == getRole()
+                    && request.resource.data.accion is string && request.resource.data.accion.size() <= 60
+                    && request.resource.data.detalle is string && request.resource.data.detalle.size() <= 300
+                    && request.resource.data.fecha == request.time;
+      allow update, delete: if false;
+    }
+
     // Calificaciones de 1 a 5 estrellas (ranking de proveedores).
     // Una por pedido: el id del documento es el id del pedido. Solo la puede
     // escribir el mayorista que hizo el pedido, y solo si ya fue entregado.

@@ -33,6 +33,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   /* ============================================================
@@ -885,6 +886,57 @@
   }
 
   /* ============================================================
+     COTIZACIONES, CALENDARIO DE COSECHA, ALERTAS Y BITÁCORA
+     ============================================================ */
+  .chats-seguir{margin-left:auto;}
+  .cot-zona{border-bottom:1px solid var(--borde); padding:10px 14px; background:var(--surface); max-height:260px; overflow-y:auto;}
+  .cot-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .cot-cuenta{font-size:.72rem; color:var(--texto-suave);}
+  .cot-form{display:grid; grid-template-columns:2fr 1fr; gap:10px; align-items:end; margin-top:10px; padding:12px; border:1px dashed var(--borde-fuerte); border-radius:14px; background:var(--surface-2);}
+  .cot-form .form-row{margin:0;}
+  .cot-form > .btn, .cot-form .order-actions{grid-column:1/-1; justify-self:start;}
+  .cot-vacio{grid-column:1/-1; font-size:.8rem; color:var(--texto-suave); margin:0;}
+  .cot-lista{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+  .cot-card{border:1px solid var(--borde); border-left:4px solid var(--c-limon); border-radius:0 12px 12px 0; padding:9px 12px; background:var(--surface-2); font-size:.8rem;}
+  .cot-card.est-cotizada{border-left-color:var(--c-naranja);}
+  .cot-card.est-aceptada{border-left-color:var(--c-verde-claro);}
+  .cot-card.est-rechazada, .cot-card.est-cancelada{border-left-color:var(--borde-fuerte); opacity:.7;}
+  .cot-top{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
+  .cot-tit{font-weight:700;}
+  .cot-estado{flex:none; font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--texto-suave);}
+  .cot-nota{color:var(--texto-suave); font-style:italic; margin-top:3px;}
+  .cot-precio{margin-top:5px;}
+  .cot-acc{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:7px; color:var(--texto-suave);}
+  .cot-acc input{width:150px; padding:7px 10px; border:1px solid var(--borde); border-radius:10px; background:var(--input-bg); color:var(--texto); font-family:inherit;}
+  .btn-fav{flex:none; border:1px solid var(--borde); background:var(--surface); color:var(--texto-suave); border-radius:20px; font-size:.8rem; line-height:1; padding:3px 8px; transition:.2s;}
+  .btn-fav:hover, .btn-fav.on{border-color:#E06A6A; color:#E06A6A;}
+  .tabla-scroll{overflow-x:auto;}
+  .cal-tabla th, .cal-tabla td{text-align:center; padding:8px 4px;}
+  .cal-tabla .cal-prod{text-align:left; min-width:190px; padding-left:12px;}
+  .cal-tabla .cal-prod small{display:block; font-size:.7rem; color:var(--texto-suave); margin-top:2px;}
+  .cal-tabla .cal-nota{font-style:italic;}
+  .cal-tabla th.hoy, .cal-tabla td.hoy{background:var(--limon-bg);}
+  .cal-tabla td.on span{display:block; height:14px; border-radius:7px; background:linear-gradient(90deg,var(--c-limon),var(--c-verde-claro));}
+  .cal-tabla .cal-acc{white-space:nowrap; padding-right:10px;}
+  .cal-reserva td{background:var(--surface-2); text-align:left !important; padding:10px 12px !important;}
+  .cal-ley{font-size:.74rem; color:var(--texto-suave); margin-top:10px;}
+  .cal-dot{display:inline-block; width:22px; height:10px; border-radius:5px; background:linear-gradient(90deg,var(--c-limon),var(--c-verde-claro)); vertical-align:-1px; margin-right:4px;}
+  .al-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px;}
+  .al-item{display:flex; gap:12px; align-items:center; padding:10px 0; border-top:1px solid var(--borde); font-size:.84rem;}
+  .al-ic{font-size:1.2rem;}
+  .al-txt{flex:1; min-width:0;}
+  .al-txt small{display:block; font-size:.7rem; color:var(--texto-suave); margin-top:2px;}
+  .al-prods{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px;}
+  .al-prod{display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--borde); border-radius:14px; background:var(--surface-2);}
+  .al-prod b{display:block; font-size:.86rem;}
+  .al-prod small{display:block; font-size:.72rem; color:var(--texto-suave);}
+  .bit-accion{display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:10px; background:var(--acento-bg); color:var(--acento); border:1px solid var(--acento-borde); white-space:nowrap;}
+  @media(max-width:640px){
+    .cot-form{grid-template-columns:1fr;}
+    .chats-seguir{padding:6px 10px;}
+  }
+
+  /* ============================================================
      AVISO DE STOCK BAJO
      ============================================================ */
   .alerta-stock{display:flex; gap:14px; align-items:flex-start; background:linear-gradient(90deg, var(--limon-bg), transparent 130%); border:1px solid var(--limon-borde); border-left:4px solid var(--c-naranja); border-radius:0 16px 16px 0; padding:14px 18px; margin-bottom:20px; animation:slideDown .5s var(--easing);}
@@ -1097,7 +1149,7 @@ function direccionDe(u){
 }
 
 let currentUser = null;   // {uid, nombre, email, rol, entidad}
-let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [] };
+let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [] };
 let califDisponible = true;  // false si Firestore todavía no tiene las reglas de calificaciones
 let editandoLote = null;   // id del lote que se está editando, o null
 let catFilter = 'todos';
@@ -1115,8 +1167,9 @@ const marcandoVista = {};    // conversaciones con una marca de "leído" en curs
 let mapaAbierto = null, mapaAnimado = null;  // mapa de recorrido visible en Trazabilidad
 const avisadosStock = {};   // lotes con stock bajo ya avisados en esta sesión
 let authMode = 'login';
+let loginManual = false;   // para registrar en la bitácora solo los ingresos desde el formulario
 let unsubLotes = null, unsubPedidos = null, unsubProyectos = null, unsubUsuarios = null, unsubCalif = null;
-let unsubConvs = null, unsubContactos = null;
+let unsubConvs = null, unsubContactos = null, unsubCotiz = null, unsubCosechas = null, unsubBitacora = null;
 
 /* ============================================================
    HELPERS
@@ -1158,6 +1211,9 @@ const ICONOS = {
   ranking:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
   precios:'<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-7"/>',
   instalar:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M9 18h6"/>',
+  cosecha:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3v3H8z"/>',
+  alertas:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  bitacora:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>',
   chats:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>',
   foco:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>'
 };
@@ -1451,7 +1507,7 @@ function marcarVista(c){
 }
 function cerrarConversacion(){
   if(unsubConvMsgs) unsubConvMsgs();
-  unsubConvMsgs = null; convAbierta = null; convOtro = null; convMsgs = []; convError = false;
+  unsubConvMsgs = null; convAbierta = null; convOtro = null; convMsgs = []; convError = false; cotizFormAbierto = false;
 }
 function abrirConversacion(otroUid){
   const id = convIdCon(otroUid);
@@ -1476,37 +1532,9 @@ function enviarMensajeDirecto(input){
   const texto = input.value.trim().slice(0, 500);
   if(!texto || !convAbierta) return;
   input.value = '';
-  const id = convAbierta, otroUid = convOtro;
-  const ref = db.collection('conversaciones').doc(id);
-  const ahora = FieldValue.serverTimestamp();
-  const resumen = { ultimoMensaje: texto.slice(0, 120), ultimoAutorUid: currentUser.uid, actualizado: ahora };
-  resumen[campoVisto()] = ahora;
   // El mensaje y el resumen de la conversación se escriben juntos: la primera vez
   // se crea la conversación con las dos partes, y las siguientes solo se actualiza.
-  const batch = db.batch();
-  if(S.convs.some(function(c){ return c.id === id; })){
-    batch.update(ref, resumen);
-  } else {
-    const yo = currentUser.entidad || currentUser.nombre;
-    const otro = nombreContacto(contactoPorUid(otroUid)) || 'Contacto';
-    const esMay = currentUser.rol === 'mayorista';
-    batch.set(ref, Object.assign({
-      mayoristaUid: esMay ? currentUser.uid : otroUid,
-      productorUid: esMay ? otroUid : currentUser.uid,
-      mayoristaNombre: esMay ? yo : otro,
-      productorNombre: esMay ? otro : yo,
-      participantes: esMay ? [currentUser.uid, otroUid] : [otroUid, currentUser.uid],
-      creado: ahora
-    }, resumen));
-  }
-  batch.set(ref.collection('mensajes').doc(), {
-    autorUid: currentUser.uid,
-    autorNombre: currentUser.entidad || currentUser.nombre,
-    rol: currentUser.rol,
-    texto: texto,
-    fecha: ahora
-  });
-  batch.commit().catch(function(err){
+  enviarTextoA(convOtro, texto).catch(function(err){
     input.value = texto;
     showToast(err.code === 'permission-denied'
       ? 'Firestore rechazó el mensaje: falta publicar las reglas nuevas.'
@@ -1543,14 +1571,6 @@ function cargarLeaflet(){
   ]).catch(function(err){ leafletPromesa = null; throw err; });
   return leafletPromesa;
 }
-const provinciaCache = {};
-function provinciaDeUsuario(uid){
-  if(!uid) return Promise.resolve(null);
-  if(provinciaCache[uid] !== undefined) return Promise.resolve(provinciaCache[uid]);
-  return db.collection('usuarios').doc(uid).get().then(function(d){
-    return (provinciaCache[uid] = d.exists ? (d.data().provincia || null) : null);
-  }).catch(function(){ return (provinciaCache[uid] = null); });
-}
 function provinciaDeDireccion(dir){
   if(!dir) return null;
   const partes = String(dir).split(',');
@@ -1581,19 +1601,22 @@ function tilesMapa(){
   });
 }
 function dibujarMapa(o){
-  const destinoProv = provinciaDeDireccion(o.entrega && o.entrega.direccion);
+  // Origen: la finca (dirección del productor). Destino: la dirección de entrega
+  // del pedido. Se usan coordenadas exactas cuando se conocen; si no, la capital provincial.
+  const e = o.entrega || {};
+  const coordsEntrega = (typeof e.lat === 'number' && typeof e.lng === 'number') ? [e.lat, e.lng] : null;
   Promise.all([
     cargarLeaflet(),
-    provinciaDeUsuario(o.productorUid),
-    destinoProv ? Promise.resolve(destinoProv) : provinciaDeUsuario(o.mayoristaUid)
+    usuarioPorUid(o.productorUid).then(function(u){ return ubicacionDe(u, null, null, 'Tucumán'); }),
+    (coordsEntrega || e.direccion ? Promise.resolve(null) : usuarioPorUid(o.mayoristaUid))
+      .then(function(u){ return ubicacionDe(u, e.direccion, coordsEntrega, 'Buenos Aires'); })
   ]).then(function(r){
     const el = document.getElementById('mapa-' + o.id);
     if(!el || el._mapa) return;
-    const provO = COORDS_PROV[r[1]] ? r[1] : 'Tucumán';
-    const provD = COORDS_PROV[r[2]] ? r[2] : 'Buenos Aires';
-    const orig = COORDS_PROV[provO];
-    let dest = COORDS_PROV[provD];
-    if(provO === provD) dest = [orig[0] - 0.3, orig[1] + 0.4];   // misma provincia: se separan un poco
+    const orig = r[1].p;
+    let dest = r[2].p;
+    const provO = r[1].etiqueta, provD = r[2].etiqueta;
+    if(Math.abs(orig[0] - dest[0]) + Math.abs(orig[1] - dest[1]) < 0.02) dest = [orig[0] - 0.3, orig[1] + 0.4];   // mismo punto: se separan un poco
     el.innerHTML = '';
     const mapa = L.map(el, { scrollWheelZoom: false });
     el._mapa = mapa;
@@ -1602,9 +1625,9 @@ function dibujarMapa(o){
     L.polyline(ruta, { color: '#F2C230', weight: 4, opacity: .85, dashArray: '8 10' }).addTo(mapa);
     const hecho = L.polyline([], { color: '#67B75A', weight: 5, opacity: .95 }).addTo(mapa);
     L.marker(orig, { icon: L.divIcon({ className: 'map-pin', html: '🌿', iconSize: [36, 36] }) })
-      .addTo(mapa).bindTooltip('Origen: finca · ' + provO, { direction: 'top', offset: [0, -16] });
+      .addTo(mapa).bindTooltip('Origen: finca · ' + esc(provO), { direction: 'top', offset: [0, -16] });
     L.marker(dest, { icon: L.divIcon({ className: 'map-pin destino', html: '🏬', iconSize: [36, 36] }) })
-      .addTo(mapa).bindTooltip('Destino: depósito · ' + provD, { direction: 'top', offset: [0, -16] });
+      .addTo(mapa).bindTooltip('Destino: depósito · ' + esc(provD), { direction: 'top', offset: [0, -16] });
     const camion = L.marker(ruta[0], { icon: L.divIcon({ className: 'map-truck', html: '<span>🚚</span>', iconSize: [40, 40] }), zIndexOffset: 1000 }).addTo(mapa);
     mapa.fitBounds(L.latLngBounds(ruta).pad(0.3));
     function ubicar(f){
@@ -1958,7 +1981,9 @@ function renderAuthScreen(){
     btn.disabled = true;
 
     if(isLogin){
+      loginManual = true;
       auth.signInWithEmailAndPassword(email, pass).catch(function(err){
+        loginManual = false;
         errBox.textContent = mapAuthError(err.code);
         errBox.classList.add('show');
         btn.disabled = false;
@@ -1992,6 +2017,9 @@ function renderAuthScreen(){
           dni: datos.dni.replace(/[.\s-]/g,''), telefono: datos.telefono,
           calle: datos.calle, numero: datos.numero, ciudad: datos.ciudad, provincia: datos.provincia,
           createdAt: FieldValue.serverTimestamp()
+        }).then(function(){
+          registrar('Registro', 'Alta de cuenta como ' + rol, { uid: cred.user.uid, nombre: datos.nombre, entidad: datos.entidad, rol: rol });
+          guardarUbicacion(cred.user.uid, datos);
         }).catch(function(err){
           // Las reglas de Firestore rechazaron el perfil (por ejemplo, alta de admin
           // con un correo que no está habilitado). Deshacemos la cuenta recién creada
@@ -2016,6 +2044,7 @@ function subscribeData(){
   unsubLotes = db.collection('lotes').orderBy('createdAt','desc').onSnapshot(function(snap){
     S.lots = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
     revisarStockBajo();
+    avisarNovedades();
     renderSubnav(); renderMain();
   }, function(err){ showToast('Error leyendo productos: ' + err.message); });
 
@@ -2058,6 +2087,42 @@ function subscribeData(){
   }
 
   if(currentUser.rol === 'mayorista' || currentUser.rol === 'productor') suscribirChats();
+  suscribirExtras();
+}
+
+/* Cotizaciones, calendario de cosecha y (solo administración) bitácora. */
+function suscribirExtras(){
+  const enVista = function(v){ return view[currentUser.rol] === v || (v === 'chats' && view[currentUser.rol] === 'chats'); };
+  const cot = currentUser.rol === 'admin'
+    ? db.collection('cotizaciones')
+    : db.collection('cotizaciones').where('participantes','array-contains',currentUser.uid);
+  unsubCotiz = cot.onSnapshot(function(snap){
+    S.cotizaciones = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); });
+    renderSubnav();
+    if(enVista('chats')) renderMain();
+  }, function(err){ console.warn('[CitrusCode] Cotizaciones no disponibles:', err.message); });
+
+  unsubCosechas = db.collection('cosechas').onSnapshot(function(snap){
+    S.cosechas = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    cosechasDisponible = true;
+    if(enVista('cosecha')) renderMain();
+  }, function(err){
+    console.warn('[CitrusCode] Calendario de cosecha no disponible:', err.message);
+    cosechasDisponible = false;
+    if(enVista('cosecha')) renderMain();
+  });
+
+  if(currentUser.rol === 'admin'){
+    unsubBitacora = db.collection('bitacora').orderBy('fecha','desc').limit(500).onSnapshot(function(snap){
+      S.bitacora = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); });
+      bitacoraDisponible = true;
+      if(enVista('bitacora')) renderMain();
+    }, function(err){
+      console.warn('[CitrusCode] Bitácora no disponible:', err.message);
+      bitacoraDisponible = false;
+      if(enVista('bitacora')) renderMain();
+    });
+  }
 }
 
 /* Chats directos: las conversaciones propias y la lista de contactos del otro rol
@@ -2113,7 +2178,13 @@ function unsubscribeData(){
   unsubConvs = unsubContactos = null;
   convsCargadas = false; chatsDisponible = true;
   Object.keys(marcandoVista).forEach(function(k){ delete marcandoVista[k]; });
-  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [] };
+  if(unsubCotiz) unsubCotiz();
+  if(unsubCosechas) unsubCosechas();
+  if(unsubBitacora) unsubBitacora();
+  unsubCotiz = unsubCosechas = unsubBitacora = null;
+  cotizFormAbierto = false; reservaAbierta = null; cosechaCat = 'todos'; novedadesAvisadas = false;
+  bitFiltro = { rol: 'todos', accion: 'todas', q: '' };
+  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [] };
 }
 
 /* ============================================================
@@ -2213,7 +2284,9 @@ function renderSubnav(){
     tabs = [
       {k:'catalogo', label:'Catálogo y nuevo pedido'},
       {k:'pedidos', label:'Mis pedidos', badge: S.orders.filter(function(o){return o.mayoristaUid===currentUser.uid && !o.cancelado && !o.ocultoMayorista;}).length || null},
-      {k:'chats', label:'Chats', badge: chatsNoLeidos() || null},
+      {k:'chats', label:'Chats', badge: (chatsNoLeidos() + cotizacionesPorAtender().length) || null},
+      {k:'cosecha', label:'Calendario de cosecha'},
+      {k:'alertas', label:'Seguimiento y alertas', badge: novedades().length || null},
       {k:'trazabilidad', label:'Trazabilidad'},
       {k:'facturas', label:'Facturas'},
       {k:'precios', label:'Evolución de precios'},
@@ -2226,7 +2299,8 @@ function renderSubnav(){
     tabs = [
       {k:'publicaciones', label:'Mis publicaciones', badge: lotesStockBajo().length || null},
       {k:'recibidos', label:'Pedidos recibidos', badge: pendCount || null},
-      {k:'chats', label:'Chats', badge: chatsNoLeidos() || null},
+      {k:'chats', label:'Chats', badge: (chatsNoLeidos() + cotizacionesPorAtender().length) || null},
+      {k:'cosecha', label:'Calendario de cosecha'},
       {k:'trazabilidad', label:'Trazabilidad de lotes'},
       {k:'ganancias', label:'Mis ganancias'},
       {k:'precios', label:'Evolución de precios'},
@@ -2238,6 +2312,7 @@ function renderSubnav(){
       {k:'dashboard', label:'Dashboard'},
       {k:'pedidos', label:'Todos los pedidos'},
       {k:'usuarios', label:'Usuarios', badge: S.users.length || null},
+      {k:'bitacora', label:'Bitácora de actividad'},
       {k:'precios', label:'Evolución de precios'},
       {k:'ranking', label:'Ranking de proveedores'},
       {k:'medida', label:'Software a medida'},
@@ -2268,12 +2343,19 @@ function renderMain(){
     try { foco.s = act.selectionStart; foco.e = act.selectionEnd; } catch(_){}
   }
 
+  // Los formularios marcados con data-keep conservan lo cargado entre redibujos
+  // (llegan mensajes o datos nuevos mientras el usuario completa el formulario).
+  const guardados = {};
+  main.querySelectorAll('[data-keep] input[id], [data-keep] select[id]').forEach(function(el){ guardados[el.id] = el.value; });
+
   // Las animaciones de entrada corren solo al cambiar de sección.
   const clave = currentUser.rol + ':' + view[currentUser.rol];
+  const mismaVista = clave === ultimaVista;
   if(clave !== ultimaVista){
     // Al cambiar de sección se cierran los mensajes, el chat y el mapa abiertos.
     cerrarChat();
     cerrarConversacion();
+    cotizFormAbierto = false; reservaAbierta = null;
     liberarMapa();
     const primera = ultimaVista === null;
     ultimaVista = clave;
@@ -2301,6 +2383,12 @@ function renderMain(){
     main.innerHTML = viewPrecios();
   } else if(view[currentUser.rol] === 'chats' && currentUser.rol !== 'admin'){
     main.innerHTML = viewChats();
+  } else if(view[currentUser.rol] === 'cosecha' && currentUser.rol !== 'admin'){
+    main.innerHTML = viewCosecha();
+  } else if(view[currentUser.rol] === 'alertas' && currentUser.rol === 'mayorista'){
+    main.innerHTML = viewAlertas();
+  } else if(view[currentUser.rol] === 'bitacora' && currentUser.rol === 'admin'){
+    main.innerHTML = viewBitacora();
   } else if(currentUser.rol === 'mayorista'){
     if(view.mayorista === 'catalogo') main.innerHTML = viewMayoristaCatalogo();
     else if(view.mayorista === 'pedidos') main.innerHTML = viewMayoristaPedidos();
@@ -2317,6 +2405,13 @@ function renderMain(){
     else if(view.admin === 'pedidos') main.innerHTML = viewAdminPedidos();
     else if(view.admin === 'usuarios') main.innerHTML = viewAdminUsuarios();
     else main.innerHTML = viewAdminMedida();
+  }
+  if(mismaVista){
+    main.querySelectorAll('[data-keep] input[id], [data-keep] select[id]').forEach(function(el){
+      if(guardados[el.id] === undefined) return;
+      if(el.tagName === 'SELECT' && !Array.prototype.some.call(el.options, function(o){ return o.value === guardados[el.id]; })) return;
+      el.value = guardados[el.id];
+    });
   }
   bindMainEvents();
 
@@ -2445,6 +2540,7 @@ function guardarCalificacion(orderId, valor, caja){
     comentario: cmt ? cmt.value.trim().slice(0, 300) : '',
     fecha: FieldValue.serverTimestamp()
   }).then(function(){
+    if(caja) registrar('Calificación', (lote ? lote.productorNombre : 'Productor') + ' · ' + valor + ' estrella' + (valor > 1 ? 's' : '') + ' · CC-' + o.numero);
     showToast(caja ? (previa ? 'Actualizaste tu calificación: ' : '¡Gracias! Calificaste con ') + valor + ' estrella' + (valor > 1 ? 's' : '') : 'Comentario guardado');
   }).catch(function(err){
     console.error('[CitrusCode] No se pudo guardar la calificación:', err);
@@ -2539,6 +2635,7 @@ function viewMayoristaCatalogo(){
         '<div class="origin">'+icono('ubicacion')+esc(p.productorNombre)+
           (rep[p.productorUid] && rep[p.productorUid].n ? '<span class="origin-rate" title="Calificación promedio del productor">'+estrellas(rep[p.productorUid].prom, 'sm')+' '+fmtProm(rep[p.productorUid].prom)+' <small>('+rep[p.productorUid].n+')</small></span>' : '')+
           '<button class="btn-contactar" data-contactar="'+esc(p.productorUid)+'" title="Escribirle a '+esc(p.productorNombre)+'">💬 Contactar</button>'+
+          '<button class="btn-fav'+(esFavorito(p.id) ? ' on' : '')+'" data-fav="'+p.id+'" title="'+(esFavorito(p.id) ? 'Quitar de favoritos' : 'Agregar a favoritos y avisarme si baja el precio')+'" aria-label="Favorito">'+(esFavorito(p.id) ? '♥' : '♡')+'</button>'+
         '</div>'+
         '<div class="product-price">'+money(p.price)+' <span style="font-size:.7rem;color:var(--texto-suave);font-weight:500;font-family:Inter,sans-serif;">/ '+p.unit+'</span>'+chipTendencia(tendenciaPrecio(p))+'</div>'+
         '<div class="product-stock">Stock: <span class="stock-num" data-stock-id="'+p.id+'" data-real="'+p.stock+'">'+p.stock.toLocaleString('es-AR')+'</span> '+p.unit+' · mín. '+p.min.toLocaleString('es-AR')+'</div>'+
@@ -2729,7 +2826,9 @@ function viewChats(){
         '<button class="btn btn-ghost btn-sm chats-volver" id="chatsVolver" type="button" aria-label="Volver a la lista">←</button>'+
         '<span class="conv-av">'+esc(inicialesDe(nombre))+'</span>'+
         '<div><b>'+esc(nombre)+'</b><small>'+(esMay ? 'Productor' : 'Mayorista')+(sub ? ' · '+esc(sub) : '')+'</small></div>'+
+        (esMay ? '<button class="btn btn-sm '+(sigoA(convOtro) ? 'btn-primary' : 'btn-ghost')+' chats-seguir" data-seguir-chat="'+esc(convOtro)+'">'+(sigoA(convOtro) ? '✓ Siguiendo' : '+ Seguir')+'</button>' : '')+
       '</div>'+
+      cajaCotizaciones(convOtro)+
       cuerpo+
       '<form class="chat-form" id="convForm">'+
         '<input type="text" id="convInput" maxlength="500" autocomplete="off" placeholder="Escribí un mensaje para '+esc(nombre)+'…">'+
@@ -3174,6 +3273,9 @@ function viewPerfil(){
         '<button class="btn btn-ghost btn-sm" id="volverPerfilBtn">Volver</button>'+
       '</div>'+
     '</div>'+
+    '<p style="font-size:.78rem; color:var(--texto-suave); margin-top:14px;">📍 '+(typeof u.lat === 'number'
+      ? 'Tu dirección está ubicada en el mapa: los recorridos de tus pedidos usan el punto exacto.'
+      : 'Tu dirección todavía no está ubicada en el mapa: los recorridos usan la capital de tu provincia. Se ubica sola al guardar el perfil.')+'</p>'+
     '<p style="font-size:.78rem; color:var(--texto-suave); margin-top:14px;">Para cambiar tu contraseña, cerrá sesión y usá el enlace «¿Olvidaste tu contraseña?» de la pantalla de ingreso.</p>'+
   '</div>';
 }
@@ -3450,6 +3552,678 @@ function viewAdminMedida(){
 /* ============================================================
    EVENTOS DE LA APP (delegados en #main)
    ============================================================ */
+/* ============================================================
+   BITÁCORA DE ACTIVIDAD (auditoría para la administración)
+   Cada acción importante deja un registro con quién, qué y cuándo. La fecha
+   la pone el servidor y las reglas impiden editar o borrar registros.
+   ============================================================ */
+function registrar(accion, detalle, quien){
+  const u = quien || currentUser;
+  if(!u || !u.uid) return;
+  db.collection('bitacora').add({
+    uid: u.uid,
+    nombre: u.entidad || u.nombre || '',
+    rol: u.rol,
+    accion: String(accion).slice(0, 60),
+    detalle: String(detalle || '').slice(0, 300),
+    fecha: FieldValue.serverTimestamp()
+  }).catch(function(err){ console.warn('[CitrusCode] Bitácora no disponible:', err.message); });
+}
+let bitFiltro = { rol: 'todos', accion: 'todas', q: '' };
+let bitacoraDisponible = true;
+function fechaHora(ts){
+  const ms = msDe(ts);
+  if(!ms) return '—';
+  return new Date(ms).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function viewBitacora(){
+  const roles = { mayorista:'Mayorista', productor:'Productor', admin:'Administración' };
+  const acciones = Array.from(new Set(S.bitacora.map(function(b){ return b.accion; }))).sort(function(a, b){ return a.localeCompare(b, 'es'); });
+  if(bitFiltro.accion !== 'todas' && acciones.indexOf(bitFiltro.accion) === -1) bitFiltro.accion = 'todas';
+  const q = sinAcentos(bitFiltro.q.trim());
+  const lista = S.bitacora.filter(function(b){
+    if(bitFiltro.rol !== 'todos' && b.rol !== bitFiltro.rol) return false;
+    if(bitFiltro.accion !== 'todas' && b.accion !== bitFiltro.accion) return false;
+    if(q && sinAcentos(b.nombre + ' ' + b.accion + ' ' + b.detalle).indexOf(q) === -1) return false;
+    return true;
+  });
+  const hoy = new Date().toDateString();
+  const deHoy = S.bitacora.filter(function(b){ return msDe(b.fecha) && new Date(msDe(b.fecha)).toDateString() === hoy; });
+  const activosHoy = new Set(deHoy.map(function(b){ return b.uid; })).size;
+  const porAccion = {};
+  S.bitacora.forEach(function(b){ porAccion[b.accion] = (porAccion[b.accion] || 0) + 1; });
+  const top = Object.keys(porAccion).sort(function(a, b){ return porAccion[b] - porAccion[a]; })[0];
+
+  let html = '<div class="panel"><div class="panel-head split"><div><h2>Bitácora de actividad</h2>'+
+    '<p>Registro de auditoría de las acciones del marketplace: quién hizo qué y cuándo. La fecha la asigna el servidor y los registros no se pueden editar ni borrar.</p></div>'+
+    botonExportar('Bitacora')+'</div>';
+  if(!bitacoraDisponible){
+    html += '<div class="envio-box" style="margin-bottom:20px;"><b>Falta un paso de configuración</b>Para usar la bitácora hay que publicar las reglas nuevas de Firestore (archivo <code>backend/firestore.rules</code>) en la consola de Firebase.</div>';
+  }
+  html += '<div class="kpi-grid">'+
+    '<div class="kpi-card"><div class="kpi-label">Eventos registrados</div><div class="kpi-value">'+S.bitacora.length+'</div><div class="kpi-sub">últimos 500 como máximo</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Eventos de hoy</div><div class="kpi-value">'+deHoy.length+'</div><div class="kpi-sub">desde las 00:00</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Usuarios activos hoy</div><div class="kpi-value">'+activosHoy+'</div><div class="kpi-sub">con al menos una acción</div></div>'+
+    '<div class="kpi-card"><div class="kpi-label">Acción más frecuente</div><div class="kpi-value" style="font-size:1.05rem;">'+esc(top || '—')+'</div><div class="kpi-sub">'+(top ? porAccion[top] + ' veces' : 'sin datos')+'</div></div>'+
+  '</div>';
+  html += '<div class="cat-toolbar" style="margin-top:18px;">'+
+    '<div class="form-row search-field"><label for="bitBuscar">Buscar</label>'+icono('buscar')+
+      '<input type="search" id="bitBuscar" placeholder="Usuario, acción o detalle…" value="'+esc(bitFiltro.q)+'" autocomplete="off"></div>'+
+    '<div class="form-row"><label for="bitRol">Rol</label><select id="bitRol">'+
+      [['todos','Todos los roles'],['mayorista','Mayorista'],['productor','Productor'],['admin','Administración']].map(function(o){
+        return '<option value="'+o[0]+'"'+(o[0]===bitFiltro.rol?' selected':'')+'>'+o[1]+'</option>'; }).join('')+
+    '</select></div>'+
+    '<div class="form-row"><label for="bitAccion">Acción</label><select id="bitAccion"><option value="todas">Todas las acciones</option>'+
+      acciones.map(function(a){ return '<option value="'+esc(a)+'"'+(a===bitFiltro.accion?' selected':'')+'>'+esc(a)+'</option>'; }).join('')+
+    '</select></div>'+
+  '</div>';
+  const filas = lista.map(function(b){
+    return '<tr><td style="white-space:nowrap;">'+fechaHora(b.fecha)+'</td><td>'+esc(b.nombre)+'</td><td>'+(roles[b.rol] || esc(b.rol))+'</td>'+
+      '<td><span class="bit-accion">'+esc(b.accion)+'</span></td><td>'+esc(b.detalle)+'</td></tr>';
+  }).join('');
+  html += '<div class="cat-meta"><span>Mostrando <b>'+lista.length+'</b> de '+S.bitacora.length+' eventos</span></div>'+
+    '<div class="tabla-scroll"><table class="simple"><tr><th>Fecha y hora</th><th>Usuario</th><th>Rol</th><th>Acción</th><th>Detalle</th></tr>'+
+    (filas || '<tr><td colspan="5" style="text-align:center; color:var(--texto-suave);">No hay eventos que coincidan.</td></tr>')+
+    '</table></div></div>';
+  return html;
+}
+
+/* ============================================================
+   COTIZACIONES DESDE EL CHAT
+   El mayorista pide precio por un volumen; el productor responde con un
+   precio especial y, si el mayorista acepta, se genera el pedido con ese precio.
+   También se usan para reservar cosecha futura desde el calendario.
+   ============================================================ */
+const COT_ESTADOS = { pendiente:'Esperando precio', cotizada:'Precio recibido', aceptada:'Aceptada', rechazada:'Rechazada', cancelada:'Cancelada' };
+let cotizFormAbierto = false;
+function cotizacionesDeConv(convId){
+  return S.cotizaciones.filter(function(c){ return c.convId === convId; })
+    .sort(function(a, b){ return msDe(b.creado) - msDe(a.creado); });
+}
+/* Cotizaciones que esperan una acción del usuario actual. */
+function cotizacionesPorAtender(){
+  if(!currentUser) return [];
+  return S.cotizaciones.filter(function(c){
+    return currentUser.rol === 'productor' ? (c.productorUid === currentUser.uid && c.estado === 'pendiente')
+      : (c.mayoristaUid === currentUser.uid && c.estado === 'cotizada');
+  });
+}
+function descripcionCot(c){
+  return Number(c.qty).toLocaleString('es-AR') + ' ' + (c.unit || 'kg') + ' de ' + c.producto +
+    (c.origen === 'cosecha' ? ' (reserva para ' + MESES[c.mes] + ')' : '');
+}
+/* Envía un mensaje de texto al chat con otra persona (crea la conversación si hace falta). */
+function enviarTextoA(otroUid, texto){
+  const id = convIdCon(otroUid);
+  const ref = db.collection('conversaciones').doc(id);
+  const ahora = FieldValue.serverTimestamp();
+  const resumen = { ultimoMensaje: texto.slice(0, 120), ultimoAutorUid: currentUser.uid, actualizado: ahora };
+  resumen[campoVisto()] = ahora;
+  const batch = db.batch();
+  const nueva = !S.convs.some(function(c){ return c.id === id; });
+  if(!nueva){
+    batch.update(ref, resumen);
+  } else {
+    const yo = currentUser.entidad || currentUser.nombre;
+    const otro = nombreContacto(contactoPorUid(otroUid)) || 'Contacto';
+    const esMay = currentUser.rol === 'mayorista';
+    batch.set(ref, Object.assign({
+      mayoristaUid: esMay ? currentUser.uid : otroUid,
+      productorUid: esMay ? otroUid : currentUser.uid,
+      mayoristaNombre: esMay ? yo : otro,
+      productorNombre: esMay ? otro : yo,
+      participantes: esMay ? [currentUser.uid, otroUid] : [otroUid, currentUser.uid],
+      creado: ahora
+    }, resumen));
+  }
+  batch.set(ref.collection('mensajes').doc(), {
+    autorUid: currentUser.uid,
+    autorNombre: currentUser.entidad || currentUser.nombre,
+    rol: currentUser.rol,
+    texto: texto.slice(0, 500),
+    fecha: ahora
+  });
+  return batch.commit().then(function(){
+    if(nueva) registrar('Chat iniciado', 'Con ' + (nombreContacto(contactoPorUid(otroUid)) || 'un contacto'));
+  });
+}
+function errorFirestore(err, accion){
+  return err && err.code === 'permission-denied'
+    ? 'Firestore rechazó la operación: falta publicar las reglas nuevas.'
+    : 'No se pudo ' + accion + ': ' + ((err && err.message) || 'error desconocido');
+}
+function crearCotizacion(datos){
+  const prod = contactoPorUid(datos.productorUid);
+  const doc = Object.assign({
+    mayoristaUid: currentUser.uid,
+    mayoristaNombre: currentUser.entidad || currentUser.nombre,
+    productorNombre: nombreContacto(prod) || datos.productorNombre || 'Productor',
+    participantes: [currentUser.uid, datos.productorUid],
+    convId: currentUser.uid + '_' + datos.productorUid,
+    estado: 'pendiente',
+    creado: FieldValue.serverTimestamp(),
+    actualizado: FieldValue.serverTimestamp()
+  }, datos);
+  return db.collection('cotizaciones').add(doc).then(function(){
+    registrar(datos.origen === 'cosecha' ? 'Reserva de cosecha' : 'Cotización pedida', descripcionCot(doc) + ' a ' + doc.productorNombre);
+    return enviarTextoA(datos.productorUid, (datos.origen === 'cosecha' ? '📅 Te pedí una reserva: ' : '📝 Te pedí una cotización: ') +
+      descripcionCot(doc) + (datos.nota ? '. ' + datos.nota : '') + '.');
+  });
+}
+function cajaCotizaciones(otroUid){
+  const esMay = currentUser.rol === 'mayorista';
+  const lista = cotizacionesDeConv(convIdCon(otroUid));
+  let html = '';
+  if(esMay){
+    const lotes = S.lots.filter(function(l){ return l.productorUid === otroUid && !l.archivado; });
+    html += '<div class="cot-bar"><button class="btn btn-ghost btn-sm'+(cotizFormAbierto ? ' abierto' : '')+'" id="cotToggle" type="button">📝 '+(cotizFormAbierto ? 'Cerrar' : 'Pedir cotización')+'</button>'+
+      (lista.length ? '<span class="cot-cuenta">'+lista.length+' cotización'+(lista.length > 1 ? 'es' : '')+' en este chat</span>' : '')+'</div>';
+    if(cotizFormAbierto){
+      html += lotes.length
+        ? '<div class="cot-form" data-keep>'+
+            '<div class="form-row"><label for="cotLote">Producto</label><select id="cotLote">'+
+              lotes.map(function(l){ return '<option value="'+l.id+'">'+esc(l.name)+' — '+money(l.price)+'/'+l.unit+' · stock '+l.stock.toLocaleString('es-AR')+' '+l.unit+'</option>'; }).join('')+
+            '</select></div>'+
+            '<div class="form-row"><label for="cotQty">Cantidad</label><input type="number" id="cotQty" min="1" step="100" value="'+lotes[0].min+'"></div>'+
+            '<div class="form-row" style="grid-column:1/-1;"><label for="cotNota">Nota (opcional)</label><input type="text" id="cotNota" maxlength="200" placeholder="Plazo de entrega, calibre, forma de pago…"></div>'+
+            '<button class="btn btn-primary btn-sm" id="cotEnviar" type="button">Enviar pedido de cotización</button>'+
+          '</div>'
+        : '<div class="cot-form"><p class="cot-vacio">Este productor no tiene publicaciones activas. Podés reservar cosecha futura desde el <b>Calendario de cosecha</b>.</p></div>';
+    }
+  }
+  if(lista.length){
+    html += '<div class="cot-lista">' + lista.map(function(c){
+      const lote = c.lotId ? lotById(c.lotId) : null;
+      let cuerpo = '';
+      if(c.estado === 'pendiente'){
+        cuerpo = esMay
+          ? '<div class="cot-acc"><span>Esperando que el productor responda con un precio.</span><button class="btn btn-ghost btn-sm cancel-btn" data-cot-cancelar="'+c.id+'">Cancelar</button></div>'
+          : '<div class="cot-acc"><input type="number" min="1" step="1" id="cotPrecio-'+c.id+'" placeholder="Precio por '+esc(c.unit || 'kg')+'"'+(lote ? ' value="'+lote.price+'"' : '')+'>'+
+              '<button class="btn btn-primary btn-sm" data-cot-responder="'+c.id+'">Enviar precio</button>'+
+              '<button class="btn btn-ghost btn-sm cancel-btn" data-cot-rechazar="'+c.id+'">Rechazar</button></div>';
+      } else if(c.estado === 'cotizada'){
+        const lista = lote ? lote.price : null;
+        const desc = lista && lista > c.precioOfertado ? ' · '+Math.round((1 - c.precioOfertado / lista) * 100)+' % menos que el precio de lista' : '';
+        cuerpo = '<div class="cot-precio"><b>'+money(c.precioOfertado)+' / '+esc(c.unit || 'kg')+'</b> · total '+money(c.precioOfertado * c.qty)+desc+'</div>'+
+          (esMay
+            ? '<div class="cot-acc"><button class="btn btn-primary btn-sm" data-cot-aceptar="'+c.id+'">'+(c.origen === 'cosecha' ? 'Confirmar reserva' : 'Aceptar y generar pedido')+'</button>'+
+                '<button class="btn btn-ghost btn-sm cancel-btn" data-cot-rechazar="'+c.id+'">Rechazar</button></div>'
+            : '<div class="cot-acc"><span>Esperando que el mayorista acepte.</span></div>');
+      } else if(c.estado === 'aceptada'){
+        cuerpo = '<div class="cot-precio"><b>'+money(c.precioOfertado)+' / '+esc(c.unit || 'kg')+'</b> · '+
+          (c.numeroPedido ? 'se generó el pedido <b>CC-'+c.numeroPedido+'</b>' : 'reserva confirmada para '+MESES[c.mes])+'</div>';
+      }
+      return '<div class="cot-card est-'+c.estado+'">'+
+        '<div class="cot-top"><span class="cot-tit">'+(c.origen === 'cosecha' ? '📅 Reserva' : '📝 Cotización')+' · '+esc(descripcionCot(c))+'</span>'+
+        '<span class="cot-estado">'+COT_ESTADOS[c.estado]+'</span></div>'+
+        (c.nota ? '<div class="cot-nota">“'+esc(c.nota)+'”</div>' : '')+cuerpo+'</div>';
+    }).join('') + '</div>';
+  }
+  return html ? '<div class="cot-zona">'+html+'</div>' : '';
+}
+function bindCotizaciones(main){
+  const toggle = document.getElementById('cotToggle');
+  if(toggle) toggle.addEventListener('click', function(){ cotizFormAbierto = !cotizFormAbierto; renderMain(); });
+  const selLote = document.getElementById('cotLote');
+  if(selLote) selLote.addEventListener('change', function(){
+    const l = lotById(selLote.value); const q = document.getElementById('cotQty');
+    if(l && q) q.value = l.min;
+  });
+  const enviar = document.getElementById('cotEnviar');
+  if(enviar) enviar.addEventListener('click', function(){
+    const l = lotById(document.getElementById('cotLote').value);
+    const qty = parseFloat(document.getElementById('cotQty').value);
+    const nota = document.getElementById('cotNota').value.trim().slice(0, 200);
+    if(!l){ showToast('Elegí un producto'); return; }
+    if(!(qty > 0)){ showToast('Indicá la cantidad que querés cotizar'); return; }
+    if(qty < l.min){ showToast('El pedido mínimo de ' + l.name + ' es ' + l.min.toLocaleString('es-AR') + ' ' + l.unit); return; }
+    if(qty > l.stock){ showToast('El stock publicado de ' + l.name + ' es ' + l.stock.toLocaleString('es-AR') + ' ' + l.unit + '. Cotizá hasta esa cantidad o reservá cosecha futura desde el calendario.'); return; }
+    enviar.disabled = true;
+    crearCotizacion({ productorUid: l.productorUid, productorNombre: l.productorNombre, lotId: l.id, producto: l.name, unit: l.unit || 'kg', qty: qty, nota: nota, origen: 'chat' })
+      .then(function(){ cotizFormAbierto = false; showToast('Pedido de cotización enviado'); renderMain(); })
+      .catch(function(err){ showToast(errorFirestore(err, 'enviar la cotización')); enviar.disabled = false; });
+  });
+  main.querySelectorAll('[data-cot-responder]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const c = S.cotizaciones.find(function(x){ return x.id === b.dataset.cotResponder; });
+      const precio = parseFloat((document.getElementById('cotPrecio-' + c.id) || {}).value);
+      if(!(precio > 0)){ showToast('Escribí el precio que le ofrecés'); return; }
+      b.disabled = true;
+      db.collection('cotizaciones').doc(c.id).update({ estado: 'cotizada', precioOfertado: precio, actualizado: FieldValue.serverTimestamp() })
+        .then(function(){
+          registrar('Cotización respondida', descripcionCot(c) + ' a ' + money(precio) + '/' + (c.unit || 'kg'));
+          return enviarTextoA(c.mayoristaUid, '💲 Te cotizo ' + descripcionCot(c) + ' a ' + money(precio) + ' por ' + (c.unit || 'kg') + ' (total ' + money(precio * c.qty) + ').');
+        })
+        .then(function(){ showToast('Precio enviado al mayorista'); })
+        .catch(function(err){ showToast(errorFirestore(err, 'responder')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-cot-rechazar],[data-cot-cancelar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const id = b.dataset.cotRechazar || b.dataset.cotCancelar;
+      const c = S.cotizaciones.find(function(x){ return x.id === id; });
+      const estado = b.dataset.cotCancelar ? 'cancelada' : 'rechazada';
+      if(!window.confirm(estado === 'cancelada' ? '¿Cancelar este pedido de cotización?' : '¿Rechazar esta cotización?')) return;
+      b.disabled = true;
+      db.collection('cotizaciones').doc(c.id).update({ estado: estado, actualizado: FieldValue.serverTimestamp() })
+        .then(function(){
+          registrar(estado === 'cancelada' ? 'Cotización cancelada' : 'Cotización rechazada', descripcionCot(c));
+          return enviarTextoA(otroDeCot(c), (estado === 'cancelada' ? 'Cancelé' : 'Rechacé') + ' la cotización de ' + descripcionCot(c) + '.');
+        })
+        .catch(function(err){ showToast(errorFirestore(err, 'actualizar la cotización')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-cot-aceptar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const c = S.cotizaciones.find(function(x){ return x.id === b.dataset.cotAceptar; });
+      if(!c) return;
+      b.disabled = true;
+      let paso;
+      if(c.origen === 'cosecha'){
+        paso = db.collection('cotizaciones').doc(c.id).update({ estado: 'aceptada', actualizado: FieldValue.serverTimestamp() })
+          .then(function(){ return { texto: '✅ Confirmé la reserva de ' + descripcionCot(c) + ' a ' + money(c.precioOfertado) + ' por ' + (c.unit || 'kg') + '.' }; });
+      } else {
+        const l = lotById(c.lotId);
+        if(!l || l.archivado){ showToast('Ese producto ya no está publicado'); b.disabled = false; return; }
+        if(l.stock < c.qty){ showToast('Ahora quedan ' + l.stock.toLocaleString('es-AR') + ' ' + l.unit + ': pedile al productor que actualice el stock o cotizá menos cantidad'); b.disabled = false; return; }
+        let numero;
+        paso = nextOrderNumber().then(function(n){
+          numero = n;
+          return db.collection('pedidos').add({
+            numero: numero, lotId: l.id, productorUid: l.productorUid,
+            mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre,
+            qty: c.qty, price: c.precioOfertado, unit: l.unit || 'kg', statusIdx: 0, traceIdx: -1, invoice: null,
+            cotizacionId: c.id,
+            entrega: datosEntrega(),
+            createdAt: FieldValue.serverTimestamp()
+          });
+        }).then(function(ref){
+          registrar('Pedido creado', 'CC-' + numero + ' · ' + descripcionCot(c) + ' a precio cotizado ' + money(c.precioOfertado));
+          return db.collection('cotizaciones').doc(c.id).update({ estado: 'aceptada', pedidoId: ref.id, numeroPedido: numero, actualizado: FieldValue.serverTimestamp() });
+        }).then(function(){ return { texto: '✅ Acepté tu cotización: generé el pedido CC-' + numero + ' por ' + descripcionCot(c) + '.' }; });
+      }
+      paso.then(function(r){
+        registrar('Cotización aceptada', descripcionCot(c) + ' a ' + money(c.precioOfertado) + '/' + (c.unit || 'kg'));
+        showToast(c.origen === 'cosecha' ? 'Reserva confirmada' : 'Pedido generado con el precio cotizado. Lo ves en Mis pedidos.');
+        return enviarTextoA(c.productorUid, r.texto);
+      }).catch(function(err){ showToast(errorFirestore(err, 'aceptar la cotización')); b.disabled = false; });
+    });
+  });
+}
+function otroDeCot(c){ return c.mayoristaUid === currentUser.uid ? c.productorUid : c.mayoristaUid; }
+/* Datos de entrega que viajan con cada pedido (incluye coordenadas si se conocen). */
+function datosEntrega(){
+  const e = {
+    contacto: currentUser.nombre || '',
+    telefono: currentUser.telefono || '',
+    dni: currentUser.dni || '',
+    direccion: direccionDe(currentUser) || ''
+  };
+  if(typeof currentUser.lat === 'number' && typeof currentUser.lng === 'number'){ e.lat = currentUser.lat; e.lng = currentUser.lng; }
+  return e;
+}
+
+/* ============================================================
+   CALENDARIO DE COSECHA
+   El productor anuncia cuándo va a tener cada fruta; el mayorista planifica
+   y reserva con anticipación (la reserva viaja como una cotización).
+   ============================================================ */
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+let cosechaCat = 'todos';
+let reservaAbierta = null;   // id de la cosecha con el formulario de reserva abierto
+let cosechasDisponible = true;
+function mesesDe(c){
+  const r = [];
+  for(let m = c.desde, i = 0; i < 12; i++, m = (m + 1) % 12){ r.push(m); if(m === c.hasta) break; }
+  return r;
+}
+function rangoTexto(c){ return c.desde === c.hasta ? MESES[c.desde] : MESES[c.desde] + ' a ' + MESES[c.hasta]; }
+function viewCosecha(){
+  const esProd = currentUser.rol === 'productor';
+  const mesHoy = new Date().getMonth();
+  let lista = S.cosechas.slice();
+  if(esProd) lista = lista.filter(function(c){ return c.productorUid === currentUser.uid; });
+  if(!esProd && cosechaCat !== 'todos') lista = lista.filter(function(c){ return c.cat === cosechaCat; });
+  // Primero lo que está en temporada o empieza antes.
+  const distancia = function(c){ const ms = mesesDe(c); return ms.indexOf(mesHoy) !== -1 ? -1 : (c.desde - mesHoy + 12) % 12; };
+  lista.sort(function(a, b){ return distancia(a) - distancia(b) || a.producto.localeCompare(b.producto, 'es'); });
+
+  let html = '<div class="panel"><div class="panel-head"><h2>Calendario de cosecha</h2><p>'+
+    (esProd ? 'Anunciá cuándo vas a tener cada producto y cuánto estimás cosechar. Los mayoristas lo ven y pueden reservar con anticipación; las reservas te llegan por el chat para que les pases el precio.'
+            : 'Qué va a tener cada productor y en qué meses. Reservá con anticipación: el productor te responde con el precio por el chat.')+
+    '</p></div>';
+  if(!cosechasDisponible){
+    html += '<div class="envio-box" style="margin-bottom:20px;"><b>Falta un paso de configuración</b>Para usar el calendario hay que publicar las reglas nuevas de Firestore (archivo <code>backend/firestore.rules</code>) en la consola de Firebase.</div>';
+  }
+  if(esProd){
+    html += '<div class="form-card" style="margin-bottom:22px;" data-keep><h4 style="margin:0 0 12px;">Anunciar una cosecha</h4><div class="form-grid">'+
+      '<div class="form-row"><label for="cosProducto">Producto</label><input type="text" id="cosProducto" maxlength="60" placeholder="Limón Eureka"></div>'+
+      '<div class="form-row"><label for="cosCat">Categoría</label><select id="cosCat">'+['limon','naranja','mandarina','pomelo','subproductos'].map(function(c){ return '<option value="'+c+'">'+c.charAt(0).toUpperCase()+c.slice(1)+'</option>'; }).join('')+'</select></div>'+
+      '<div class="form-row"><label for="cosDesde">Desde</label><select id="cosDesde">'+MESES.map(function(m, i){ return '<option value="'+i+'"'+(i===mesHoy?' selected':'')+'>'+m+'</option>'; }).join('')+'</select></div>'+
+      '<div class="form-row"><label for="cosHasta">Hasta</label><select id="cosHasta">'+MESES.map(function(m, i){ return '<option value="'+i+'"'+(i===(mesHoy+2)%12?' selected':'')+'>'+m+'</option>'; }).join('')+'</select></div>'+
+      '<div class="form-row"><label for="cosVolumen">Volumen estimado</label><input type="number" id="cosVolumen" min="1" step="100" placeholder="50000"></div>'+
+      '<div class="form-row"><label for="cosUnit">Unidad</label><select id="cosUnit">'+UNIDADES.map(function(u){ return '<option value="'+u+'">'+u+'</option>'; }).join('')+'</select></div>'+
+      '<div class="form-row" style="grid-column:1/-1;"><label for="cosNotas">Notas (opcional)</label><input type="text" id="cosNotas" maxlength="200" placeholder="Calibre, certificaciones, condiciones…"></div>'+
+    '</div><div class="order-actions" style="margin-top:14px;"><button class="btn btn-primary btn-sm" id="cosPublicar">Publicar en el calendario</button></div></div>';
+  } else {
+    const cats = ['todos','limon','naranja','mandarina','pomelo','subproductos'];
+    html += '<div class="filters" style="margin-bottom:16px;">'+cats.map(function(c){
+      return '<button class="filter-btn'+(c===cosechaCat?' active':'')+'" data-cos-cat="'+c+'">'+(c==='todos'?'Todos':c.charAt(0).toUpperCase()+c.slice(1))+'</button>';
+    }).join('')+'</div>';
+  }
+  if(!lista.length){
+    html += '<div class="empty-state"><div class="ee-icon">📅</div>'+(esProd ? 'Todavía no anunciaste ninguna cosecha.' : 'Todavía no hay cosechas anunciadas'+(cosechaCat !== 'todos' ? ' en esta categoría' : '')+'.')+'</div></div>';
+    return html;
+  }
+  const cab = '<tr><th class="cal-prod">Producto</th>'+MESES.map(function(m, i){ return '<th class="'+(i===mesHoy?'hoy':'')+'" title="'+m+'">'+m.slice(0,3)+'</th>'; }).join('')+'<th></th></tr>';
+  const filas = lista.map(function(c){
+    const ms = mesesDe(c);
+    const celdas = MESES.map(function(_, i){
+      const on = ms.indexOf(i) !== -1;
+      return '<td class="'+(i===mesHoy?'hoy ':'')+(on?'on':'')+'">'+(on ? '<span></span>' : '')+'</td>';
+    }).join('');
+    const acc = esProd
+      ? '<button class="btn btn-ghost btn-sm cancel-btn" data-cos-borrar="'+c.id+'" title="Quitar del calendario">✕</button>'
+      : '<button class="btn btn-primary btn-sm" data-cos-reservar="'+c.id+'">Reservar</button>';
+    let fila = '<tr><td class="cal-prod"><b>'+esc(c.producto)+'</b><small>'+(esProd ? '' : esc(c.productorNombre)+' · ')+rangoTexto(c)+' · ~'+Number(c.volumen).toLocaleString('es-AR')+' '+esc(c.unit)+'</small>'+
+      (c.notas ? '<small class="cal-nota">'+esc(c.notas)+'</small>' : '')+'</td>'+celdas+'<td class="cal-acc">'+acc+'</td></tr>';
+    if(!esProd && reservaAbierta === c.id){
+      fila += '<tr class="cal-reserva"><td colspan="14"><div class="cot-form" style="margin:0;" data-keep>'+
+        '<div class="form-row"><label for="resMes">Mes</label><select id="resMes">'+ms.map(function(m){ return '<option value="'+m+'">'+MESES[m]+'</option>'; }).join('')+'</select></div>'+
+        '<div class="form-row"><label for="resQty">Cantidad ('+esc(c.unit)+')</label><input type="number" id="resQty" min="1" step="100" value="1000"></div>'+
+        '<div class="form-row" style="grid-column:1/-1;"><label for="resNota">Nota (opcional)</label><input type="text" id="resNota" maxlength="200" placeholder="Destino, calibre, forma de pago…"></div>'+
+        '<div class="order-actions" style="margin:0;"><button class="btn btn-primary btn-sm" data-res-enviar="'+c.id+'">Enviar reserva</button><button class="btn btn-ghost btn-sm" data-res-cerrar="1">Cancelar</button></div>'+
+      '</div></td></tr>';
+    }
+    return fila;
+  }).join('');
+  html += '<div class="tabla-scroll"><table class="simple cal-tabla">'+cab+filas+'</table></div>'+
+    '<p class="cal-ley"><span class="cal-dot"></span> Meses con cosecha disponible · la columna resaltada es el mes actual.</p></div>';
+  return html;
+}
+function bindCosecha(main){
+  main.querySelectorAll('[data-cos-cat]').forEach(function(b){
+    b.addEventListener('click', function(){ cosechaCat = b.dataset.cosCat; reservaAbierta = null; renderMain(); });
+  });
+  const pub = document.getElementById('cosPublicar');
+  if(pub) pub.addEventListener('click', function(){
+    const v = function(id){ return document.getElementById(id).value.trim(); };
+    const producto = v('cosProducto'), volumen = parseFloat(v('cosVolumen'));
+    if(producto.length < 3){ showToast('Escribí el nombre del producto'); return; }
+    if(!(volumen > 0)){ showToast('Indicá el volumen estimado'); return; }
+    const datos = {
+      productorUid: currentUser.uid, productorNombre: currentUser.entidad || currentUser.nombre,
+      producto: producto, cat: v('cosCat'), unit: v('cosUnit'),
+      desde: parseInt(v('cosDesde'), 10), hasta: parseInt(v('cosHasta'), 10),
+      volumen: volumen, notas: v('cosNotas').slice(0, 200), provincia: currentUser.provincia || '',
+      creado: FieldValue.serverTimestamp()
+    };
+    pub.disabled = true;
+    db.collection('cosechas').add(datos).then(function(){
+      registrar('Cosecha anunciada', producto + ' · ' + rangoTexto(datos) + ' · ~' + volumen.toLocaleString('es-AR') + ' ' + datos.unit);
+      ['cosProducto','cosVolumen','cosNotas'].forEach(function(id){ const el = document.getElementById(id); if(el) el.value = ''; });
+      pub.disabled = false;
+      showToast('Cosecha publicada en el calendario');
+    }).catch(function(err){ showToast(errorFirestore(err, 'publicar la cosecha')); pub.disabled = false; });
+  });
+  main.querySelectorAll('[data-cos-borrar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const c = S.cosechas.find(function(x){ return x.id === b.dataset.cosBorrar; });
+      if(!c || !window.confirm('¿Quitar ' + c.producto + ' del calendario?')) return;
+      b.disabled = true;
+      db.collection('cosechas').doc(c.id).delete()
+        .then(function(){ registrar('Cosecha quitada', c.producto + ' · ' + rangoTexto(c)); showToast('Quitada del calendario'); })
+        .catch(function(err){ showToast(errorFirestore(err, 'quitarla')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-cos-reservar]').forEach(function(b){
+    b.addEventListener('click', function(){ reservaAbierta = reservaAbierta === b.dataset.cosReservar ? null : b.dataset.cosReservar; renderMain(); });
+  });
+  main.querySelectorAll('[data-res-cerrar]').forEach(function(b){
+    b.addEventListener('click', function(){ reservaAbierta = null; renderMain(); });
+  });
+  main.querySelectorAll('[data-res-enviar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const c = S.cosechas.find(function(x){ return x.id === b.dataset.resEnviar; });
+      const qty = parseFloat(document.getElementById('resQty').value);
+      if(!c) return;
+      if(!(qty > 0)){ showToast('Indicá la cantidad que querés reservar'); return; }
+      b.disabled = true;
+      crearCotizacion({
+        productorUid: c.productorUid, productorNombre: c.productorNombre, cosechaId: c.id,
+        producto: c.producto, unit: c.unit, qty: qty, mes: parseInt(document.getElementById('resMes').value, 10),
+        nota: document.getElementById('resNota').value.trim().slice(0, 200), origen: 'cosecha'
+      }).then(function(){
+        reservaAbierta = null;
+        showToast('Reserva enviada. El productor te responde con el precio en Chats.');
+        view.mayorista = 'chats';
+        renderSubnav(); renderMain();
+        abrirConversacion(c.productorUid);
+      }).catch(function(err){ showToast(errorFirestore(err, 'enviar la reserva')); b.disabled = false; });
+    });
+  });
+}
+
+/* ============================================================
+   SEGUIMIENTO DE PRODUCTORES Y ALERTAS DE PRECIO (mayorista)
+   Lo que sigue cada mayorista se guarda en su propio perfil.
+   ============================================================ */
+let novedadesAvisadas = false;
+function sigoA(uid){ return (currentUser.siguiendo || []).indexOf(uid) !== -1; }
+function esFavorito(lotId){ return (currentUser.favoritos || []).indexOf(lotId) !== -1; }
+function alertasDesde(){ return currentUser.alertasVistas || (Date.now() - 7 * 86400000); }
+function novedades(){
+  if(!currentUser || currentUser.rol !== 'mayorista') return [];
+  const desde = alertasDesde();
+  const lista = [];
+  S.lots.forEach(function(l){
+    if(l.archivado) return;
+    const seguido = sigoA(l.productorUid), fav = esFavorito(l.id);
+    if(!seguido && !fav) return;
+    const creado = msDe(l.createdAt);
+    if(seguido && creado > desde){
+      lista.push({ tipo: 'nuevo', t: creado, lote: l, texto: esc(l.productorNombre) + ' publicó <b>' + esc(l.name) + '</b> a ' + money(l.price) + ' / ' + l.unit });
+      return;
+    }
+    const h = (l.historialPrecios || []).slice().sort(function(a, b){ return a.fecha - b.fecha; });
+    for(let i = h.length - 1; i > 0; i--){
+      if(h[i].fecha <= desde) break;
+      if(h[i].precio < h[i-1].precio){
+        const pct = Math.round((1 - h[i].precio / h[i-1].precio) * 100);
+        lista.push({ tipo: 'baja', t: h[i].fecha, lote: l, texto: 'Bajó el precio de <b>' + esc(l.name) + '</b> (' + esc(l.productorNombre) + '): ' + money(h[i-1].precio) + ' → ' + money(h[i].precio) + ' / ' + l.unit + ' <span class="trend down">▼ ' + pct + ' %</span>' });
+        break;
+      }
+    }
+  });
+  return lista.sort(function(a, b){ return b.t - a.t; });
+}
+function actualizarSeguimiento(campo, valor, agregar){
+  const lista = (currentUser[campo] || []).slice();
+  const i = lista.indexOf(valor);
+  if(agregar && i === -1) lista.push(valor);
+  if(!agregar && i !== -1) lista.splice(i, 1);
+  const anterior = currentUser[campo];
+  currentUser[campo] = lista;
+  renderSubnav(); renderMain();
+  const upd = {}; upd[campo] = agregar ? FieldValue.arrayUnion(valor) : FieldValue.arrayRemove(valor);
+  return db.collection('usuarios').doc(currentUser.uid).update(upd).catch(function(err){
+    currentUser[campo] = anterior;
+    renderSubnav(); renderMain();
+    showToast(errorFirestore(err, 'guardar el cambio'));
+    throw err;
+  });
+}
+function viewAlertas(){
+  const nov = novedades();
+  const productores = S.contactos.slice().sort(function(a, b){ return nombreContacto(a).localeCompare(nombreContacto(b), 'es'); });
+  const favs = S.lots.filter(function(l){ return esFavorito(l.id); });
+  let html = '<div class="panel"><div class="panel-head"><h2>Seguimiento y alertas</h2>'+
+    '<p>Seguí a tus productores de confianza y marcá productos favoritos (♡ en el catálogo): te avisamos cuando publican algo nuevo o cuando baja un precio.</p></div>';
+
+  html += '<div class="chart-card"><div class="al-head"><h4 style="margin:0;">Novedades'+(nov.length ? ' <span class="badge">'+nov.length+'</span>' : '')+'</h4>'+
+    (nov.length ? '<button class="btn btn-ghost btn-sm" id="alVistas">Marcar todo como visto</button>' : '')+'</div>';
+  html += nov.length ? nov.map(function(n){
+    return '<div class="al-item '+n.tipo+'"><span class="al-ic">'+(n.tipo === 'nuevo' ? '🆕' : '📉')+'</span>'+
+      '<div class="al-txt">'+n.texto+'<small>'+fechaHora({ toMillis: function(){ return n.t; } })+'</small></div>'+
+      '<button class="btn btn-ghost btn-sm" data-al-ver="'+n.lote.id+'">Ver en el catálogo</button></div>';
+  }).join('') : '<div class="chats-vacio">No hay novedades desde la última vez que miraste.'+((currentUser.siguiendo || []).length || favs.length ? '' : '<br>Empezá siguiendo a algún productor de la lista de abajo.')+'</div>';
+  html += '</div>';
+
+  html += '<div class="chart-card"><h4>Productores</h4>'+(productores.length ? '<div class="al-prods">'+productores.map(function(u){
+    const activos = S.lots.filter(function(l){ return l.productorUid === u.uid && !l.archivado; }).length;
+    const sigo = sigoA(u.uid);
+    return '<div class="al-prod"><span class="conv-av">'+esc(inicialesDe(nombreContacto(u)))+'</span>'+
+      '<div class="conv-txt"><b>'+esc(nombreContacto(u))+'</b><small>'+esc(u.provincia || '')+' · '+activos+' publicación'+(activos === 1 ? '' : 'es')+' activa'+(activos === 1 ? '' : 's')+'</small></div>'+
+      '<button class="btn btn-sm '+(sigo ? 'btn-primary' : 'btn-ghost')+'" data-seguir="'+u.uid+'">'+(sigo ? '✓ Siguiendo' : '+ Seguir')+'</button></div>';
+  }).join('')+'</div>' : '<div class="chats-vacio">Todavía no hay productores registrados.</div>')+'</div>';
+
+  html += '<div class="chart-card"><h4>Productos favoritos</h4>'+(favs.length ? '<table class="simple"><tr><th>Producto</th><th>Productor</th><th>Precio</th><th>Stock</th><th></th></tr>'+favs.map(function(l){
+    return '<tr><td>'+esc(l.name)+(l.archivado ? ' <small>(ya no publicado)</small>' : '')+'</td><td>'+esc(l.productorNombre)+'</td><td>'+money(l.price)+' / '+l.unit+' '+chipTendencia(tendenciaPrecio(l))+'</td>'+
+      '<td>'+l.stock.toLocaleString('es-AR')+' '+l.unit+'</td><td><button class="btn btn-ghost btn-sm cancel-btn" data-fav="'+l.id+'">Quitar</button></td></tr>';
+  }).join('')+'</table>' : '<div class="chats-vacio">Todavía no marcaste productos favoritos. Tocá ♡ en cualquier producto del catálogo.</div>')+'</div>';
+  return html + '</div>';
+}
+function bindAlertas(main){
+  const vistas = document.getElementById('alVistas');
+  if(vistas) vistas.addEventListener('click', function(){
+    const ahora = Date.now();
+    currentUser.alertasVistas = ahora;
+    renderSubnav(); renderMain();
+    db.collection('usuarios').doc(currentUser.uid).update({ alertasVistas: ahora })
+      .catch(function(err){ showToast(errorFirestore(err, 'guardar')); });
+  });
+  main.querySelectorAll('[data-seguir]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const uid = b.dataset.seguir, sigo = sigoA(uid);
+      const nombre = nombreContacto(contactoPorUid(uid)) || (S.lots.find(function(l){ return l.productorUid === uid; }) || {}).productorNombre || 'el productor';
+      actualizarSeguimiento('siguiendo', uid, !sigo).then(function(){
+        registrar(sigo ? 'Dejó de seguir' : 'Siguió a productor', nombre);
+        showToast(sigo ? 'Dejaste de seguir a ' + nombre : 'Ahora seguís a ' + nombre + ': te avisamos cuando publique algo nuevo');
+      }).catch(function(){});
+    });
+  });
+  main.querySelectorAll('[data-fav]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      const id = b.dataset.fav, fav = esFavorito(id);
+      const l = lotById(id);
+      actualizarSeguimiento('favoritos', id, !fav).then(function(){
+        showToast(fav ? 'Quitado de favoritos' : (l ? l.name : 'Producto') + ' agregado a favoritos: te avisamos si baja el precio');
+      }).catch(function(){});
+    });
+  });
+  main.querySelectorAll('[data-al-ver]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const l = lotById(b.dataset.alVer);
+      if(!l) return;
+      catFilter = 'todos'; prodFilter = 'todos'; itemFilter = 'todos'; catBusqueda = l.name;
+      view.mayorista = 'catalogo';
+      renderSubnav(); renderMain();
+    });
+  });
+}
+function avisarNovedades(){
+  if(novedadesAvisadas || !currentUser || currentUser.rol !== 'mayorista' || !S.lots.length) return;
+  novedadesAvisadas = true;
+  const n = novedades().length;
+  if(n) setTimeout(function(){ showToast('🔔 Tenés ' + n + ' novedad' + (n > 1 ? 'es' : '') + ' de productores que seguís. Mirá «Seguimiento y alertas».'); }, 1200);
+}
+
+/* ============================================================
+   UBICACIÓN EXACTA (geocodificación con OpenStreetMap Nominatim)
+   La dirección se convierte en coordenadas al registrarse o editar el perfil;
+   el mapa del pedido usa esas coordenadas y, si no hay, la capital provincial.
+   ============================================================ */
+const geoCache = {};
+function geocodificar(direccion){
+  if(!direccion) return Promise.resolve(null);
+  if(geoCache[direccion] !== undefined) return Promise.resolve(geoCache[direccion]);
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&accept-language=es&q=' + encodeURIComponent(direccion + ', Argentina');
+  const ctrl = window.AbortController ? new AbortController() : null;
+  const corte = ctrl ? setTimeout(function(){ ctrl.abort(); }, 8000) : null;
+  return fetch(url, ctrl ? { signal: ctrl.signal } : undefined).then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(res){
+      const p = res && res[0] ? [parseFloat(res[0].lat), parseFloat(res[0].lon)] : null;
+      return (geoCache[direccion] = (p && isFinite(p[0]) && isFinite(p[1])) ? p : null);
+    })
+    .catch(function(){ return null; })
+    .finally(function(){ if(corte) clearTimeout(corte); });
+}
+/* Guarda en el perfil las coordenadas de la dirección (en segundo plano). */
+function guardarUbicacion(uid, datos){
+  const dir = direccionDe(datos);
+  return geocodificar(dir).then(function(p){
+    const upd = p ? { lat: p[0], lng: p[1] } : { lat: FieldValue.delete(), lng: FieldValue.delete() };
+    return db.collection('usuarios').doc(uid).update(upd).then(function(){
+      if(currentUser && currentUser.uid === uid){
+        if(p){ currentUser.lat = p[0]; currentUser.lng = p[1]; } else { delete currentUser.lat; delete currentUser.lng; }
+      }
+      return p;
+    });
+  }).catch(function(err){ console.warn('[CitrusCode] No se pudo ubicar la dirección:', err.message); return null; });
+}
+const usuarioCache = {};
+function usuarioPorUid(uid){
+  if(!uid) return Promise.resolve(null);
+  if(usuarioCache[uid] !== undefined) return Promise.resolve(usuarioCache[uid]);
+  return db.collection('usuarios').doc(uid).get().then(function(d){
+    return (usuarioCache[uid] = d.exists ? d.data() : null);
+  }).catch(function(){ return (usuarioCache[uid] = null); });
+}
+/* Punto en el mapa de un usuario: coordenadas guardadas, dirección o provincia. */
+function ubicacionDe(u, direccionAlternativa, coordsAlternativas, provDefecto){
+  if(coordsAlternativas) return Promise.resolve({ p: coordsAlternativas, etiqueta: direccionAlternativa || (u && direccionDe(u)) || '', exacta: true });
+  if(u && typeof u.lat === 'number' && typeof u.lng === 'number') return Promise.resolve({ p: [u.lat, u.lng], etiqueta: direccionDe(u) || u.provincia, exacta: true });
+  const dir = direccionAlternativa || (u && direccionDe(u));
+  return geocodificar(dir).then(function(p){
+    if(p) return { p: p, etiqueta: dir, exacta: true };
+    const prov = provinciaDeDireccion(dir) || (u && COORDS_PROV[u.provincia] ? u.provincia : provDefecto);
+    return { p: COORDS_PROV[prov], etiqueta: prov + ' (capital provincial)', exacta: false };
+  });
+}
+
+/* ============================================================
+   FOTOS EN FIREBASE STORAGE
+   La foto propia se sube a Storage y el lote guarda solo su URL. Si Storage
+   no está habilitado en el proyecto, se guarda como antes dentro del lote.
+   ============================================================ */
+const storage = (firebase.storage && firebaseConfig.storageBucket) ? firebase.storage() : null;
+function subirFoto(dataUrl, lotId){
+  if(!storage) return Promise.resolve(dataUrl);
+  const ruta = 'lotes/' + currentUser.uid + '/' + (lotId || 'nuevo') + '-' + Date.now() + '.jpg';
+  const subida = storage.ref(ruta).putString(dataUrl, 'data_url', { contentType: 'image/jpeg' })
+    .then(function(snap){ return snap.ref.getDownloadURL(); });
+  const limite = new Promise(function(_, mal){ setTimeout(function(){ mal(new Error('tiempo de espera agotado')); }, 20000); });
+  return Promise.race([subida, limite]).catch(function(err){
+    console.warn('[CitrusCode] Storage no disponible, la foto se guarda en el lote:', err.message);
+    return dataUrl;
+  });
+}
+function borrarFotoStorage(url){
+  if(!storage || !url || url.indexOf('firebasestorage') === -1) return;
+  try { storage.refFromURL(url).delete().catch(function(){}); } catch(_){}
+}
+
+function bindExtras(main){
+  bindCotizaciones(main);
+  bindCosecha(main);
+  bindAlertas(main);
+  const bitBuscar = document.getElementById('bitBuscar');
+  if(bitBuscar) bitBuscar.addEventListener('input', function(){ bitFiltro.q = bitBuscar.value; renderMain(); });
+  const bitRol = document.getElementById('bitRol');
+  if(bitRol) bitRol.addEventListener('change', function(){ bitFiltro.rol = bitRol.value; renderMain(); });
+  const bitAccion = document.getElementById('bitAccion');
+  if(bitAccion) bitAccion.addEventListener('change', function(){ bitFiltro.accion = bitAccion.value; renderMain(); });
+  main.querySelectorAll('[data-seguir-chat]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const uid = b.dataset.seguirChat, sigo = sigoA(uid);
+      actualizarSeguimiento('siguiendo', uid, !sigo).then(function(){
+        registrar(sigo ? 'Dejó de seguir' : 'Siguió a productor', nombreContacto(contactoPorUid(uid)));
+      }).catch(function(){});
+    });
+  });
+}
+
 function bindMainEvents(){
   const main = document.getElementById('main');
 
@@ -3558,9 +4332,13 @@ function bindMainEvents(){
       const file = inp.files && inp.files[0];
       if(!file) return;
       showToast('Subiendo la foto…');
+      const anterior = (lotById(inp.dataset.subirFoto) || {}).fotoPropia;
       procesarFoto(file).then(function(data){
-        return db.collection('lotes').doc(inp.dataset.subirFoto).update({ fotoPropia: data });
+        return subirFoto(data, inp.dataset.subirFoto);
+      }).then(function(foto){
+        return db.collection('lotes').doc(inp.dataset.subirFoto).update({ fotoPropia: foto });
       }).then(function(){
+        borrarFotoStorage(anterior);
         showToast('Foto actualizada: los mayoristas ya la ven en el catálogo');
       }).catch(function(err){
         showToast(err.code === 'permission-denied' ? 'Firestore rechazó el cambio por permisos.' : err.message);
@@ -3570,8 +4348,9 @@ function bindMainEvents(){
   main.querySelectorAll('[data-usar-ia]').forEach(function(b){
     b.addEventListener('click', function(){
       b.disabled = true;
+      const anterior = (lotById(b.dataset.usarIa) || {}).fotoPropia;
       db.collection('lotes').doc(b.dataset.usarIa).update({ fotoPropia: FieldValue.delete() })
-        .then(function(){ showToast('Volviste a la foto generada con IA'); })
+        .then(function(){ borrarFotoStorage(anterior); showToast('Volviste a la foto generada con IA'); })
         .catch(function(err){ showToast('No se pudo cambiar la foto: ' + err.message); b.disabled = false; });
     });
   });
@@ -3655,13 +4434,10 @@ function bindMainEvents(){
               productorUid: p.productorUid,
               mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre,
               qty: S.cart[id], price: p.price, unit: p.unit || 'kg', statusIdx:0, traceIdx:-1, invoice:null,
-              entrega: {
-                contacto: currentUser.nombre || '',
-                telefono: currentUser.telefono || '',
-                dni: currentUser.dni || '',
-                direccion: direccionDe(currentUser) || ''
-              },
+              entrega: datosEntrega(),
               createdAt: FieldValue.serverTimestamp()
+            }).then(function(){
+              registrar('Pedido creado', 'CC-' + numero + ' · ' + S.cart[id].toLocaleString('es-AR') + ' ' + (p.unit || 'kg') + ' de ' + p.name + ' a ' + p.productorNombre);
             });
           });
         });
@@ -3691,16 +4467,19 @@ function bindMainEvents(){
       const min = (minInput && minInput > 0) ? Math.min(minInput, stock) : Math.min(300, stock);
       const palette = {limon:'#E8C547', naranja:'#F0A03C', mandarina:'#F5B25C', pomelo:'#E88C86', subproductos:'#B7C93C'};
       addLotBtn.disabled = true;
-      db.collection('lotes').add({
+      const fotoElegida = fotoNueva;
+      // La foto propia se sube primero a Firebase Storage (si está habilitado).
+      (fotoElegida ? subirFoto(fotoElegida, null) : Promise.resolve(null)).then(function(foto){ return db.collection('lotes').add({
         name: name, productorUid: currentUser.uid, productorNombre: currentUser.entidad || currentUser.nombre,
         cat: cat, price: price, unit: unit, stock: stock, stockInicial: stock, min: min,
         color: palette[cat] || '#8A5FB0',
         imagenUrl: urlFotoIA(name, cat),
-        fotoPropia: fotoNueva || null,
+        fotoPropia: foto || null,
         historialPrecios: [{ precio: price, fecha: Date.now() }],
         archivado: false, createdAt: FieldValue.serverTimestamp()
-      }).then(function(){
-        const conFoto = !!fotoNueva;
+      }); }).then(function(){
+        registrar('Publicación creada', name + ' · ' + money(price) + ' / ' + unit + ' · stock ' + stock.toLocaleString('es-AR') + ' ' + unit);
+        const conFoto = !!fotoElegida;
         fotoNueva = null;
         if(!conFoto) new Image().src = urlFotoIA(name, cat);   // empieza a generar la foto ya mismo
         showToast(conFoto ? 'Producto publicado en el marketplace con tu foto' : 'Producto publicado en el marketplace — generando la foto con IA');
@@ -3742,6 +4521,8 @@ function bindMainEvents(){
         // Mantenemos la copia local en memoria al día, sin recargar la sesión.
         Object.keys(datos).forEach(function(k){ currentUser[k] = datos[k]; });
         currentUser.dni = datos.dni.replace(/[.\s-]/g,'');
+        registrar('Perfil actualizado', direccionDe(datos) || '');
+        guardarUbicacion(currentUser.uid, datos).then(function(){ if(view[currentUser.rol] === 'perfil') renderMain(); });
         showToast('Perfil actualizado');
         renderHeaderRight();
         renderSideUser();
@@ -3814,6 +4595,8 @@ function bindMainEvents(){
       }
       db.collection('lotes').doc(lote.id).update(cambios).then(function(){
         const dif = stock - antes;
+        registrar(price !== lote.price ? 'Precio modificado' : 'Publicación editada',
+          name + (price !== lote.price ? ' · ' + money(lote.price) + ' → ' + money(price) + ' / ' + unit : '') + (dif ? ' · stock ' + (dif > 0 ? '+' : '') + dif.toLocaleString('es-AR') + ' ' + unit : ''));
         showToast(dif > 0
           ? 'Publicación actualizada — repusiste ' + dif.toLocaleString('es-AR') + ' ' + unit
           : 'Publicación actualizada');
@@ -3834,8 +4617,9 @@ function bindMainEvents(){
     b.addEventListener('click', function(){
       if(!window.confirm('¿Eliminar esta publicación? Dejará de verse en el catálogo. Los pedidos ya realizados sobre este producto se conservan.')) return;
       b.disabled = true;
+      const ld = lotById(b.dataset.deleteLot);
       db.collection('lotes').doc(b.dataset.deleteLot).update({ archivado: true })
-        .then(function(){ showToast('Publicación eliminada'); })
+        .then(function(){ showToast('Publicación eliminada'); registrar('Publicación eliminada', ld ? ld.name : ''); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });
@@ -3860,6 +4644,7 @@ function bindMainEvents(){
         stageIdx: 0,
         createdAt: FieldValue.serverTimestamp()
       }).then(function(){
+        registrar('Solicitud de software', name);
         showToast('Solicitud enviada al equipo de CitrusCode');
         document.getElementById('newReqName').value = '';
         document.getElementById('newReqDetalle').value = '';
@@ -3923,6 +4708,7 @@ function bindMainEvents(){
           });
 
       operacion.then(function(){
+        registrar('Pedido confirmado', 'CC-' + o.numero + (stockNuevo === null ? '' : ' · stock restante ' + stockNuevo.toLocaleString('es-AR') + ' ' + unitOf(o)));
         showToast(stockNuevo === null
           ? 'Pedido confirmado'
           : 'Pedido confirmado — stock actualizado: quedan ' + stockNuevo.toLocaleString('es-AR') + ' ' + unitOf(o));
@@ -3953,6 +4739,7 @@ function bindMainEvents(){
       const update = { traceIdx: traceIdx, statusIdx: statusIdx };
       if(statusIdx === 4 && !o.invoice){ update.invoice = genInvoice(o); }
       db.collection('pedidos').doc(o.id).update(update).then(function(){
+        registrar(statusIdx === 4 ? 'Pedido entregado' : 'Trazabilidad avanzada', 'CC-' + o.numero + ' · ' + TRACE_LABELS[traceIdx] + (statusIdx === 4 ? ' · factura CAE ' + update.invoice.cae : ''));
         showToast(statusIdx === 4 ? 'Pedido entregado — factura generada automáticamente' : 'Trazabilidad actualizada: ' + TRACE_LABELS[traceIdx]);
       }).catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
@@ -3962,8 +4749,9 @@ function bindMainEvents(){
     b.addEventListener('click', function(){
       if(!window.confirm('¿Seguro que querés cancelar este pedido? Esta acción no se puede deshacer.')) return;
       b.disabled = true;
+      const oc = S.orders.find(function(x){ return x.id === b.dataset.cancelOrder; });
       db.collection('pedidos').doc(b.dataset.cancelOrder).update({ cancelado: true })
-        .then(function(){ showToast('Pedido cancelado'); })
+        .then(function(){ showToast('Pedido cancelado'); registrar('Pedido cancelado', oc ? 'CC-' + oc.numero : ''); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });
@@ -4036,10 +4824,11 @@ function bindMainEvents(){
       if(!pr) return;
       b.disabled = true;
       db.collection('proyectos').doc(pr.id).update({ stageIdx: pr.stageIdx + 1 })
-        .then(function(){ showToast(pr.name + ' avanzó de etapa'); })
+        .then(function(){ showToast(pr.name + ' avanzó de etapa'); registrar('Proyecto avanzado', pr.name + ' → ' + PROJECT_STAGES[pr.stageIdx + 1]); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });
+  bindExtras(main);
 }
 
 /* ============================================================
@@ -4053,7 +4842,9 @@ auth.onAuthStateChanged(function(user){
         return;
       }
       const data = doc.data();
-      currentUser = { uid: user.uid, email: data.email, nombre: data.nombre, rol: data.rol, entidad: data.entidad };
+      // Se carga el perfil completo: la dirección y el teléfono viajan con cada pedido.
+      currentUser = Object.assign({}, data, { uid: user.uid });
+      if(loginManual){ loginManual = false; registrar('Inicio de sesión', currentUser.email || ''); }
       renderHeaderRight();
       renderApp();
       subscribeData();

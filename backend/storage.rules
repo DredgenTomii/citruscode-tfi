@@ -1,0 +1,16 @@
+rules_version = '2';
+// Reglas de Firebase Storage: fotos de los lotes publicadas por cada productor.
+// Cualquiera puede ver las fotos (se muestran en el catálogo), pero cada
+// productor solo puede subir o borrar archivos dentro de su propia carpeta,
+// y solo imágenes de hasta 2 MB.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /lotes/{uid}/{archivo} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+                            && request.resource.size < 2 * 1024 * 1024
+                            && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

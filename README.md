@@ -25,9 +25,9 @@ eligiendo uno de los tres roles.
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
-| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
-| **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos, padrón de usuarios, **ranking de proveedores**, evolución de precios y tablero Kanban de proyectos de software a medida. Las tablas se exportan a CSV. |
+| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), **pedir cotizaciones** por volumen y aceptarlas con un clic, **reservar cosecha futura** desde el calendario, **seguir productores y marcar favoritos** para recibir alertas de novedades y bajas de precio, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
+| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, **responder cotizaciones** con un precio especial, anunciar sus cosechas en el **calendario de cosecha**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
+| **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos, padrón de usuarios, **bitácora de actividad** (auditoría de quién hizo qué y cuándo), **ranking de proveedores**, evolución de precios y tablero Kanban de proyectos de software a medida. Las tablas se exportan a CSV. |
 
 ### Funciones destacadas
 
@@ -43,6 +43,18 @@ eligiendo uno de los tres roles.
 - **Chats directos** entre mayoristas y productores, sin pedido de por medio: lista de conversaciones
   con el último mensaje, aviso de mensajes sin leer en el menú y botón *Contactar* en cada producto
   del catálogo.
+- **Cotizaciones desde el chat.** El mayorista pide precio por un volumen; el productor responde con un
+  precio especial y, si el mayorista acepta, se genera el pedido con ese precio.
+- **Calendario de cosecha.** Cada productor anuncia qué va a tener y en qué meses; el mayorista reserva
+  con anticipación y la reserva llega al chat para acordar el precio.
+- **Seguimiento y alertas.** El mayorista sigue productores y marca productos favoritos (♡); el sistema
+  avisa cuando publican algo nuevo o baja un precio.
+- **Bitácora de actividad.** Registro de auditoría con fecha del servidor, filtros y exportación a CSV,
+  que nadie puede editar ni borrar.
+- **Ubicación exacta en el mapa.** La dirección se convierte en coordenadas (OpenStreetMap Nominatim) y el
+  recorrido del pedido va de la finca al depósito reales; si no se encuentra, se usa la capital provincial.
+- **Fotos en Firebase Storage.** La foto propia del lote se sube a Storage y el lote guarda solo la URL;
+  si Storage no está habilitado, se guarda como antes dentro del lote.
 - **Mapa de recorrido** de cada lote (Leaflet + OpenStreetMap), con el avance según la
   trazabilidad.
 - **Modo claro / oscuro** en el sitio y en el sistema, con la misma paleta de la marca.
@@ -100,7 +112,8 @@ cliente vía SDK.
   puede abrir un chat entre dos mayoristas ni a nombre de otro), y después de creada solo cambian el
   resumen del último mensaje y las marcas de leído.
 - **Probado en emulador.** Las reglas se verificaron con el emulador de Firestore y
-  `@firebase/rules-unit-testing` (32 casos entre permitidos y rechazados).
+  `@firebase/rules-unit-testing` (32 casos de la primera versión y 59 de los chats, cotizaciones,
+  calendario y bitácora, entre permitidos y rechazados).
 
 ---
 
@@ -115,7 +128,8 @@ cliente vía SDK.
 │   ├── sw.js                  Service worker (instalación y apertura sin conexión)
 │   └── icon-*.png             Íconos de la app
 ├── backend/
-│   └── firestore.rules        Reglas de seguridad de la base de datos
+│   ├── firestore.rules        Reglas de seguridad de la base de datos
+│   └── storage.rules          Reglas de Firebase Storage (fotos de los lotes)
 └── docs/
     ├── CitrusCode_TFI_Primer_Entregable.pdf / .docx
     ├── CitrusCode_TFI_Entregable_Completo.pdf / .docx
@@ -125,7 +139,9 @@ cliente vía SDK.
 ```
 
 Si se modifican las reglas, hay que publicarlas en la consola de Firebase
-(Firestore → Reglas → Publicar): el archivo del repositorio no se aplica solo.
+(Firestore → Reglas → Publicar): el archivo del repositorio no se aplica solo. Las de
+`storage.rules` se publican en Storage → Rules (Storage tiene que estar habilitado en el proyecto;
+si no lo está, el sistema sigue guardando las fotos dentro del lote).
 
 ---
 
@@ -178,9 +194,13 @@ Las dejamos documentadas a propósito, porque forman parte del análisis del tra
 - El generador gratuito de imágenes limita cuántas fotos nuevas crea por persona. Mientras una
   foto no está lista se muestra una ilustración, y el sistema la reintenta en segundo plano;
   una vez generada, queda en caché para todos.
-- Las fotos subidas por los productores se guardan dentro del documento del lote. Con muchos
-  productos convendría moverlas a Firebase Storage.
-- El mapa ubica origen y destino por provincia (capital provincial), no por dirección exacta.
+- La bitácora se escribe desde el navegador: las reglas garantizan que nadie registre a nombre de otro,
+  falsee su rol o la fecha, ni edite o borre registros, pero un usuario con conocimientos técnicos
+  podría omitir registrar una acción propia. La solución completa son *triggers* de Cloud Functions.
+- La geocodificación usa el servicio gratuito de OpenStreetMap, que pide no superar una consulta por
+  segundo; con muchos usuarios convendría un proveedor pago o guardar las coordenadas en el alta.
+- Firebase Storage requiere el plan Blaze en proyectos nuevos; mientras no esté habilitado, las fotos se
+  guardan dentro del lote como antes.
 
 ---
 
