@@ -83,6 +83,48 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Chats directos entre un mayorista y un productor, sin pedido de por medio.
+    // Hay una conversacion por par y su id es "mayoristaUid_productorUid", asi
+    // que nadie puede abrir una a nombre de otros. Las reglas verifican el rol
+    // real de cada parte contra su perfil. Solo las dos partes la leen y la
+    // escriben (la administracion puede leer). Los mensajes no se editan ni se borran.
+    match /conversaciones/{convId} {
+      function partes() {
+        return [request.resource.data.mayoristaUid, request.resource.data.productorUid];
+      }
+      allow read: if isSignedIn() &&
+                  (request.auth.uid in resource.data.participantes || getRole() == 'admin');
+      allow create: if isSignedIn()
+                    && convId == request.resource.data.mayoristaUid + '_' + request.resource.data.productorUid
+                    && request.resource.data.participantes == partes()
+                    && request.auth.uid in partes()
+                    && get(/databases/$(database)/documents/usuarios/$(request.resource.data.mayoristaUid)).data.rol == 'mayorista'
+                    && get(/databases/$(database)/documents/usuarios/$(request.resource.data.productorUid)).data.rol == 'productor'
+                    && request.resource.data.ultimoAutorUid == request.auth.uid;
+      // Despues de creada solo cambia el resumen del ultimo mensaje y las marcas
+      // de leido; las partes y los nombres quedan fijos.
+      allow update: if isSignedIn() && request.auth.uid in resource.data.participantes
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['ultimoMensaje', 'ultimoAutorUid', 'actualizado', 'vistoMayorista', 'vistoProductor'])
+                    && (request.resource.data.ultimoAutorUid == resource.data.ultimoAutorUid
+                        || request.resource.data.ultimoAutorUid == request.auth.uid);
+      allow delete: if false;
+
+      match /mensajes/{msgId} {
+        // El id de la conversacion contiene los uid de las dos partes.
+        allow read: if isSignedIn() &&
+                    (request.auth.uid in convId.split('_') || getRole() == 'admin');
+        // getAfter: la conversacion puede crearse en el mismo lote que su primer mensaje.
+        allow create: if isSignedIn()
+                      && request.auth.uid in getAfter(/databases/$(database)/documents/conversaciones/$(convId)).data.participantes
+                      && request.resource.data.autorUid == request.auth.uid
+                      && request.resource.data.texto is string
+                      && request.resource.data.texto.size() > 0
+                      && request.resource.data.texto.size() <= 500;
+        allow update, delete: if false;
+      }
+    }
+
     // Calificaciones de 1 a 5 estrellas (ranking de proveedores).
     // Una por pedido: el id del documento es el id del pedido. Solo la puede
     // escribir el mayorista que hizo el pedido, y solo si ya fue entregado.

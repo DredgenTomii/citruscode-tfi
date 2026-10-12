@@ -25,8 +25,8 @@ eligiendo uno de los tres roles.
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor**, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
-| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
+| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
+| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
 | **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos, padrón de usuarios, **ranking de proveedores**, evolución de precios y tablero Kanban de proyectos de software a medida. Las tablas se exportan a CSV. |
 
 ### Funciones destacadas
@@ -40,6 +40,9 @@ eligiendo uno de los tres roles.
 - **Evolución de precios.** Gráfico por producto que combina los cambios de precio publicados
   y el precio de cada pedido realizado, con mínimo, máximo y variación.
 - **Mensajes por pedido** entre comprador y productor, en tiempo real.
+- **Chats directos** entre mayoristas y productores, sin pedido de por medio: lista de conversaciones
+  con el último mensaje, aviso de mensajes sin leer en el menú y botón *Contactar* en cada producto
+  del catálogo.
 - **Mapa de recorrido** de cada lote (Leaflet + OpenStreetMap), con el avance según la
   trazabilidad.
 - **Modo claro / oscuro** en el sitio y en el sistema, con la misma paleta de la marca.
@@ -92,6 +95,10 @@ cliente vía SDK.
   cambiar su estado), así nadie puede marcarse un pedido como entregado para calificar sin comprar.
 - **Mensajes privados.** Cada chat es una subcolección del pedido; las reglas solo dejan leer y
   escribir a las dos partes (y leer a la administración). Los mensajes no se editan ni se borran.
+- **Chats directos seguros.** Hay una conversación por par mayorista–productor y su id es
+  `mayoristaUid_productorUid`. Las reglas verifican el rol real de cada parte contra su perfil (no se
+  puede abrir un chat entre dos mayoristas ni a nombre de otro), y después de creada solo cambian el
+  resumen del último mensaje y las marcas de leído.
 - **Probado en emulador.** Las reglas se verificaron con el emulador de Firestore y
   `@firebase/rules-unit-testing` (32 casos entre permitidos y rechazados).
 

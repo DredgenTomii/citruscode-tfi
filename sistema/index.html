@@ -845,6 +845,46 @@
   [data-chat].abierto{background:var(--limon-bg); border-color:var(--limon-borde);}
 
   /* ============================================================
+     CHATS ENTRE MAYORISTAS Y PRODUCTORES
+     ============================================================ */
+  .chats{display:grid; grid-template-columns:300px 1fr; border:1px solid var(--borde); border-radius:18px; overflow:hidden; background:var(--surface); min-height:520px;}
+  .chats-lista{display:flex; flex-direction:column; border-right:1px solid var(--borde); background:var(--surface-2); min-width:0; overflow:hidden;}
+  .chats-nuevo{padding:12px; border-bottom:1px solid var(--borde);}
+  .chats-nuevo select{width:100%;}
+  .chats-convs{flex:1; overflow-y:auto; overflow-x:hidden; max-height:500px;}
+  .conv-item{display:flex; gap:10px; align-items:center; width:100%; min-width:0; overflow:hidden; padding:12px 14px; border:none; border-bottom:1px solid var(--borde); background:transparent; color:var(--texto); text-align:left; font-family:inherit; transition:background .2s;}
+  .conv-item:hover{background:var(--acento-bg);}
+  .conv-item.activa{background:var(--limon-bg);}
+  .conv-av{flex:none; width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-family:'Poppins',sans-serif; font-weight:800; font-size:.85rem; color:#22301E; background:linear-gradient(135deg,var(--c-limon),var(--c-verde-claro));}
+  .conv-txt{display:block; flex:1; min-width:0;}
+  .conv-top{display:flex; justify-content:space-between; gap:8px; align-items:baseline;}
+  .conv-nom{font-weight:700; font-size:.86rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .conv-hora{flex:none; font-size:.66rem; color:var(--texto-suave);}
+  .conv-prev{display:block; font-size:.76rem; color:var(--texto-suave); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;}
+  .conv-item.nueva .conv-nom, .conv-item.nueva .conv-prev{color:var(--texto); font-weight:800;}
+  .conv-dot{flex:none; width:9px; height:9px; border-radius:50%; background:var(--c-naranja);}
+  .chats-vacio{font-size:.8rem; color:var(--texto-suave); text-align:center; padding:28px 16px;}
+  .chats-panel{display:flex; flex-direction:column; min-width:0;}
+  .chats-head{display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--borde);}
+  .chats-head b{display:block; font-size:.92rem;}
+  .chats-head small{display:block; font-size:.72rem; color:var(--texto-suave);}
+  .chats-volver{display:none;}
+  .chats-panel .chat-msgs{flex:1; max-height:none; min-height:300px; height:380px; background:var(--surface-2);}
+  .chats-panel .chat-form{border-top:1px solid var(--borde);}
+  .chats-elegir .ic{width:34px; height:34px; color:var(--acento); opacity:.7;}
+  .chats-elegir{flex:1; display:grid; place-items:center; text-align:center; padding:30px; color:var(--texto-suave); font-size:.88rem;}
+  .btn-contactar{margin-left:auto; flex:none; border:1px solid var(--borde); background:var(--surface); color:var(--texto-suave); border-radius:20px; font-size:.7rem; font-weight:600; padding:3px 9px; transition:.2s;}
+  .btn-contactar:hover{border-color:var(--c-verde-claro); color:var(--acento);}
+  @media(max-width:640px){
+    .chats{grid-template-columns:1fr; min-height:0;}
+    .chats-lista{border-right:none;}
+    .chats.con-abierta .chats-lista{display:none;}
+    .chats:not(.con-abierta) .chats-panel{display:none;}
+    .chats-volver{display:inline-flex;}
+    .chats-panel .chat-msgs{height:58vh;}
+  }
+
+  /* ============================================================
      AVISO DE STOCK BAJO
      ============================================================ */
   .alerta-stock{display:flex; gap:14px; align-items:flex-start; background:linear-gradient(90deg, var(--limon-bg), transparent 130%); border:1px solid var(--limon-borde); border-left:4px solid var(--c-naranja); border-radius:0 16px 16px 0; padding:14px 18px; margin-bottom:20px; animation:slideDown .5s var(--easing);}
@@ -1057,7 +1097,7 @@ function direccionDe(u){
 }
 
 let currentUser = null;   // {uid, nombre, email, rol, entidad}
-let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [] };
+let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [] };
 let califDisponible = true;  // false si Firestore todavía no tiene las reglas de calificaciones
 let editandoLote = null;   // id del lote que se está editando, o null
 let catFilter = 'todos';
@@ -1068,10 +1108,15 @@ let catOrden = 'recientes'; // criterio de orden del catálogo
 let precioSel = null;       // lote elegido en "Evolución de precios"
 let fotoNueva = null;       // foto propia elegida para el lote que se está por publicar (data URL)
 let chatAbierto = null, chatMsgs = [], chatError = false, unsubChat = null;  // mensajes del pedido abierto
+let convAbierta = null, convOtro = null, convMsgs = [], convError = false, unsubConvMsgs = null;  // chat directo abierto
+let chatsDisponible = true;  // false si Firestore todavía no tiene las reglas de conversaciones
+let convsCargadas = false;   // para no avisar con un toast los chats que ya existían al entrar
+const marcandoVista = {};    // conversaciones con una marca de "leído" en curso
 let mapaAbierto = null, mapaAnimado = null;  // mapa de recorrido visible en Trazabilidad
 const avisadosStock = {};   // lotes con stock bajo ya avisados en esta sesión
 let authMode = 'login';
 let unsubLotes = null, unsubPedidos = null, unsubProyectos = null, unsubUsuarios = null, unsubCalif = null;
+let unsubConvs = null, unsubContactos = null;
 
 /* ============================================================
    HELPERS
@@ -1113,6 +1158,7 @@ const ICONOS = {
   ranking:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
   precios:'<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-7"/>',
   instalar:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M9 18h6"/>',
+  chats:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>',
   foco:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>'
 };
 function icono(nombre){
@@ -1313,6 +1359,12 @@ function revisarStockBajo(){
 }
 
 /* ---------- Mensajes del pedido ---------- */
+function burbujaMsg(m, otro){
+  const mio = m.autorUid === currentUser.uid;
+  let hora = '';
+  try { hora = m.fecha && m.fecha.toDate ? m.fecha.toDate().toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : 'enviando…'; } catch(_){}
+  return '<div class="msg'+(mio ? ' mio' : '')+'"><span class="msg-meta">'+(mio ? 'Vos' : esc(m.autorNombre || otro))+' · '+hora+'</span>'+esc(m.texto)+'</div>';
+}
 function cerrarChat(){
   if(unsubChat) unsubChat();
   unsubChat = null; chatAbierto = null; chatMsgs = []; chatError = false;
@@ -1342,12 +1394,7 @@ function cajaChat(o, otro){
   if(chatError){
     return '<div class="chat-box"><div class="chat-aviso">Los mensajes se habilitan cuando se publiquen las reglas nuevas de Firestore.</div></div>';
   }
-  const msgs = chatMsgs.length ? chatMsgs.map(function(m){
-    const mio = m.autorUid === currentUser.uid;
-    let hora = '';
-    try { hora = m.fecha && m.fecha.toDate ? m.fecha.toDate().toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : 'enviando…'; } catch(_){}
-    return '<div class="msg'+(mio ? ' mio' : '')+'"><span class="msg-meta">'+(mio ? 'Vos' : esc(m.autorNombre || otro))+' · '+hora+'</span>'+esc(m.texto)+'</div>';
-  }).join('') : '<div class="chat-vacio">Todavía no hay mensajes con '+esc(otro)+'.<br>Escribí para coordinar horarios de entrega, calidad o embalaje.</div>';
+  const msgs = chatMsgs.length ? chatMsgs.map(function(m){ return burbujaMsg(m, otro); }).join('') : '<div class="chat-vacio">Todavía no hay mensajes con '+esc(otro)+'.<br>Escribí para coordinar horarios de entrega, calidad o embalaje.</div>';
   return '<div class="chat-box">'+
     '<div class="chat-msgs" id="chatMsgs">'+msgs+'</div>'+
     '<form class="chat-form" data-chat-form="'+o.id+'">'+
@@ -1367,6 +1414,99 @@ function enviarMensaje(orderId, input){
     texto: texto,
     fecha: FieldValue.serverTimestamp()
   }).catch(function(err){
+    input.value = texto;
+    showToast(err.code === 'permission-denied'
+      ? 'Firestore rechazó el mensaje: falta publicar las reglas nuevas.'
+      : 'No se pudo enviar: ' + err.message);
+  });
+}
+
+/* ---------- Chats directos entre mayoristas y productores ----------
+   Una conversación por par mayorista–productor, con id "mayoristaUid_productorUid",
+   independiente de los pedidos. Los mensajes van en la subcolección "mensajes". */
+function msDe(ts){ return ts && ts.toMillis ? ts.toMillis() : 0; }
+function campoVisto(){ return currentUser.rol === 'mayorista' ? 'vistoMayorista' : 'vistoProductor'; }
+function convIdCon(otroUid){
+  return currentUser.rol === 'mayorista' ? currentUser.uid + '_' + otroUid : otroUid + '_' + currentUser.uid;
+}
+function otroUidDe(c){ return c.mayoristaUid === currentUser.uid ? c.productorUid : c.mayoristaUid; }
+function contactoPorUid(uid){ return S.contactos.find(function(u){ return u.uid === uid; }); }
+function nombreContacto(u){ return u ? (u.entidad || u.nombre || '') : ''; }
+function nombreOtroEnConv(c){
+  const u = contactoPorUid(otroUidDe(c));
+  if(u) return nombreContacto(u);
+  return (c.mayoristaUid === currentUser.uid ? c.productorNombre : c.mayoristaNombre) || 'Contacto';
+}
+function convNoLeida(c){
+  return !!c.ultimoAutorUid && c.ultimoAutorUid !== currentUser.uid && msDe(c.actualizado) > msDe(c[campoVisto()]);
+}
+function chatsNoLeidos(){ return S.convs.filter(convNoLeida).length; }
+function marcarVista(c){
+  if(!convNoLeida(c) || marcandoVista[c.id]) return;
+  marcandoVista[c.id] = true;
+  const upd = {}; upd[campoVisto()] = FieldValue.serverTimestamp();
+  db.collection('conversaciones').doc(c.id).update(upd)
+    .catch(function(err){ console.warn('[CitrusCode] No se pudo marcar como leído:', err.message); })
+    .then(function(){ delete marcandoVista[c.id]; });
+}
+function cerrarConversacion(){
+  if(unsubConvMsgs) unsubConvMsgs();
+  unsubConvMsgs = null; convAbierta = null; convOtro = null; convMsgs = []; convError = false;
+}
+function abrirConversacion(otroUid){
+  const id = convIdCon(otroUid);
+  if(convAbierta === id) return;
+  cerrarConversacion();
+  convAbierta = id; convOtro = otroUid;
+  unsubConvMsgs = db.collection('conversaciones').doc(id).collection('mensajes').orderBy('fecha').onSnapshot(function(snap){
+    convMsgs = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    convError = false;
+    renderMain();
+  }, function(err){
+    console.warn('[CitrusCode] Mensajes del chat no disponibles:', err.message);
+    convError = true;
+    renderMain();
+  });
+  const c = S.convs.find(function(x){ return x.id === id; });
+  if(c) marcarVista(c);
+  renderMain();
+  setTimeout(function(){ const i = document.getElementById('convInput'); if(i) i.focus({ preventScroll: true }); }, 50);
+}
+function enviarMensajeDirecto(input){
+  const texto = input.value.trim().slice(0, 500);
+  if(!texto || !convAbierta) return;
+  input.value = '';
+  const id = convAbierta, otroUid = convOtro;
+  const ref = db.collection('conversaciones').doc(id);
+  const ahora = FieldValue.serverTimestamp();
+  const resumen = { ultimoMensaje: texto.slice(0, 120), ultimoAutorUid: currentUser.uid, actualizado: ahora };
+  resumen[campoVisto()] = ahora;
+  // El mensaje y el resumen de la conversación se escriben juntos: la primera vez
+  // se crea la conversación con las dos partes, y las siguientes solo se actualiza.
+  const batch = db.batch();
+  if(S.convs.some(function(c){ return c.id === id; })){
+    batch.update(ref, resumen);
+  } else {
+    const yo = currentUser.entidad || currentUser.nombre;
+    const otro = nombreContacto(contactoPorUid(otroUid)) || 'Contacto';
+    const esMay = currentUser.rol === 'mayorista';
+    batch.set(ref, Object.assign({
+      mayoristaUid: esMay ? currentUser.uid : otroUid,
+      productorUid: esMay ? otroUid : currentUser.uid,
+      mayoristaNombre: esMay ? yo : otro,
+      productorNombre: esMay ? otro : yo,
+      participantes: esMay ? [currentUser.uid, otroUid] : [otroUid, currentUser.uid],
+      creado: ahora
+    }, resumen));
+  }
+  batch.set(ref.collection('mensajes').doc(), {
+    autorUid: currentUser.uid,
+    autorNombre: currentUser.entidad || currentUser.nombre,
+    rol: currentUser.rol,
+    texto: texto,
+    fecha: ahora
+  });
+  batch.commit().catch(function(err){
     input.value = texto;
     showToast(err.code === 'permission-denied'
       ? 'Firestore rechazó el mensaje: falta publicar las reglas nuevas.'
@@ -1916,6 +2056,43 @@ function subscribeData(){
         renderSubnav(); renderMain();
       }, function(err){ showToast('Error leyendo tus solicitudes: ' + err.message); });
   }
+
+  if(currentUser.rol === 'mayorista' || currentUser.rol === 'productor') suscribirChats();
+}
+
+/* Chats directos: las conversaciones propias y la lista de contactos del otro rol
+   (el mayorista ve a los productores y el productor a los mayoristas). */
+function suscribirChats(){
+  const otroRol = currentUser.rol === 'mayorista' ? 'productor' : 'mayorista';
+  unsubContactos = db.collection('usuarios').where('rol','==',otroRol).onSnapshot(function(snap){
+    S.contactos = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); })
+      .filter(function(u){ return u.uid !== currentUser.uid; });
+    if(view[currentUser.rol] === 'chats') renderMain();
+  }, function(err){ console.warn('[CitrusCode] Contactos no disponibles:', err.message); });
+
+  unsubConvs = db.collection('conversaciones').where('participantes','array-contains',currentUser.uid).onSnapshot(function(snap){
+    if(convsCargadas){
+      snap.docChanges().forEach(function(ch){
+        if(ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) return;
+        const c = ch.doc.data();
+        if(c.ultimoAutorUid && c.ultimoAutorUid !== currentUser.uid && ch.doc.id !== convAbierta){
+          showToast('💬 Nuevo mensaje de ' + nombreOtroEnConv(Object.assign({id: ch.doc.id}, c)));
+        }
+      });
+    }
+    convsCargadas = true;
+    S.convs = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); });
+    S.convs.sort(function(a, b){ return msDe(b.actualizado) - msDe(a.actualizado); });
+    chatsDisponible = true;
+    const abierta = convAbierta && S.convs.find(function(c){ return c.id === convAbierta; });
+    if(abierta) marcarVista(abierta);
+    renderSubnav();
+    if(view[currentUser.rol] === 'chats') renderMain();
+  }, function(err){
+    console.warn('[CitrusCode] Chats no disponibles:', err.message);
+    chatsDisponible = false;
+    if(view[currentUser.rol] === 'chats') renderMain();
+  });
 }
 function unsubscribeData(){
   if(unsubLotes) unsubLotes();
@@ -1930,7 +2107,13 @@ function unsubscribeData(){
   editandoLote = null;
   catFilter = prodFilter = itemFilter = 'todos';
   catBusqueda = ''; catOrden = 'recientes';
-  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [] };
+  if(unsubConvs) unsubConvs();
+  if(unsubContactos) unsubContactos();
+  cerrarConversacion();
+  unsubConvs = unsubContactos = null;
+  convsCargadas = false; chatsDisponible = true;
+  Object.keys(marcandoVista).forEach(function(k){ delete marcandoVista[k]; });
+  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [] };
 }
 
 /* ============================================================
@@ -2030,6 +2213,7 @@ function renderSubnav(){
     tabs = [
       {k:'catalogo', label:'Catálogo y nuevo pedido'},
       {k:'pedidos', label:'Mis pedidos', badge: S.orders.filter(function(o){return o.mayoristaUid===currentUser.uid && !o.cancelado && !o.ocultoMayorista;}).length || null},
+      {k:'chats', label:'Chats', badge: chatsNoLeidos() || null},
       {k:'trazabilidad', label:'Trazabilidad'},
       {k:'facturas', label:'Facturas'},
       {k:'precios', label:'Evolución de precios'},
@@ -2042,6 +2226,7 @@ function renderSubnav(){
     tabs = [
       {k:'publicaciones', label:'Mis publicaciones', badge: lotesStockBajo().length || null},
       {k:'recibidos', label:'Pedidos recibidos', badge: pendCount || null},
+      {k:'chats', label:'Chats', badge: chatsNoLeidos() || null},
       {k:'trazabilidad', label:'Trazabilidad de lotes'},
       {k:'ganancias', label:'Mis ganancias'},
       {k:'precios', label:'Evolución de precios'},
@@ -2086,8 +2271,9 @@ function renderMain(){
   // Las animaciones de entrada corren solo al cambiar de sección.
   const clave = currentUser.rol + ':' + view[currentUser.rol];
   if(clave !== ultimaVista){
-    // Al cambiar de sección se cierran los mensajes y el mapa abiertos.
+    // Al cambiar de sección se cierran los mensajes, el chat y el mapa abiertos.
     cerrarChat();
+    cerrarConversacion();
     liberarMapa();
     const primera = ultimaVista === null;
     ultimaVista = clave;
@@ -2113,6 +2299,8 @@ function renderMain(){
     main.innerHTML = viewRanking();
   } else if(view[currentUser.rol] === 'precios'){
     main.innerHTML = viewPrecios();
+  } else if(view[currentUser.rol] === 'chats' && currentUser.rol !== 'admin'){
+    main.innerHTML = viewChats();
   } else if(currentUser.rol === 'mayorista'){
     if(view.mayorista === 'catalogo') main.innerHTML = viewMayoristaCatalogo();
     else if(view.mayorista === 'pedidos') main.innerHTML = viewMayoristaPedidos();
@@ -2350,6 +2538,7 @@ function viewMayoristaCatalogo(){
         '<h4>'+esc(p.name)+'</h4>'+
         '<div class="origin">'+icono('ubicacion')+esc(p.productorNombre)+
           (rep[p.productorUid] && rep[p.productorUid].n ? '<span class="origin-rate" title="Calificación promedio del productor">'+estrellas(rep[p.productorUid].prom, 'sm')+' '+fmtProm(rep[p.productorUid].prom)+' <small>('+rep[p.productorUid].n+')</small></span>' : '')+
+          '<button class="btn-contactar" data-contactar="'+esc(p.productorUid)+'" title="Escribirle a '+esc(p.productorNombre)+'">💬 Contactar</button>'+
         '</div>'+
         '<div class="product-price">'+money(p.price)+' <span style="font-size:.7rem;color:var(--texto-suave);font-weight:500;font-family:Inter,sans-serif;">/ '+p.unit+'</span>'+chipTendencia(tendenciaPrecio(p))+'</div>'+
         '<div class="product-stock">Stock: <span class="stock-num" data-stock-id="'+p.id+'" data-real="'+p.stock+'">'+p.stock.toLocaleString('es-AR')+'</span> '+p.unit+' · mín. '+p.min.toLocaleString('es-AR')+'</div>'+
@@ -2470,6 +2659,93 @@ function cajaCalificar(o, productor){
 /* ============================================================
    VISTA COMÚN — RANKING DE PROVEEDORES / MI REPUTACIÓN
    ============================================================ */
+/* ============================================================
+   VISTA COMUN — CHATS (mayoristas y productores)
+   ============================================================ */
+function horaCorta(ts){
+  const ms = msDe(ts);
+  if(!ms) return '';
+  const d = new Date(ms), hoy = new Date();
+  return d.toDateString() === hoy.toDateString()
+    ? d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' })
+    : d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit' });
+}
+function inicialesDe(nombre){
+  return String(nombre || '?').trim().split(/\s+/).slice(0, 2).map(function(w){ return w.charAt(0); }).join('').toUpperCase() || '?';
+}
+function viewChats(){
+  const esMay = currentUser.rol === 'mayorista';
+  const otroRol = esMay ? 'productor' : 'mayorista';
+  let html = '<div class="panel"><div class="panel-head"><h2>Chats</h2><p>'+
+    (esMay
+      ? 'Escribile directamente a cualquier productor para consultar stock, precios, calidad o condiciones de entrega, aunque todavía no tengas un pedido con él.'
+      : 'Conversaciones directas con los mayoristas: respondé consultas de stock, precios, calidad o entregas, tengan o no un pedido con vos.')+
+    '</p></div>';
+
+  if(!chatsDisponible){
+    html += '<div class="envio-box" style="margin-bottom:20px;"><b>Falta un paso de configuración</b>Para usar los chats hay que publicar las reglas nuevas de Firestore (archivo <code>backend/firestore.rules</code>) en la consola de Firebase.</div>';
+  }
+
+  // Selector para empezar un chat nuevo con alguien del otro rol.
+  const contactos = S.contactos.slice().sort(function(a, b){ return nombreContacto(a).localeCompare(nombreContacto(b), 'es'); });
+  const opts = contactos.map(function(u){
+    return '<option value="'+esc(u.uid)+'">'+esc(nombreContacto(u))+(u.provincia ? ' — '+esc(u.provincia) : '')+'</option>';
+  }).join('');
+  const nuevo = '<div class="chats-nuevo form-row" style="margin:0;">'+
+    '<select id="chatNuevo" aria-label="Empezar un chat nuevo"'+(contactos.length ? '' : ' disabled')+'><option value="">'+
+      (contactos.length ? '＋ Nuevo chat con un '+otroRol+'…' : 'Todavía no hay '+otroRol+'es registrados')+
+    '</option>'+opts+'</select></div>';
+
+  const lista = S.convs.length ? S.convs.map(function(c){
+    const otroUid = otroUidDe(c);
+    const nombre = nombreOtroEnConv(c);
+    const nueva = convNoLeida(c);
+    const prev = (c.ultimoAutorUid === currentUser.uid ? 'Vos: ' : '') + (c.ultimoMensaje || '');
+    return '<button class="conv-item'+(c.id === convAbierta ? ' activa' : '')+(nueva ? ' nueva' : '')+'" data-conv-otro="'+esc(otroUid)+'">'+
+      '<span class="conv-av">'+esc(inicialesDe(nombre))+'</span>'+
+      '<span class="conv-txt"><span class="conv-top"><span class="conv-nom">'+esc(nombre)+'</span><span class="conv-hora">'+horaCorta(c.actualizado)+'</span></span>'+
+        '<span class="conv-prev">'+esc(prev)+'</span></span>'+
+      (nueva ? '<span class="conv-dot" aria-label="Mensajes sin leer"></span>' : '')+
+    '</button>';
+  }).join('') : '<div class="chats-vacio">Todavía no tenés conversaciones.<br>Elegí un '+otroRol+' arriba para empezar.</div>';
+
+  let panel;
+  if(convAbierta){
+    const conv = S.convs.find(function(c){ return c.id === convAbierta; });
+    const u = contactoPorUid(convOtro);
+    const nombre = u ? nombreContacto(u) : (conv ? nombreOtroEnConv(conv) : 'Contacto');
+    const sub = u ? [u.entidad && u.nombre && u.entidad !== u.nombre ? u.nombre : '', u.ciudad || '', u.provincia || ''].filter(Boolean).join(' · ') : '';
+    let cuerpo;
+    if(convError){
+      cuerpo = '<div class="chat-msgs" id="chatMsgs"><div class="chat-aviso">Los chats se habilitan cuando se publiquen las reglas nuevas de Firestore.</div></div>';
+    } else {
+      cuerpo = '<div class="chat-msgs" id="chatMsgs">'+(convMsgs.length
+        ? convMsgs.map(function(m){ return burbujaMsg(m, nombre); }).join('')
+        : '<div class="chat-vacio">Todavía no hay mensajes con '+esc(nombre)+'.<br>'+
+            (esMay ? 'Preguntá por disponibilidad, precios por volumen o calidad del lote.' : 'Escribí para ofrecer tus lotes o coordinar una entrega.')+'</div>')+
+      '</div>';
+    }
+    panel = '<div class="chats-head">'+
+        '<button class="btn btn-ghost btn-sm chats-volver" id="chatsVolver" type="button" aria-label="Volver a la lista">←</button>'+
+        '<span class="conv-av">'+esc(inicialesDe(nombre))+'</span>'+
+        '<div><b>'+esc(nombre)+'</b><small>'+(esMay ? 'Productor' : 'Mayorista')+(sub ? ' · '+esc(sub) : '')+'</small></div>'+
+      '</div>'+
+      cuerpo+
+      '<form class="chat-form" id="convForm">'+
+        '<input type="text" id="convInput" maxlength="500" autocomplete="off" placeholder="Escribí un mensaje para '+esc(nombre)+'…">'+
+        '<button class="btn btn-primary btn-sm" type="submit">Enviar</button>'+
+      '</form>';
+  } else {
+    panel = '<div class="chats-elegir"><div>'+icono('chats')+'<p style="margin-top:8px;">Elegí una conversación o empezá una nueva.</p></div></div>';
+  }
+
+  html += '<div class="chats'+(convAbierta ? ' con-abierta' : '')+'">'+
+    '<div class="chats-lista">'+nuevo+'<div class="chats-convs">'+lista+'</div></div>'+
+    '<div class="chats-panel">'+panel+'</div>'+
+  '</div></div>';
+  return html;
+}
+
 function viewRanking(){
   const esProductor = currentUser.rol === 'productor';
   const r = reputacion();
@@ -3225,6 +3501,26 @@ function bindMainEvents(){
       e.preventDefault();
       enviarMensaje(f.dataset.chatForm, f.querySelector('input'));
     });
+  });
+  // Chats directos
+  main.querySelectorAll('[data-contactar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      view[currentUser.rol] = 'chats';
+      renderSubnav(); renderMain();
+      abrirConversacion(b.dataset.contactar);
+    });
+  });
+  main.querySelectorAll('[data-conv-otro]').forEach(function(b){
+    b.addEventListener('click', function(){ abrirConversacion(b.dataset.convOtro); });
+  });
+  const chatNuevo = document.getElementById('chatNuevo');
+  if(chatNuevo) chatNuevo.addEventListener('change', function(){ if(chatNuevo.value) abrirConversacion(chatNuevo.value); });
+  const chatsVolver = document.getElementById('chatsVolver');
+  if(chatsVolver) chatsVolver.addEventListener('click', function(){ cerrarConversacion(); renderMain(); });
+  const convForm = document.getElementById('convForm');
+  if(convForm) convForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    enviarMensajeDirecto(document.getElementById('convInput'));
   });
   main.querySelectorAll('[data-map]').forEach(function(b){
     b.addEventListener('click', function(){
