@@ -968,6 +968,21 @@
   /* ============================================================
      APP INSTALABLE
      ============================================================ */
+  .hero-apps{margin-top:26px; max-width:520px; animation:fadeUp .7s var(--easing) .65s backwards;}
+  .hero-apps-tit{display:block; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--c-limon-claro); margin-bottom:10px;}
+  .hero-apps-btns{display:flex; gap:10px; flex-wrap:wrap;}
+  .app-dl{display:flex; align-items:center; gap:11px; flex:1 1 200px; padding:11px 14px; border-radius:14px; background:#fff; color:#173423; text-decoration:none; box-shadow:0 10px 24px rgba(0,0,0,.18); transition:transform .25s var(--easing), box-shadow .25s;}
+  .app-dl:hover{transform:translateY(-3px); box-shadow:0 14px 30px rgba(0,0,0,.26);}
+  .app-dl .ic{width:26px; height:26px; color:#2E7D3E; flex-shrink:0;}
+  .app-dl b{display:block; font-size:.9rem; line-height:1.2;}
+  .app-dl small{display:block; font-size:.72rem; color:#4b5f52;}
+  .app-dl.sugerida{outline:3px solid var(--c-limon); outline-offset:2px;}
+  .hero-apps-nota{margin-top:9px; font-size:.72rem; color:rgba(255,255,255,.68);}
+  .side-apps{border:1px solid var(--borde); background:var(--surface); border-radius:16px; padding:12px 14px; display:grid; gap:8px;}
+  .side-apps-tit{font-size:.72rem; font-weight:700; color:var(--texto-suave); text-transform:uppercase; letter-spacing:.06em;}
+  .side-apps a{display:flex; align-items:center; gap:9px; font-size:.8rem; font-weight:600; color:var(--texto); text-decoration:none; padding:7px 9px; border-radius:10px; transition:background .2s;}
+  .side-apps a:hover{background:var(--acento-bg); color:var(--acento);}
+  .side-apps .ic{width:17px; height:17px; color:var(--acento);}
   .install-btn{display:flex; align-items:center; gap:10px; width:100%; padding:12px 14px; border-radius:16px; border:1px solid var(--acento-borde); background:var(--acento-bg); color:var(--acento); font-weight:700; font-size:.82rem; transition:.25s var(--easing); text-align:left;}
   .install-btn:hover{transform:translateY(-2px); box-shadow:var(--sombra-sm);}
   .install-btn small{display:block; font-weight:500; color:var(--texto-suave); font-size:.7rem;}
@@ -1032,7 +1047,7 @@
     header{position:relative;}
     .shell{grid-template-columns:minmax(0,1fr); gap:18px; padding:0 16px 30px;}
     .sidebar{min-width:0; position:sticky; top:0; z-index:40; gap:0; margin:0 -16px; padding:10px 16px; background:var(--header-bg); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--borde);}
-    .side-user, .side-label, .side-tip, .install-btn{display:none;}
+    .side-user, .side-label, .side-tip, .install-btn, .side-apps{display:none;}
     .subnav{flex-direction:row; overflow-x:auto; padding:4px; border-radius:14px; scrollbar-width:none; box-shadow:none;}
     .subnav::-webkit-scrollbar{display:none;}
     .subnav button{width:auto; white-space:nowrap; flex-shrink:0; padding:9px 12px;}
@@ -1210,6 +1225,8 @@ const ICONOS = {
   info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
   ranking:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
   precios:'<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-7"/>',
+  celular:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
+  pc:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
   instalar:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M9 18h6"/>',
   cosecha:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3v3H8z"/>',
   alertas:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
@@ -1219,6 +1236,38 @@ const ICONOS = {
 };
 function icono(nombre){
   return '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONOS[nombre]||'')+'</svg>';
+}
+/* ---------- Apps de celular y escritorio ----------
+   Los instaladores se publican en GitHub Releases (los compila la acción
+   .github/workflows/apps.yml). Dentro de las propias apps no se muestran. */
+const APPS = {
+  android: 'https://github.com/DredgenTomii/citruscode-tfi/releases/latest/download/CitrusCode.apk',
+  windows: 'https://github.com/DredgenTomii/citruscode-tfi/releases/latest/download/CitrusCode-Setup.exe'
+};
+const EN_APP = /CitrusCodeApp\//.test(navigator.userAgent);
+function bloqueApps(){
+  if(EN_APP) return '';
+  const ua = navigator.userAgent;
+  const esAndroid = /Android/i.test(ua);
+  const esWindows = /Windows/i.test(ua);
+  const esApple = /iPhone|iPad|iPod|Macintosh/i.test(ua);
+  return '<div class="hero-apps">'+
+    '<span class="hero-apps-tit">Descargá la app</span>'+
+    '<div class="hero-apps-btns">'+
+      '<a class="app-dl'+(esAndroid ? ' sugerida' : '')+'" href="'+APPS.android+'" rel="noopener">'+icono('celular')+'<span><b>Android</b><small>Celular y tablet · APK</small></span></a>'+
+      '<a class="app-dl'+(esWindows ? ' sugerida' : '')+'" href="'+APPS.windows+'" rel="noopener">'+icono('pc')+'<span><b>Windows</b><small>Instalador para PC</small></span></a>'+
+    '</div>'+
+    (esApple ? '<p class="hero-apps-nota">¿iPhone o Mac? Abrí esta página en Safari y elegí Compartir › Agregar a pantalla de inicio.</p>'
+             : '<p class="hero-apps-nota">Gratis. Usás la misma cuenta que en la página.</p>')+
+  '</div>';
+}
+function bloqueAppsLateral(){
+  if(EN_APP) return '';
+  return '<div class="side-apps">'+
+    '<span class="side-apps-tit">Descargá la app</span>'+
+    '<a href="'+APPS.android+'" rel="noopener">'+icono('celular')+'Android (celular)</a>'+
+    '<a href="'+APPS.windows+'" rel="noopener">'+icono('pc')+'Windows (PC)</a>'+
+  '</div>';
 }
 /* Estrellas de solo lectura (admite medias: 4,3 → 4 llenas y un 30 % de la quinta). */
 function estrellas(valor, tam){
@@ -1878,6 +1927,7 @@ function renderAuthScreen(){
           '<li><span class="fi">'+icono('facturas')+'</span><div><b>Comprobantes y facturas</b><span>PDF descargables y factura emitida al entregar.</span></div></li>'+
         '</ul>'+
         '<div class="hero-roles"><span>Mayoristas</span><span>Productores</span><span>Administración</span></div>'+
+        bloqueApps()+
       '</section>'+
       '<div class="auth-side"><div class="auth-card">'+
       '<h2>'+(isLogin ? 'Ingresar al sistema' : 'Crear una cuenta')+'</h2>'+
@@ -2209,7 +2259,8 @@ function renderApp(){
         '<div class="side-label">Menú</div>'+
         '<nav class="subnav" id="subnav" aria-label="Secciones"></nav>'+
         '<div class="side-tip">'+icono('foco')+'<span>'+(tips[currentUser.rol] || '')+'</span></div>'+
-        '<button class="install-btn" id="installBtn" type="button"'+(eventoInstalar ? '' : ' hidden')+'>'+icono('instalar')+'<span>Instalar la app<small>Abrila desde el escritorio o el celular</small></span></button>'+
+        bloqueAppsLateral()+
+        '<button class="install-btn" id="installBtn" type="button"'+(eventoInstalar && !EN_APP ? '' : ' hidden')+'>'+icono('instalar')+'<span>Instalar la app<small>Abrila desde el escritorio o el celular</small></span></button>'+
       '</aside>'+
       '<div class="content">'+
         (bannerVisto ? '' :
@@ -2241,7 +2292,7 @@ window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   eventoInstalar = e;
   const b = document.getElementById('installBtn');
-  if(b) b.hidden = false;
+  if(b && !EN_APP) b.hidden = false;
 });
 window.addEventListener('appinstalled', function(){
   eventoInstalar = null;

@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ar.citruscode.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'ar.citruscode.app'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    // La firma está en el repositorio a propósito: así cualquiera del grupo puede
+    // compilar una versión nueva y el celular la acepta como actualización.
+    signingConfigs {
+        release {
+            storeFile file('citruscode.keystore')
+            storePassword 'citruscode'
+            keyAlias 'citruscode'
+            keyPassword 'citruscode'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

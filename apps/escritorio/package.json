@@ -1,0 +1,42 @@
+{
+  "name": "citruscode",
+  "productName": "CitrusCode",
+  "version": "1.0.0",
+  "description": "CitrusCode — Marketplace B2B de cítricos (app de escritorio)",
+  "author": "CitrusCode · UTN FRT 4K1 Grupo 13",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "ar.citruscode.escritorio",
+    "productName": "CitrusCode",
+    "copyright": "CitrusCode · UTN FRT 4K1 Grupo 13",
+    "files": ["main.js", "sin-conexion.html", "build/icon.png"],
+    "directories": { "output": "dist" },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.ico",
+      "artifactName": "CitrusCode-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "CitrusCode",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "language": "3082",
+      "installerLanguages": ["es_ES"]
+    }
+  }
+}

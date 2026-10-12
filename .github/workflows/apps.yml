@@ -1,0 +1,87 @@
+# Compila las apps de CitrusCode y las publica en GitHub Releases, que es de
+# donde las descargan los botones de la página del sistema:
+#   https://github.com/DredgenTomii/citruscode-tfi/releases/latest/download/CitrusCode.apk
+#   https://github.com/DredgenTomii/citruscode-tfi/releases/latest/download/CitrusCode-Setup.exe
+# Corre solo cuando cambia algo en apps/ (o a mano desde la pestaña Actions).
+name: Apps de celular y escritorio
+
+on:
+  push:
+    paths:
+      - 'apps/**'
+      - '.github/workflows/apps.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apps
+  cancel-in-progress: false
+
+env:
+  VERSION: v1.0.0
+
+jobs:
+  android:
+    name: APK de Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compilar
+        working-directory: apps/android
+        run: gradle assembleRelease --no-daemon
+      - name: Renombrar
+        run: cp apps/android/app/build/outputs/apk/release/app-release.apk CitrusCode.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: CitrusCode.apk
+
+  windows:
+    name: Instalador de Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Compilar
+        working-directory: apps/escritorio
+        run: |
+          npm ci
+          npm run dist
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: apps/escritorio/dist/CitrusCode-Setup.exe
+
+  publicar:
+    name: Publicar en Releases
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Crear o actualizar la versión
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ls -la
+          NOTAS="Apps de CitrusCode. Android: descargá CitrusCode.apk y abrilo (si el celular lo pide, permití instalar apps de esta fuente). Windows: descargá CitrusCode-Setup.exe y seguí el instalador (si aparece SmartScreen, tocá Más información > Ejecutar de todas formas). Las dos apps abren el sistema publicado en citruscode.netlify.app, así que se actualizan solas con cada cambio del sitio."
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            gh release upload "$VERSION" CitrusCode.apk CitrusCode-Setup.exe --clobber
+          else
+            gh release create "$VERSION" CitrusCode.apk CitrusCode-Setup.exe --target "$GITHUB_SHA" --title "CitrusCode $VERSION — apps de celular y escritorio" --notes "$NOTAS" --latest
+          fi
