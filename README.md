@@ -43,8 +43,9 @@ eligiendo uno de los tres roles.
 - **Chats directos** entre mayoristas y productores, sin pedido de por medio: lista de conversaciones
   con el último mensaje, aviso de mensajes sin leer en el menú y botón *Contactar* en cada producto
   del catálogo.
-- **Cotizaciones desde el chat.** El mayorista pide precio por un volumen; el productor responde con un
-  precio especial y, si el mayorista acepta, se genera el pedido con ese precio.
+- **Cotizaciones desde el chat, con contraofertas.** El mayorista pide precio por un volumen; el productor
+  responde con un precio especial. El mayorista puede aceptarlo (se genera el pedido con ese precio),
+  rechazarlo o proponer otro precio, y así ida y vuelta (hasta 10 propuestas) hasta cerrar el trato.
 - **Calendario de cosecha.** Cada productor anuncia qué va a tener y en qué meses; el mayorista reserva
   con anticipación y la reserva llega al chat para acordar el precio.
 - **Seguimiento y alertas.** El mayorista sigue productores y marca productos favoritos (♡); el sistema
@@ -59,6 +60,16 @@ eligiendo uno de los tres roles.
   trazabilidad.
 - **Modo claro / oscuro** en el sitio y en el sistema, con la misma paleta de la marca.
 - **App instalable (PWA)** en computadora y Android, con manifiesto y *service worker*.
+- **Apps de Android y Windows** (`apps/`), con descarga desde la pantalla de inicio del sistema.
+- **Modo sin conexión (Offline-First).** Firestore guarda los datos en el dispositivo: sin señal se puede
+  seguir cargando (publicaciones, trazabilidad, cosechas, mensajes) y todo se sincroniza solo al volver
+  la conexión. Un aviso muestra cuántos cambios esperan sincronizarse.
+- **Trazabilidad por QR.** Cada lote en camino tiene un QR real y una etiqueta en PDF para imprimir. Al
+  escanearla con el celular (cámara o foto) la trazabilidad avanza sola al paso siguiente.
+- **Reportes de ventas** para la administración: por mes, por producto y por productor, con gráficos y
+  descarga en Excel o PDF.
+- **Suspensión de cuentas.** La administración bloquea a un usuario problemático sin borrar su
+  historial; las reglas de Firestore le impiden crear o modificar datos mientras esté suspendido.
 
 El rol de administración está restringido: además del código que pide el formulario, las
 reglas de Firestore validan que el correo esté en una lista de habilitados
@@ -191,10 +202,10 @@ Las dejamos documentadas a propósito, porque forman parte del análisis del tra
   Cloud Functions con *custom claims* de Firebase.
 - La facturación electrónica está **simulada**: se genera un CAE ficticio en lugar de
   consumir la API real de AFIP.
-- La trazabilidad avanza por acción manual del productor; en producción se dispararía al
-  escanear el QR desde el celular en el empaque.
-- El modo Offline-First descrito en el TFI está implementado solo en parte: la app se instala y
-  abre sin conexión, pero los datos (pedidos, stock) necesitan internet.
+- Sin conexión se puede consultar y cargar casi todo, pero **confirmar un pedido** necesita internet,
+  porque descuenta stock en una transacción del servidor y así se evita vender dos veces lo mismo.
+  Para entrar sin señal hay que haber iniciado sesión antes en ese dispositivo.
+- Las notificaciones al celular o por mail no están hechas: necesitan Cloud Functions (plan Blaze).
 - El generador gratuito de imágenes limita cuántas fotos nuevas crea por persona. Mientras una
   foto no está lista se muestra una ilustración, y el sistema la reintenta en segundo plano;
   una vez generada, queda en caché para todos.

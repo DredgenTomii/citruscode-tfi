@@ -8,6 +8,15 @@ service cloud.firestore {
     function getRole() {
       return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
     }
+    // Cuenta habilitada: la administracion puede suspender a un usuario
+    // problematico sin borrar su historial. Una cuenta suspendida puede leer
+    // (para ver el aviso) pero no crear ni modificar nada.
+    function activo() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('suspendido', false) != true;
+    }
+    function camposSuspension() {
+      return ['suspendido', 'motivoSuspension', 'suspendidoPor', 'suspendidoEn'];
+    }
 
     // Correos habilitados para darse de alta como administracion.
     // El codigo de admin del formulario es solo una comodidad de la interfaz:
@@ -28,8 +37,19 @@ service cloud.firestore {
                     && request.resource.data.rol in ['mayorista', 'productor', 'admin']
                     && (request.resource.data.rol != 'admin'
                         || request.auth.token.email in adminsHabilitados());
+      // El propio usuario edita sus datos, pero no puede cambiar su rol ni levantarse una suspension.
       allow update: if isSignedIn() && request.auth.uid == uid
-                    && request.resource.data.rol == resource.data.rol; // el rol no se puede cambiar despues de creado
+                    && request.resource.data.rol == resource.data.rol // el rol no se puede cambiar despues de creado
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(camposSuspension())
+                    && activo();
+      // La administracion suspende o reactiva cuentas de mayoristas y productores (nunca de otro admin
+      // ni la propia), tocando solo los campos de la suspension.
+      allow update: if isSignedIn() && getRole() == 'admin' && activo()
+                    && request.auth.uid != uid
+                    && resource.data.rol != 'admin'
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(camposSuspension())
+                    && request.resource.data.get('suspendido', false) is bool
+                    && (!('motivoSuspension' in request.resource.data) || request.resource.data.motivoSuspension.size() <= 200);
       allow delete: if false;
     }
 
@@ -39,9 +59,9 @@ service cloud.firestore {
     // solo se le permite bajar el stock, nunca subirlo ni tocar otros campos.
     match /lotes/{lotId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && getRole() == 'productor'
+      allow create: if isSignedIn() && getRole() == 'productor' && activo()
                     && request.resource.data.productorUid == request.auth.uid;
-      allow update: if isSignedIn() &&
+      allow update: if isSignedIn() && activo() &&
                     (resource.data.productorUid == request.auth.uid
                      || getRole() == 'admin'
                      || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
@@ -56,9 +76,9 @@ service cloud.firestore {
     // calificar sin haber comprado.
     match /pedidos/{orderId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && getRole() == 'mayorista'
+      allow create: if isSignedIn() && getRole() == 'mayorista' && activo()
                     && request.resource.data.mayoristaUid == request.auth.uid;
-      allow update: if isSignedIn() &&
+      allow update: if isSignedIn() && activo() &&
                     (getRole() == 'admin' ||
                      (getRole() == 'productor' && resource.data.productorUid == request.auth.uid) ||
                      (getRole() == 'mayorista' && resource.data.mayoristaUid == request.auth.uid
@@ -75,7 +95,7 @@ service cloud.firestore {
         return p.mayoristaUid == request.auth.uid || p.productorUid == request.auth.uid;
       }
       allow read: if isSignedIn() && (esParte() || getRole() == 'admin');
-      allow create: if isSignedIn() && esParte()
+      allow create: if isSignedIn() && esParte() && activo()
                     && request.resource.data.autorUid == request.auth.uid
                     && request.resource.data.texto is string
                     && request.resource.data.texto.size() > 0
@@ -94,7 +114,7 @@ service cloud.firestore {
       }
       allow read: if isSignedIn() &&
                   (request.auth.uid in resource.data.participantes || getRole() == 'admin');
-      allow create: if isSignedIn()
+      allow create: if isSignedIn() && activo()
                     && convId == request.resource.data.mayoristaUid + '_' + request.resource.data.productorUid
                     && request.resource.data.participantes == partes()
                     && request.auth.uid in partes()
@@ -103,7 +123,7 @@ service cloud.firestore {
                     && request.resource.data.ultimoAutorUid == request.auth.uid;
       // Despues de creada solo cambia el resumen del ultimo mensaje y las marcas
       // de leido; las partes y los nombres quedan fijos.
-      allow update: if isSignedIn() && request.auth.uid in resource.data.participantes
+      allow update: if isSignedIn() && activo() && request.auth.uid in resource.data.participantes
                     && request.resource.data.diff(resource.data).affectedKeys()
                          .hasOnly(['ultimoMensaje', 'ultimoAutorUid', 'actualizado', 'vistoMayorista', 'vistoProductor'])
                     && (request.resource.data.ultimoAutorUid == resource.data.ultimoAutorUid
@@ -115,7 +135,7 @@ service cloud.firestore {
         allow read: if isSignedIn() &&
                     (request.auth.uid in convId.split('_') || getRole() == 'admin');
         // getAfter: la conversacion puede crearse en el mismo lote que su primer mensaje.
-        allow create: if isSignedIn()
+        allow create: if isSignedIn() && activo()
                       && request.auth.uid in getAfter(/databases/$(database)/documents/conversaciones/$(convId)).data.participantes
                       && request.resource.data.autorUid == request.auth.uid
                       && request.resource.data.texto is string
@@ -127,8 +147,10 @@ service cloud.firestore {
 
     // Cotizaciones y reservas de cosecha entre un mayorista y un productor.
     // El mayorista la pide; el productor responde con un precio o la rechaza;
-    // el mayorista la acepta (y genera el pedido) o la rechaza. Cada parte solo
-    // puede hacer los cambios de estado que le corresponden.
+    // el mayorista la acepta (y genera el pedido), la rechaza o propone otro
+    // precio (contraoferta). El productor acepta la contraoferta, propone otro
+    // precio o la rechaza, y asi hasta cerrar. Cada parte solo puede hacer los
+    // cambios de estado que le corresponden; las propuestas tienen un tope.
     match /cotizaciones/{cotId} {
       function esParteCot() {
         return request.auth.uid in resource.data.participantes;
@@ -136,8 +158,12 @@ service cloud.firestore {
       function soloCambia(campos) {
         return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
       }
+      function rondasOk() {
+        return !('rondas' in request.resource.data)
+            || (request.resource.data.rondas is list && request.resource.data.rondas.size() <= 10);
+      }
       allow read: if isSignedIn() && (esParteCot() || getRole() == 'admin');
-      allow create: if isSignedIn() && getRole() == 'mayorista'
+      allow create: if isSignedIn() && getRole() == 'mayorista' && activo()
                     && request.resource.data.mayoristaUid == request.auth.uid
                     && request.resource.data.participantes == [request.auth.uid, request.resource.data.productorUid]
                     && request.resource.data.convId == request.auth.uid + '_' + request.resource.data.productorUid
@@ -147,18 +173,24 @@ service cloud.firestore {
                     && request.resource.data.producto is string && request.resource.data.producto.size() <= 80
                     && request.resource.data.origen in ['chat', 'cosecha']
                     && !('precioOfertado' in request.resource.data);
-      allow update: if isSignedIn() && (
-        // Productor: responde con un precio o rechaza una cotización pendiente.
-        (request.auth.uid == resource.data.productorUid && resource.data.estado == 'pendiente'
+      allow update: if isSignedIn() && activo() && rondasOk() && (
+        // Productor: a una cotizacion pendiente o a una contraoferta le responde
+        // con un precio (o acepta el del mayorista), o la rechaza.
+        (request.auth.uid == resource.data.productorUid && resource.data.estado in ['pendiente', 'contraoferta']
           && ((request.resource.data.estado == 'cotizada' && request.resource.data.precioOfertado is number
-               && request.resource.data.precioOfertado > 0 && soloCambia(['estado', 'precioOfertado', 'actualizado']))
+               && request.resource.data.precioOfertado > 0
+               && soloCambia(['estado', 'precioOfertado', 'acordado', 'rondas', 'actualizado']))
               || (request.resource.data.estado == 'rechazada' && soloCambia(['estado', 'actualizado']))))
         ||
-        // Mayorista: cancela la que pidió, o acepta / rechaza el precio recibido.
+        // Mayorista: cancela la que pidió (o retira su contraoferta), acepta / rechaza
+        // el precio recibido, o propone otro precio.
         (request.auth.uid == resource.data.mayoristaUid
-          && ((resource.data.estado == 'pendiente' && request.resource.data.estado == 'cancelada' && soloCambia(['estado', 'actualizado']))
+          && ((resource.data.estado in ['pendiente', 'contraoferta'] && request.resource.data.estado == 'cancelada' && soloCambia(['estado', 'actualizado']))
               || (resource.data.estado == 'cotizada' && request.resource.data.estado in ['aceptada', 'rechazada']
-                  && soloCambia(['estado', 'actualizado', 'pedidoId', 'numeroPedido']))))
+                  && soloCambia(['estado', 'actualizado', 'pedidoId', 'numeroPedido']))
+              || (resource.data.estado == 'cotizada' && request.resource.data.estado == 'contraoferta'
+                  && request.resource.data.precioContraoferta is number && request.resource.data.precioContraoferta > 0
+                  && soloCambia(['estado', 'precioContraoferta', 'acordado', 'rondas', 'actualizado']))))
       );
       allow delete: if false;
     }
@@ -176,9 +208,9 @@ service cloud.firestore {
             && d.notas is string && d.notas.size() <= 200;
       }
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && getRole() == 'productor' && cosechaValida();
-      allow update: if isSignedIn() && resource.data.productorUid == request.auth.uid && cosechaValida();
-      allow delete: if isSignedIn() && (resource.data.productorUid == request.auth.uid || getRole() == 'admin');
+      allow create: if isSignedIn() && getRole() == 'productor' && activo() && cosechaValida();
+      allow update: if isSignedIn() && resource.data.productorUid == request.auth.uid && activo() && cosechaValida();
+      allow delete: if isSignedIn() && activo() && (resource.data.productorUid == request.auth.uid || getRole() == 'admin');
     }
 
     // Bitacora de actividad (auditoria). Cualquier usuario registra sus propias
@@ -213,9 +245,9 @@ service cloud.firestore {
     }
     match /calificaciones/{pedidoId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && getRole() == 'mayorista'
+      allow create: if isSignedIn() && getRole() == 'mayorista' && activo()
                     && calificacionValida(pedidoId) && pedidoCalificable(pedidoId);
-      allow update: if isSignedIn() && getRole() == 'mayorista'
+      allow update: if isSignedIn() && getRole() == 'mayorista' && activo()
                     && resource.data.mayoristaUid == request.auth.uid
                     && calificacionValida(pedidoId) && pedidoCalificable(pedidoId);
       allow delete: if false;
@@ -227,7 +259,7 @@ service cloud.firestore {
     match /proyectos/{projId} {
       allow read: if isSignedIn() &&
                   (getRole() == 'admin' || resource.data.solicitanteUid == request.auth.uid);
-      allow create: if isSignedIn() &&
+      allow create: if isSignedIn() && activo() &&
                     (getRole() == 'admin' ||
                      (getRole() == 'productor'
                       && request.resource.data.solicitanteUid == request.auth.uid
@@ -239,7 +271,7 @@ service cloud.firestore {
     // Contador para numerar pedidos (CC-8841, CC-8842, ...)
     match /meta/{docId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn() && (getRole() == 'mayorista' || getRole() == 'admin');
+      allow write: if isSignedIn() && activo() && (getRole() == 'mayorista' || getRole() == 'admin');
     }
   }
 }

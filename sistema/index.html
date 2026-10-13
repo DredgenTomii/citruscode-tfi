@@ -493,6 +493,25 @@
   .trace-lot:hover{box-shadow:var(--sombra); transform:translateY(-2px);}
   .qr-mini{width:104px; height:104px; background:#22301E; border-radius:14px; padding:9px; display:grid; grid-template-columns:repeat(7,1fr); gap:2px; position:relative; overflow:hidden; border:1px solid var(--borde-fuerte); box-shadow:0 8px 18px rgba(34,48,30,.2);}
   .qr-mini div{background:#FFFDF6; border-radius:1px;}
+  .qr-real{width:120px; height:120px; background:#fff; border-radius:14px; padding:6px; border:1px solid var(--borde-fuerte); box-shadow:0 8px 18px rgba(34,48,30,.16);}
+  .qr-real svg{width:100%; height:100%; display:block;}
+  .trace-lot.resaltado{box-shadow:0 0 0 3px var(--c-limon), var(--sombra); }
+  body.modal-abierto{overflow:hidden;}
+  .qr-modal{position:fixed; inset:0; z-index:300; background:rgba(10,18,12,.72); display:flex; align-items:center; justify-content:center; padding:16px; animation:fadeUp .25s var(--easing);}
+  .qr-modal-card{background:var(--surface); color:var(--texto); border-radius:22px; padding:18px; width:100%; max-width:440px; box-shadow:var(--sombra-fuerte); display:grid; gap:12px;}
+  .qr-modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .qr-modal-head b{display:flex; align-items:center; gap:8px; font-size:1rem;}
+  .qr-modal-head .ic{width:20px; height:20px; color:var(--acento);}
+  .qr-cerrar{background:var(--surface-2); border:1px solid var(--borde); color:var(--texto); width:34px; height:34px; border-radius:10px; font-size:1rem; cursor:pointer;}
+  .qr-visor{position:relative; aspect-ratio:1/1; background:#0d1510; border-radius:16px; overflow:hidden;}
+  .qr-visor video{width:100%; height:100%; object-fit:cover; display:block;}
+  .qr-marco{position:absolute; inset:16%; border:3px solid rgba(242,194,48,.9); border-radius:18px; box-shadow:0 0 0 999px rgba(0,0,0,.28); pointer-events:none;}
+  .qr-marco::after{content:''; position:absolute; left:6%; right:6%; height:3px; top:50%; background:var(--c-limon); box-shadow:0 0 12px var(--c-limon); animation:scan 2.2s ease-in-out infinite;}
+  .qr-estado{font-size:.84rem; color:var(--texto-suave); text-align:center; margin:0;}
+  .qr-res{border-radius:14px; padding:12px 14px; font-size:.88rem; font-weight:600; display:grid; gap:8px; justify-items:start;}
+  .qr-res.ok{background:var(--acento-bg); color:var(--acento); border:1px solid var(--acento-borde);}
+  .qr-res.error{background:rgba(201,73,58,.1); color:var(--rojo); border:1px solid rgba(201,73,58,.35);}
+  .qr-foto{justify-self:center; cursor:pointer;}
   .qr-mini::after{content:''; position:absolute; left:0; right:0; height:22%; background:linear-gradient(180deg, transparent, rgba(242,194,48,.55), transparent); animation:scan 2.6s ease-in-out infinite;}
 
   .kanban{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
@@ -507,7 +526,15 @@
   /* ============================================================
      TOAST, VACÍOS Y CARGA
      ============================================================ */
-  .toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(30px) scale(.96); opacity:0; visibility:hidden; background:var(--toast-bg); color:#fff; padding:13px 22px 13px 40px; border-radius:16px; font-size:.84rem; font-weight:600; z-index:200; transition:transform .5s var(--spring), opacity .3s, visibility .3s; box-shadow:var(--sombra-fuerte); max-width:min(560px, 90vw); text-align:left; overflow:hidden; border:1px solid rgba(242,194,48,.3);}
+  .offline-bar{position:fixed; top:74px; left:50%; transform:translateX(-50%); z-index:250; width:max-content; max-width:calc(100vw - 32px); display:flex; align-items:center; gap:10px; padding:10px 18px; border-radius:16px; background:#7A4B0E; color:#FFF6E0; font-size:.8rem; font-weight:600; text-align:left; box-shadow:0 10px 26px rgba(0,0,0,.22);}
+  .offline-bar[hidden]{display:none;}
+  .live-pill.sin-red{background:rgba(122,75,14,.12) !important; color:#7A4B0E !important; border-color:rgba(122,75,14,.35) !important;}
+  [data-theme="dark"] .live-pill.sin-red{color:#F0B860 !important;}
+  .live-pill.sin-red .dotpulse{background:#C2761C;}
+  .live-pill.sin-red .dotpulse::after{display:none;}
+  .offline-bar .ic{width:17px; height:17px; flex-shrink:0;}
+  .offline-bar.sincronizando{background:var(--c-verde, #2E7D3E);}
+  .toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(30px) scale(.96); opacity:0; visibility:hidden; background:var(--toast-bg); color:#fff; padding:13px 22px 13px 40px; border-radius:16px; font-size:.84rem; font-weight:600; z-index:400; transition:transform .5s var(--spring), opacity .3s, visibility .3s; box-shadow:var(--sombra-fuerte); max-width:min(560px, 90vw); text-align:left; overflow:hidden; border:1px solid rgba(242,194,48,.3);}
   .toast::before{content:''; position:absolute; left:16px; top:50%; width:10px; height:10px; margin-top:-5px; border-radius:50%; background:var(--c-limon); box-shadow:0 0 0 4px rgba(242,194,48,.25);}
   .toast::after{content:''; position:absolute; left:0; bottom:0; height:3px; width:100%; background:linear-gradient(90deg,var(--c-limon),var(--c-verde-claro)); transform-origin:left; transform:scaleX(0);}
   .toast.show{transform:translateX(-50%) translateY(0) scale(1); opacity:1; visibility:visible;}
@@ -516,6 +543,32 @@
 
   .empty-state{text-align:center; padding:46px 20px; color:var(--texto-suave); background:var(--surface); border:1px dashed var(--borde-fuerte); border-radius:18px; font-size:.9rem;}
   .empty-state .ee-icon{width:76px; height:76px; border-radius:50%; background:var(--limon-bg); border:1px solid var(--limon-borde); display:grid; place-items:center; margin:0 auto 14px; font-size:2rem; animation:bob 4s ease-in-out infinite;}
+  .rep-acciones{display:flex; gap:8px; flex-wrap:wrap;}
+  .rep-filtros{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;}
+  .rep-filtros label{display:grid; gap:5px; font-size:.72rem; font-weight:700; color:var(--texto-suave); text-transform:uppercase; letter-spacing:.06em;}
+  .rep-filtros select{min-width:200px; padding:9px 12px; border-radius:12px; border:1px solid var(--borde); background:var(--surface); color:var(--texto); font:inherit; font-size:.86rem; text-transform:none; letter-spacing:0;}
+  .rep-kpi-texto{font-size:1.15rem !important; line-height:1.25; overflow-wrap:anywhere;}
+  .rep-chart{width:100%; height:auto; display:block;}
+  .rep-chart .grid-l{stroke:var(--borde); stroke-width:1;}
+  .rep-chart .base-l{stroke:var(--borde-fuerte); stroke-width:1;}
+  .rep-chart .eje{fill:var(--texto-suave); font-size:11px; font-family:'Inter',sans-serif;}
+  .rep-chart .col{fill:var(--c-verde);}
+  [data-theme="dark"] .rep-chart .col{fill:#67B75A;}
+  .rep-chart .hit{fill:transparent;}
+  .rep-chart .rep-barra:hover .hit{fill:var(--acento-bg);}
+  .rep-dos{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .rep-dos .chart-card{margin-bottom:0;}
+  .rep-ranking{display:grid; gap:14px;}
+  .rep-fila-top{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; margin-bottom:5px;}
+  .rep-fila-top span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .rep-pista{height:10px; border-radius:6px; background:var(--surface-2);}
+  .rep-valor{height:100%; border-radius:0 5px 5px 0; background:var(--c-verde);}
+  [data-theme="dark"] .rep-valor{background:#67B75A;}
+  .rep-sub{font-size:.72rem; color:var(--texto-suave); margin-top:4px;}
+  .rep-tabla{margin-top:14px;}
+  .rep-tabla summary{cursor:pointer; font-size:.8rem; font-weight:600; color:var(--acento);}
+  .rep-tabla table{margin-top:10px;}
+  @media(max-width:980px){ .rep-dos{grid-template-columns:1fr;} .rep-dos .chart-card{margin-bottom:20px;} }
   .chart-card .empty-state{border:none; background:transparent; padding:20px;}
 
   .loading-state{min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; color:var(--texto-suave); font-size:.9rem; text-align:center; padding:40px 20px; position:relative; z-index:1;}
@@ -828,6 +881,9 @@
   .precio-leyenda i.pedido{border-color:var(--c-verde);}
   .spark{width:96px; height:28px; display:block;}
   table.simple tr.sel td{background:var(--acento-bg);}
+  table.simple tr.fila-suspendida td{opacity:.72;}
+  .motivo-susp{font-size:.72rem; color:var(--rojo); margin-top:2px;}
+  .susp-resumen{font-size:.82rem; color:var(--rojo); font-weight:600; margin:-8px 0 12px;}
   .spark path{fill:none; stroke:var(--c-verde-claro); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
 
   /* ============================================================
@@ -906,6 +962,13 @@
   .cot-estado{flex:none; font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--texto-suave);}
   .cot-nota{color:var(--texto-suave); font-style:italic; margin-top:3px;}
   .cot-precio{margin-top:5px;}
+  .cot-card.est-contraoferta{border-left-color:#7A5EA8;}
+  .cot-acuerdo{margin-top:5px; color:var(--acento); font-weight:600;}
+  .cot-antes{color:var(--texto-suave); text-decoration:line-through;}
+  .cot-hist{margin-top:7px; color:var(--texto-suave);}
+  .cot-hist summary{cursor:pointer; font-weight:600;}
+  .cot-hist ol{margin:6px 0 0 18px; display:grid; gap:3px;}
+  .cot-hist li span{color:var(--texto-suave); font-size:.74rem;}
   .cot-acc{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:7px; color:var(--texto-suave);}
   .cot-acc input{width:150px; padding:7px 10px; border:1px solid var(--borde); border-radius:10px; background:var(--input-bg); color:var(--texto); font-family:inherit;}
   .btn-fav{flex:none; border:1px solid var(--borde); background:var(--surface); color:var(--texto-suave); border-radius:20px; font-size:.8rem; line-height:1; padding:3px 8px; transition:.2s;}
@@ -1059,7 +1122,7 @@
     .hero-fruit.f1{width:56px; top:auto; bottom:22px; right:18px;}
     .form-grid{grid-template-columns:1fr;}
     .trace-lot{grid-template-columns:1fr; text-align:center;}
-    .qr-mini{margin:0 auto;}
+    .qr-mini, .qr-real{margin:0 auto;}
   }
   @media(max-width:640px){
     header{padding:10px 16px;}
@@ -1108,6 +1171,7 @@
   </div>
 </header>
 
+<div class="offline-bar" id="offlineBar" role="status" aria-live="polite" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.8M19 12.9a10 10 0 0 0-2.1-1.6M2 8.8a15 15 0 0 1 4.2-2.7M10.7 5.1A15 15 0 0 1 22 8.8M12 20h.01"/></svg><span></span></div>
 <div id="appBody"><div class="loading-state"><div class="loader-ring"></div><div>Conectando con el sistema<span class="loading-dots"><span></span><span></span><span></span></span></div></div></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1131,6 +1195,72 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const FieldValue = firebase.firestore.FieldValue;
+
+/* ---------- Modo sin conexión (offline-first) ----------
+   Firestore guarda en el dispositivo una copia de los datos que ya se vieron y
+   anota los cambios hechos sin señal; cuando vuelve la conexión los manda solo.
+   Así el productor puede cargar datos en la finca y se sincronizan después.
+   Tiene que activarse antes de cualquier lectura o escritura. */
+let cacheLocal = true;
+db.enablePersistence({ synchronizeTabs: true }).catch(function(err){
+  // failed-precondition: otra pestaña vieja la tiene tomada; unimplemented: navegador sin IndexedDB.
+  cacheLocal = false;
+  console.warn('[CitrusCode] Sin caché local de datos:', err.code || err.message);
+});
+let cambiosSinSincronizar = 0;
+/* Envuelve una escritura de Firestore. Con conexión espera la confirmación del
+   servidor como siempre; sin conexión (o con señal muy débil) da el cambio por
+   guardado en el dispositivo enseguida, para no dejar la pantalla esperando,
+   y avisa si después el servidor lo rechaza. */
+function guardar(promesa){
+  let resueltaSinRed = false;
+  const real = Promise.resolve(promesa);
+  const espera = new Promise(function(ok){
+    setTimeout(function(){ resueltaSinRed = true; ok({ pendiente: true }); }, navigator.onLine ? 7000 : 250);
+  });
+  real.then(function(){
+    if(resueltaSinRed){ cambiosSinSincronizar = Math.max(0, cambiosSinSincronizar - 1); actualizarBarraOffline(); }
+  }, function(err){
+    if(!resueltaSinRed) return;
+    cambiosSinSincronizar = Math.max(0, cambiosSinSincronizar - 1); actualizarBarraOffline();
+    showToast('Un cambio hecho sin conexión no se pudo sincronizar: ' + ((err && err.message) || 'error desconocido'));
+  });
+  return Promise.race([real, espera]).then(function(r){
+    if(r && r.pendiente){
+      cambiosSinSincronizar++;
+      actualizarBarraOffline();
+      setTimeout(function(){ showToast('Guardado en el dispositivo: se sincroniza cuando vuelva la señal'); }, 3400);
+    }
+    return r;
+  });
+}
+function actualizarBarraOffline(){
+  const pill = document.getElementById('livePill');
+  if(pill){
+    pill.classList.toggle('sin-red', !navigator.onLine);
+    pill.lastChild.textContent = navigator.onLine ? 'Conectado' : 'Sin conexión';
+  }
+  const barra = document.getElementById('offlineBar');
+  if(!barra) return;
+  const sinRed = !navigator.onLine;
+  barra.hidden = !sinRed && !cambiosSinSincronizar;
+  barra.classList.toggle('sincronizando', !sinRed);
+  const n = cambiosSinSincronizar;
+  barra.querySelector('span').textContent = sinRed
+    ? 'Sin conexión. Podés seguir trabajando: ' + (n ? n + (n === 1 ? ' cambio guardado' : ' cambios guardados') + ' en el dispositivo' : 'los cambios se guardan en el dispositivo') + ' y se sincronizan solos al volver la señal.'
+    : 'Volvió la conexión. Sincronizando ' + n + (n === 1 ? ' cambio' : ' cambios') + '…';
+}
+window.addEventListener('offline', actualizarBarraOffline);
+window.addEventListener('online', function(){
+  const habia = cambiosSinSincronizar;
+  actualizarBarraOffline();
+  db.waitForPendingWrites().then(function(){
+    cambiosSinSincronizar = 0;
+    actualizarBarraOffline();
+    if(habia) showToast('Listo: los cambios hechos sin conexión ya están sincronizados');
+  }).catch(function(){});
+});
+document.addEventListener('DOMContentLoaded', actualizarBarraOffline);
 
 const ADMIN_CODE = "TFI-CITRUSCODE-2026"; // código simple para demo académica
 
@@ -1164,6 +1294,12 @@ function direccionDe(u){
 }
 
 let currentUser = null;   // {uid, nombre, email, rol, entidad}
+let avisoSuspension = null;   // se muestra en la pantalla de ingreso al cerrar la sesión de una cuenta suspendida
+let unsubYo = null;
+function textoSuspension(d){
+  return 'Tu cuenta está suspendida por la administración de CitrusCode' + (d && d.motivoSuspension ? ': ' + d.motivoSuspension : '') +
+    '. Tu historial se conserva. Escribinos para revisarlo.';
+}
 let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [] };
 let califDisponible = true;  // false si Firestore todavía no tiene las reglas de calificaciones
 let editandoLote = null;   // id del lote que se está editando, o null
@@ -1227,6 +1363,7 @@ const ICONOS = {
   precios:'<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-7"/>',
   celular:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
   pc:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  reportes:'<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="5" width="3" height="13" rx="1"/>',
   instalar:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M9 18h6"/>',
   cosecha:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3v3H8z"/>',
   alertas:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
@@ -1895,7 +2032,7 @@ function renderHeaderRight(){
   const el = document.getElementById('headerRight');
   if(currentUser){
     el.innerHTML =
-      '<span class="live-pill"><span class="dotpulse"></span>Conectado</span>'+
+      '<span class="live-pill'+(navigator.onLine ? '' : ' sin-red')+'" id="livePill"><span class="dotpulse"></span><span>'+(navigator.onLine ? 'Conectado' : 'Sin conexión')+'</span></span>'+
       '<button class="acc-pill" id="perfilBtn" title="Ver y editar mis datos" style="cursor:pointer;"><span class="acc-name">'+esc(currentUser.nombre)+'</span><span class="acc-role">'+esc(currentUser.rol)+'</span></button>'+
       '<button class="logout-btn" id="logoutBtn">Cerrar sesión</button>';
     document.getElementById('logoutBtn').addEventListener('click', function(){ auth.signOut(); });
@@ -1970,6 +2107,13 @@ function renderAuthScreen(){
       '</form>'+
       (isLogin ? '<p class="auth-hint"><a href="#" id="resetPassLink" style="color:var(--acento); font-weight:600; text-decoration:underline;">¿Olvidaste tu contraseña?</a></p>' : '')+
     '</div></div></div>';
+
+  if(avisoSuspension){
+    const caja = document.getElementById('authError');
+    caja.textContent = avisoSuspension;
+    caja.classList.add('show');
+    avisoSuspension = null;
+  }
 
   // Mostrar / ocultar la contraseña
   const passToggle = document.getElementById('passToggle');
@@ -2101,6 +2245,7 @@ function subscribeData(){
   unsubPedidos = db.collection('pedidos').orderBy('createdAt','desc').onSnapshot(function(snap){
     S.orders = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
     renderSubnav(); renderMain();
+    revisarQRDeEnlace();
   }, function(err){ showToast('Error leyendo pedidos: ' + err.message); });
 
   // Calificaciones de 1 a 5 estrellas (ranking de proveedores). Si las reglas
@@ -2138,6 +2283,15 @@ function subscribeData(){
 
   if(currentUser.rol === 'mayorista' || currentUser.rol === 'productor') suscribirChats();
   suscribirExtras();
+
+  // Si la administración suspende la cuenta mientras está abierta, se cierra la sesión.
+  unsubYo = db.collection('usuarios').doc(currentUser.uid).onSnapshot(function(d){
+    const datos = d.data();
+    if(datos && datos.suspendido === true){
+      avisoSuspension = textoSuspension(datos);
+      auth.signOut();
+    }
+  }, function(){});
 }
 
 /* Cotizaciones, calendario de cosecha y (solo administración) bitácora. */
@@ -2219,6 +2373,7 @@ function unsubscribeData(){
   mapaAbierto = mapaAnimado = null; precioSel = null; fotoNueva = null;
   Object.keys(avisadosStock).forEach(function(k){ delete avisadosStock[k]; });
   unsubLotes = unsubPedidos = unsubProyectos = unsubUsuarios = unsubCalif = null;
+  if(unsubYo){ unsubYo(); unsubYo = null; }
   editandoLote = null;
   catFilter = prodFilter = itemFilter = 'todos';
   catBusqueda = ''; catOrden = 'recientes';
@@ -2361,6 +2516,7 @@ function renderSubnav(){
   } else {
     tabs = [
       {k:'dashboard', label:'Dashboard'},
+      {k:'reportes', label:'Reportes de ventas'},
       {k:'pedidos', label:'Todos los pedidos'},
       {k:'usuarios', label:'Usuarios', badge: S.users.length || null},
       {k:'bitacora', label:'Bitácora de actividad'},
@@ -2455,6 +2611,7 @@ function renderMain(){
     if(view.admin === 'dashboard') main.innerHTML = viewAdminDashboard();
     else if(view.admin === 'pedidos') main.innerHTML = viewAdminPedidos();
     else if(view.admin === 'usuarios') main.innerHTML = viewAdminUsuarios();
+    else if(view.admin === 'reportes') main.innerHTML = viewAdminReportes();
     else main.innerHTML = viewAdminMedida();
   }
   if(mismaVista){
@@ -3268,29 +3425,324 @@ function viewProductorTrazabilidad(){
   }
   const cards = active.map(function(o){
     const p = lotById(o.lotId);
-    const qrCells = Array.from({length:49}, function(_, i){
-      const on = ((i*97+o.numero) % 100) < 45;
-      return '<div style="opacity:'+(on?1:0)+'"></div>';
-    }).join('');
     const stepsHtml = TRACE_LABELS.map(function(l, i){
       const done = i <= o.traceIdx;
       return '<div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:.82rem; color:'+(done?'var(--texto)':'var(--texto-suave)')+';">'+
         '<span style="width:8px;height:8px;border-radius:50%;background:'+(done?'var(--neon)':'var(--borde)')+';"></span>'+l+(done?' ✓':'')+
       '</div>';
     }).join('');
-    return '<div class="trace-lot">'+
-      '<div class="qr-mini">'+qrCells+'</div>'+
+    const sigue = o.traceIdx + 1 < TRACE_LABELS.length ? TRACE_LABELS[o.traceIdx + 1] : null;
+    return '<div class="trace-lot" id="lote-'+o.id+'">'+
+      qrHtml(o)+
       '<div>'+
         '<b style="color:var(--texto); display:block; margin-bottom:6px;">Lote #CC-'+o.numero+' — '+esc(p ? p.name : '—')+'</b>'+
         stepsHtml+
+        '<div class="order-actions">'+
+          (sigue ? '<button class="btn btn-ghost btn-sm" data-advance="'+o.id+'">Avanzar → '+sigue+'</button>' : '')+
+          '<button class="btn btn-ghost btn-sm" data-etiqueta="'+o.id+'">🖨 Etiqueta QR (PDF)</button>'+
+        '</div>'+
         botonMapa(o)+
       '</div>'+
       cajaMapa(o)+
     '</div>';
   }).join('');
-  return '<div class="panel"><div class="panel-head"><h2>Trazabilidad de lotes</h2><p>Cada lote en camino muestra su código QR y el estado de la cadena de trazabilidad, desde la cosecha hasta la entrega.</p></div>'+cards+'</div>';
+  return '<div class="panel"><div class="panel-head" style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;"><div><h2>Trazabilidad de lotes</h2><p>Imprimí la etiqueta QR de cada lote y pegala en los cajones. En el empaque, el despacho y la entrega, escaneala con el celular y el estado avanza solo.</p></div>'+
+    '<button class="btn btn-primary" data-escanear>'+icono('qr')+' Escanear QR</button></div>'+cards+'</div>';
 }
 
+/* ============================================================
+   CÓDIGO QR DE CADA LOTE Y ESCÁNER CON LA CÁMARA
+   Cada pedido en camino tiene un QR real que apunta a
+   https://citruscode.netlify.app/#qr=<id del pedido>. El productor lo
+   imprime como etiqueta y, al escanearlo en el empaque o en el despacho,
+   la trazabilidad avanza sola al paso siguiente. Si alguien lo escanea con
+   la cámara común del celular, se abre el sistema en ese lote.
+   ============================================================ */
+const URL_SISTEMA = 'https://citruscode.netlify.app/';
+// Cada librería tiene un CDN de respaldo por si el primero no responde.
+const LIBS = {
+  qr: ['https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js', 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'],
+  jsqr: ['https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js', 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'],
+  xlsx: ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js']
+};
+const scriptsCargando = {};
+function cargarScript(urls){
+  const clave = urls.join(' ');
+  if(scriptsCargando[clave]) return scriptsCargando[clave];
+  function probar(i){
+    return new Promise(function(ok, mal){
+      const el = document.createElement('script');
+      el.src = urls[i];
+      el.onload = function(){ ok(); };
+      el.onerror = function(){ el.remove(); mal(); };
+      document.head.appendChild(el);
+    }).catch(function(){
+      if(i + 1 < urls.length) return probar(i + 1);
+      throw new Error('No se pudo cargar una librería (¿sin conexión?)');
+    });
+  }
+  scriptsCargando[clave] = probar(0).catch(function(err){ delete scriptsCargando[clave]; throw err; });
+  return scriptsCargando[clave];
+}
+function textoQR(o){ return URL_SISTEMA + '#qr=' + o.id; }
+function svgQR(texto){
+  const q = window.qrcode(0, 'M');
+  q.addData(texto);
+  q.make();
+  return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+}
+/* QR del lote. Si la librería todavía no cargó, se muestra el dibujo animado
+   de siempre y se redibuja cuando llega. */
+function qrHtml(o){
+  if(window.qrcode){
+    return '<div class="qr-real" title="QR del lote CC-'+o.numero+'">'+svgQR(textoQR(o))+'</div>';
+  }
+  cargarScript(LIBS.qr).then(function(){ renderMain(); }).catch(function(){});
+  const celdas = Array.from({length:49}, function(_, i){
+    const on = ((i*97+o.numero) % 100) < 45;
+    return '<div style="opacity:'+(on?1:0)+'"></div>';
+  }).join('');
+  return '<div class="qr-mini">'+celdas+'</div>';
+}
+/* Saca el id del pedido de lo que leyó la cámara: la URL del QR, o un número CC-1234. */
+function pedidoDeTextoQR(texto){
+  const t = String(texto || '').trim();
+  const m = t.match(/#qr=([A-Za-z0-9_-]+)/);
+  if(m) return S.orders.find(function(o){ return o.id === m[1]; }) || { idDesconocido: m[1] };
+  const n = t.match(/CC-?(\d+)/i);
+  if(n) return S.orders.find(function(o){ return String(o.numero) === n[1]; }) || null;
+  return null;
+}
+/* Avanza un paso la trazabilidad del pedido (lo usan el botón y el escáner). */
+function avanzarTrazabilidad(o, via){
+  const traceIdx = o.traceIdx + 1;
+  const statusIdx = traceStatusIdx(traceIdx);
+  const update = { traceIdx: traceIdx, statusIdx: statusIdx };
+  if(statusIdx === 4 && !o.invoice){ update.invoice = genInvoice(o); }
+  return guardar(db.collection('pedidos').doc(o.id).update(update)).then(function(){
+    registrar(statusIdx === 4 ? 'Pedido entregado' : 'Trazabilidad avanzada',
+      'CC-' + o.numero + ' · ' + TRACE_LABELS[traceIdx] + (via ? ' · ' + via : '') + (statusIdx === 4 ? ' · factura CAE ' + update.invoice.cae : ''));
+    return { traceIdx: traceIdx, statusIdx: statusIdx };
+  });
+}
+/* Qué pasa al leer un QR, según quién lo lee. Devuelve un mensaje para mostrar. */
+function procesarQR(texto){
+  const o = pedidoDeTextoQR(texto);
+  if(!o) return Promise.resolve({ ok: false, msg: 'Este QR no es de un lote de CitrusCode.' });
+  if(o.idDesconocido) return Promise.resolve({ ok: false, msg: 'No encontramos ese lote. Puede ser de otro productor o haberse borrado.' });
+  const p = lotById(o.lotId);
+  const nombre = 'Lote CC-' + o.numero + (p ? ' · ' + p.name : '');
+  if(currentUser.rol !== 'productor' || o.productorUid !== currentUser.uid){
+    return Promise.resolve({ ok: true, msg: nombre + ': ' + (o.cancelado ? 'pedido cancelado.' : (o.traceIdx >= 0 ? TRACE_LABELS[o.traceIdx] : STATUSES[o.statusIdx]) + '.'), ver: o });
+  }
+  if(o.cancelado) return Promise.resolve({ ok: false, msg: nombre + ': el pedido está cancelado.' });
+  if(o.statusIdx === 0) return Promise.resolve({ ok: false, msg: nombre + ': primero confirmá el pedido en Pedidos recibidos.' });
+  if(o.statusIdx >= 4) return Promise.resolve({ ok: true, msg: nombre + ': ya fue entregado. La trazabilidad está cerrada.' });
+  return avanzarTrazabilidad(o, 'escaneo QR').then(function(r){
+    return { ok: true, avanzo: true, msg: nombre + ' → ' + TRACE_LABELS[r.traceIdx] + (r.statusIdx === 4 ? '. Entregado y facturado.' : '.') };
+  }).catch(function(err){ return { ok: false, msg: 'No se pudo actualizar: ' + err.message }; });
+}
+
+let escaner = null;   // { stream, timer, ultimo, ultimoMs }
+function abrirEscaner(){
+  cerrarEscaner();
+  const caja = document.createElement('div');
+  caja.className = 'qr-modal';
+  caja.id = 'qrModal';
+  caja.innerHTML =
+    '<div class="qr-modal-card" role="dialog" aria-modal="true" aria-label="Escanear QR del lote">'+
+      '<div class="qr-modal-head"><b>'+icono('qr')+' Escanear QR del lote</b><button type="button" class="qr-cerrar" id="qrCerrar" aria-label="Cerrar">✕</button></div>'+
+      '<div class="qr-visor"><video id="qrVideo" playsinline muted></video><div class="qr-marco"></div></div>'+
+      '<p class="qr-estado" id="qrEstado">Apuntá la cámara a la etiqueta del lote.</p>'+
+      '<div class="qr-res" id="qrRes" hidden></div>'+
+      '<label class="btn btn-ghost btn-sm qr-foto">📷 Sacar o elegir una foto del QR<input type="file" accept="image/*" capture="environment" id="qrFoto" hidden></label>'+
+    '</div>';
+  document.body.appendChild(caja);
+  document.body.classList.add('modal-abierto');
+  caja.addEventListener('click', function(e){ if(e.target === caja) cerrarEscaner(); });
+  document.getElementById('qrCerrar').addEventListener('click', cerrarEscaner);
+  document.getElementById('qrFoto').addEventListener('change', function(e){
+    const f = e.target.files && e.target.files[0];
+    if(f) leerFotoQR(f);
+    e.target.value = '';
+  });
+  escaner = { stream: null, timer: null, ultimo: '', ultimoMs: 0 };
+  const estado = document.getElementById('qrEstado');
+  const lector = ('BarcodeDetector' in window)
+    ? Promise.resolve(window.BarcodeDetector.getSupportedFormats ? window.BarcodeDetector.getSupportedFormats() : ['qr_code']).then(function(f){
+        return f.indexOf('qr_code') >= 0 ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
+      }).catch(function(){ return null; })
+    : Promise.resolve(null);
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    estado.textContent = 'Este navegador no deja usar la cámara en vivo. Sacale una foto al QR con el botón de abajo.';
+    return;
+  }
+  Promise.all([
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }),
+    lector,
+    cargarScript(LIBS.jsqr).catch(function(){ return null; })
+  ]).then(function(r){
+    if(!escaner){ r[0].getTracks().forEach(function(t){ t.stop(); }); return; }
+    escaner.stream = r[0];
+    const detector = r[1];
+    const video = document.getElementById('qrVideo');
+    video.srcObject = r[0];
+    video.play().catch(function(){});
+    const lienzo = document.createElement('canvas');
+    const ctx = lienzo.getContext('2d', { willReadFrequently: true });
+    let ocupado = false;
+    escaner.timer = setInterval(function(){
+      if(ocupado || !escaner || video.readyState < 2) return;
+      ocupado = true;
+      leerCuadro(video, detector, lienzo, ctx).then(function(texto){
+        ocupado = false;
+        if(texto) alLeerQR(texto);
+      }, function(){ ocupado = false; });
+    }, 280);
+  }).catch(function(err){
+    estado.textContent = (err && err.name === 'NotAllowedError')
+      ? 'No diste permiso para usar la cámara. Podés habilitarlo en los ajustes, o sacarle una foto al QR con el botón de abajo.'
+      : 'No se pudo abrir la cámara. Sacale una foto al QR con el botón de abajo.';
+  });
+}
+function leerCuadro(fuente, detector, lienzo, ctx){
+  if(detector){
+    return detector.detect(fuente).then(function(cod){ return cod && cod.length ? cod[0].rawValue : null; });
+  }
+  if(!window.jsQR) return Promise.resolve(null);
+  const w = fuente.videoWidth || fuente.naturalWidth || fuente.width;
+  const h = fuente.videoHeight || fuente.naturalHeight || fuente.height;
+  if(!w || !h) return Promise.resolve(null);
+  const escala = Math.min(1, 900 / Math.max(w, h));
+  lienzo.width = Math.round(w * escala); lienzo.height = Math.round(h * escala);
+  ctx.drawImage(fuente, 0, 0, lienzo.width, lienzo.height);
+  const datos = ctx.getImageData(0, 0, lienzo.width, lienzo.height);
+  const cod = window.jsQR(datos.data, datos.width, datos.height, { inversionAttempts: 'dontInvert' });
+  return Promise.resolve(cod ? cod.data : null);
+}
+function leerFotoQR(archivo){
+  const estado = document.getElementById('qrEstado');
+  if(estado) estado.textContent = 'Leyendo la foto…';
+  const url = URL.createObjectURL(archivo);
+  const img = new Image();
+  img.onload = function(){
+    const lienzo = document.createElement('canvas');
+    const ctx = lienzo.getContext('2d', { willReadFrequently: true });
+    const detector = ('BarcodeDetector' in window) ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
+    cargarScript(LIBS.jsqr).catch(function(){}).then(function(){
+      return leerCuadro(img, detector, lienzo, ctx).catch(function(){ return detector ? leerCuadro(img, null, lienzo, ctx) : null; });
+    }).then(function(texto){
+      URL.revokeObjectURL(url);
+      if(texto) alLeerQR(texto);
+      else if(estado) estado.textContent = 'No encontramos un QR en la foto. Probá más cerca y con buena luz.';
+    });
+  };
+  img.onerror = function(){ URL.revokeObjectURL(url); if(estado) estado.textContent = 'No se pudo abrir la foto.'; };
+  img.src = url;
+}
+function alLeerQR(texto){
+  if(!escaner) return;
+  const ahora = Date.now();
+  // La cámara lee el mismo QR muchas veces por segundo: se procesa una vez cada 4 s.
+  if(texto === escaner.ultimo && ahora - escaner.ultimoMs < 4000) return;
+  escaner.ultimo = texto; escaner.ultimoMs = ahora;
+  if(navigator.vibrate) navigator.vibrate(60);
+  const res = document.getElementById('qrRes');
+  const estado = document.getElementById('qrEstado');
+  procesarQR(texto).then(function(r){
+    if(!res) return;
+    res.hidden = false;
+    res.className = 'qr-res ' + (r.ok ? 'ok' : 'error');
+    res.innerHTML = (r.ok ? '✓ ' : '⚠ ') + esc(r.msg) +
+      (r.ver ? '<button type="button" class="btn btn-ghost btn-sm" id="qrVer">Ver trazabilidad</button>' : '');
+    const ver = document.getElementById('qrVer');
+    if(ver) ver.addEventListener('click', function(){ cerrarEscaner(); irATrazabilidad(r.ver); });
+    if(estado) estado.textContent = r.avanzo ? 'Podés escanear el próximo lote.' : 'Apuntá la cámara a la etiqueta del lote.';
+    if(r.avanzo) showToast(r.msg);
+  });
+}
+function cerrarEscaner(){
+  if(escaner){
+    clearInterval(escaner.timer);
+    if(escaner.stream) escaner.stream.getTracks().forEach(function(t){ t.stop(); });
+    escaner = null;
+  }
+  const m = document.getElementById('qrModal');
+  if(m) m.remove();
+  document.body.classList.remove('modal-abierto');
+}
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && escaner) cerrarEscaner(); });
+function irATrazabilidad(o){
+  if(!currentUser) return;
+  if(currentUser.rol === 'mayorista') view.mayorista = 'trazabilidad';
+  else if(currentUser.rol === 'productor') view.productor = (o && o.statusIdx === 0) ? 'recibidos' : 'trazabilidad';
+  else view.admin = 'pedidos';
+  renderSubnav(); renderMain();
+  setTimeout(function(){
+    const el = o && document.getElementById('lote-' + o.id);
+    if(el){ el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('resaltado'); setTimeout(function(){ el.classList.remove('resaltado'); }, 2400); }
+  }, 120);
+}
+/* Si el sistema se abrió desde la cámara común (…/#qr=<id>), se procesa una vez cargados los pedidos. */
+let qrDeEnlace = (location.hash.match(/#qr=([A-Za-z0-9_-]+)/) || [])[1] || null;
+function revisarQRDeEnlace(){
+  if(!qrDeEnlace || !currentUser || !S.orders.length) return;
+  const id = qrDeEnlace;
+  qrDeEnlace = null;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(_){}
+  const o = S.orders.find(function(x){ return x.id === id; });
+  if(!o){ showToast('No encontramos el lote de ese QR.'); return; }
+  if(currentUser.rol === 'productor' && o.productorUid === currentUser.uid && !o.cancelado && o.statusIdx > 0 && o.statusIdx < 4){
+    if(window.confirm('Lote CC-' + o.numero + ': ¿avanzar la trazabilidad a "' + TRACE_LABELS[o.traceIdx + 1] + '"?')){
+      procesarQR(URL_SISTEMA + '#qr=' + id).then(function(r){ showToast(r.msg); });
+    }
+  }
+  irATrazabilidad(o);
+}
+window.addEventListener('hashchange', function(){
+  const m = location.hash.match(/#qr=([A-Za-z0-9_-]+)/);
+  if(m){ qrDeEnlace = m[1]; revisarQRDeEnlace(); }
+});
+/* Etiqueta en PDF para imprimir y pegar en los cajones o el pallet. Se arma
+   como PDF (y no como ventana para imprimir) porque así funciona igual en el
+   navegador, en la app de escritorio y en la de Android. */
+function imprimirEtiqueta(o){
+  if(typeof window.jspdf === 'undefined'){ showToast('No se pudo cargar el generador de PDF'); return; }
+  cargarScript(LIBS.qr).then(function(){
+    const p = lotById(o.lotId);
+    const e = o.entrega || {};
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: [100, 150] });
+    doc.setFillColor(18, 53, 36);
+    doc.rect(0, 0, 100, 18, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+    doc.text('CitrusCode', 8, 11.5);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    doc.text('Etiqueta de trazabilidad', 92, 11.5, { align: 'right' });
+    doc.setTextColor(21, 32, 24);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('Lote CC-' + o.numero, 50, 29, { align: 'center' });
+    // El QR se dibuja módulo por módulo: queda nítido a cualquier tamaño de impresión.
+    const q = window.qrcode(0, 'M');
+    q.addData(textoQR(o)); q.make();
+    const n = q.getModuleCount(), lado = 64, celda = lado / n, x0 = (100 - lado) / 2, y0 = 34;
+    doc.setFillColor(0, 0, 0);
+    for(let r = 0; r < n; r++) for(let c = 0; c < n; c++) if(q.isDark(r, c)) doc.rect(x0 + c * celda, y0 + r * celda, celda + 0.02, celda + 0.02, 'F');
+    let y = y0 + lado + 9;
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    doc.text(doc.splitTextToSize((p ? p.name : 'Producto') + ' · ' + o.qty.toLocaleString('es-AR') + ' ' + unitOf(o), 84), 50, y, { align: 'center' });
+    y += 7;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    const lineas = doc.splitTextToSize('Productor: ' + (p ? p.productorNombre : (currentUser.entidad || currentUser.nombre)), 84)
+      .concat(doc.splitTextToSize('Destino: ' + (o.mayoristaNombre || '—') + (e.direccion ? ' · ' + e.direccion : ''), 84));
+    doc.text(lineas, 50, y, { align: 'center' });
+    doc.setTextColor(90, 110, 98); doc.setFontSize(7.5);
+    doc.text('Escaneá este código en cada etapa para actualizar el envío.', 50, 143, { align: 'center' });
+    doc.save('Etiqueta_CC-' + o.numero + '.pdf');
+    registrar('Etiqueta QR generada', 'CC-' + o.numero);
+  }).catch(function(err){ showToast(err.message); });
+}
 /* ============================================================
    VISTA COMÚN — MI PERFIL
    ============================================================ */
@@ -3351,20 +3803,31 @@ function viewAdminUsuarios(){
 
   const rows = usuarios.length ? usuarios.map(function(u){
     const dir = direccionDe(u);
-    return '<tr>'+
-      '<td>'+esc(u.nombre||'—')+'</td>'+
+    const suspendible = u.rol !== 'admin' && u.uid !== currentUser.uid;
+    const estado = u.suspendido
+      ? '<span class="status-badge st-cancel" title="'+esc(u.motivoSuspension || 'Sin motivo cargado')+'">Suspendida</span>'
+      : '<span class="status-badge st-4">Activa</span>';
+    const accion = !suspendible ? '' : (u.suspendido
+      ? '<button class="btn btn-ghost btn-sm" data-reactivar="'+u.uid+'">Reactivar</button>'
+      : '<button class="btn btn-ghost btn-sm cancel-btn" data-suspender="'+u.uid+'">Suspender</button>');
+    return '<tr'+(u.suspendido ? ' class="fila-suspendida"' : '')+'>'+
+      '<td>'+esc(u.nombre||'—')+(u.suspendido && u.motivoSuspension ? '<div class="motivo-susp">'+esc(u.motivoSuspension)+'</div>' : '')+'</td>'+
       '<td><span class="status-badge '+(u.rol==='admin'?'st-2':(u.rol==='productor'?'st-4':'st-1'))+'">'+esc(u.rol)+'</span></td>'+
       '<td>'+esc(u.entidad||'—')+'</td>'+
       '<td>'+esc(u.email||'—')+'</td>'+
       '<td>'+esc(u.telefono||'—')+'</td>'+
       '<td>'+(dir ? esc(dir) : '<span style="color:var(--texto-suave); font-style:italic;">sin cargar</span>')+'</td>'+
+      '<td>'+estado+'</td>'+
+      '<td>'+accion+'</td>'+
     '</tr>';
-  }).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--texto-suave);">Todavía no hay usuarios registrados.</td></tr>';
+  }).join('') : '<tr><td colspan="8" style="text-align:center; color:var(--texto-suave);">Todavía no hay usuarios registrados.</td></tr>';
+  const suspendidas = usuarios.filter(function(u){ return u.suspendido; }).length;
 
   return '<div class="panel">'+
-    '<div class="panel-head split"><div><h2>Usuarios del sistema</h2><p>Padrón de cuentas registradas en CitrusCode, con su rol y sus datos de contacto.</p></div>'+botonExportar('Usuarios')+'</div>'+
+    '<div class="panel-head split"><div><h2>Usuarios del sistema</h2><p>Padrón de cuentas registradas en CitrusCode, con su rol y sus datos de contacto. Suspender una cuenta le impide entrar y operar, pero conserva todo su historial.</p></div>'+botonExportar('Usuarios')+'</div>'+
     kpis+
-    '<table class="simple"><tr><th>Nombre</th><th>Rol</th><th>Empresa / finca</th><th>Correo</th><th>Teléfono</th><th>Dirección</th></tr>'+rows+'</table>'+
+    (suspendidas ? '<p class="susp-resumen">'+suspendidas+(suspendidas === 1 ? ' cuenta suspendida.' : ' cuentas suspendidas.')+'</p>' : '')+
+    '<div class="tabla-scroll"><table class="simple"><tr><th>Nombre</th><th>Rol</th><th>Empresa / finca</th><th>Correo</th><th>Teléfono</th><th>Dirección</th><th>Cuenta</th><th></th></tr>'+rows+'</table></div>'+
   '</div>';
 }
 
@@ -3382,10 +3845,6 @@ function viewMayoristaTrazabilidad(){
   }
   const cards = mios.map(function(o){
     const p = lotById(o.lotId);
-    const qrCells = Array.from({length:49}).map(function(_,i){
-      const on = ((i*97+o.numero) % 100) < 45;
-      return '<div style="opacity:'+(on?1:0)+'"></div>';
-    }).join('');
     const pasos = TRACE_LABELS.map(function(l,i){
       const done = i <= o.traceIdx;
       return '<div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:.82rem; color:'+(done?'var(--texto)':'var(--texto-suave)')+';">'+
@@ -3393,8 +3852,8 @@ function viewMayoristaTrazabilidad(){
       '</div>';
     }).join('');
     const entregado = o.statusIdx === 4;
-    return '<div class="trace-lot">'+
-      '<div class="qr-mini">'+qrCells+'</div>'+
+    return '<div class="trace-lot" id="lote-'+o.id+'">'+
+      qrHtml(o)+
       '<div>'+
         '<b style="display:block; margin-bottom:2px;">Lote #CC-'+o.numero+' — '+esc(p ? p.name : '—')+'</b>'+
         '<div class="order-meta" style="margin-bottom:8px;">'+o.qty.toLocaleString('es-AR')+' '+unitOf(o)+' · Productor: '+esc(p ? p.productorNombre : '—')+'</div>'+
@@ -3408,7 +3867,8 @@ function viewMayoristaTrazabilidad(){
     '</div>';
   }).join('');
   return '<div class="panel">'+
-    '<div class="panel-head"><h2>Trazabilidad de mis pedidos</h2><p>Seguí el recorrido de cada lote desde la finca hasta tu depósito. El código QR identifica al lote y acompaña la mercadería.</p></div>'+
+    '<div class="panel-head" style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;"><div><h2>Trazabilidad de mis pedidos</h2><p>Seguí el recorrido de cada lote desde la finca hasta tu depósito. El código QR viaja en la etiqueta de la mercadería: escanealo al recibirla para ver su historial.</p></div>'+
+    '<button class="btn btn-ghost" data-escanear>'+icono('qr')+' Escanear QR</button></div>'+
     cards+
   '</div>';
 }
@@ -3557,6 +4017,264 @@ function viewAdminPedidos(){
 }
 
 /* ============================================================
+   VISTA ADMIN — REPORTES DE VENTAS
+   Ventas por mes, por producto y por productor, con gráficos y
+   descarga en Excel o PDF. Se calculan con los pedidos que ya están
+   cargados en vivo, así que no hacen falta consultas aparte.
+   ============================================================ */
+let repPeriodo = '12m';      // '12m' | 'anio' | 'todo'
+let repAlcance = 'activos';  // 'activos' (no cancelados) | 'entregados'
+const MESES_CORTOS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function datosReporte(){
+  const ahora = new Date();
+  let desde = null;
+  if(repPeriodo === '12m') desde = new Date(ahora.getFullYear(), ahora.getMonth() - 11, 1);
+  else if(repPeriodo === 'anio') desde = new Date(ahora.getFullYear(), 0, 1);
+  const pedidos = S.orders.filter(function(o){
+    if(o.cancelado) return false;
+    if(repAlcance === 'entregados' && o.statusIdx !== 4) return false;
+    const ms = msDe(o.createdAt) || Date.now();   // recién creado: todavía sin hora del servidor
+    return !desde || ms >= desde.getTime();
+  });
+  const filas = pedidos.map(function(o){
+    const p = lotById(o.lotId);
+    const u = S.users.find(function(x){ return x.uid === o.productorUid; });
+    const ms = msDe(o.createdAt) || Date.now();
+    return {
+      numero: 'CC-' + o.numero, fecha: new Date(ms), ms: ms,
+      producto: p ? p.name : 'Producto eliminado',
+      productor: (p && p.productorNombre) || (u && (u.entidad || u.nombre)) || '—',
+      mayorista: o.mayoristaNombre || '—',
+      cantidad: o.qty, unidad: unitOf(o), precio: o.price, monto: o.qty * o.price,
+      estado: STATUSES[o.statusIdx]
+    };
+  }).sort(function(a, b){ return a.ms - b.ms; });
+
+  // Meses del período, incluidos los que no tuvieron ventas.
+  const inicio = desde || (filas.length ? new Date(filas[0].fecha.getFullYear(), filas[0].fecha.getMonth(), 1) : new Date(ahora.getFullYear(), ahora.getMonth(), 1));
+  const porMes = [];
+  for(let d = new Date(inicio.getFullYear(), inicio.getMonth(), 1); d <= ahora; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)){
+    porMes.push({ clave: d.getFullYear() + '-' + d.getMonth(), nombre: MESES_CORTOS[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2), monto: 0, pedidos: 0 });
+  }
+  const indiceMes = {};
+  porMes.forEach(function(m, i){ indiceMes[m.clave] = i; });
+  function agrupar(campo){
+    const mapa = {};
+    filas.forEach(function(f){
+      const k = f[campo];
+      if(!mapa[k]) mapa[k] = { nombre: k, monto: 0, pedidos: 0, cantidades: {} };
+      mapa[k].monto += f.monto; mapa[k].pedidos++;
+      mapa[k].cantidades[f.unidad] = (mapa[k].cantidades[f.unidad] || 0) + f.cantidad;
+    });
+    return Object.keys(mapa).map(function(k){ return mapa[k]; }).sort(function(a, b){ return b.monto - a.monto; });
+  }
+  filas.forEach(function(f){
+    const i = indiceMes[f.fecha.getFullYear() + '-' + f.fecha.getMonth()];
+    if(i !== undefined){ porMes[i].monto += f.monto; porMes[i].pedidos++; }
+  });
+  const total = filas.reduce(function(a, f){ return a + f.monto; }, 0);
+  return {
+    filas: filas, porMes: porMes, porProducto: agrupar('producto'), porProductor: agrupar('productor'),
+    total: total, ticket: filas.length ? total / filas.length : 0,
+    textoPeriodo: { '12m': 'Últimos 12 meses', anio: 'Año ' + ahora.getFullYear(), todo: 'Todo el historial' }[repPeriodo],
+    textoAlcance: repAlcance === 'entregados' ? 'solo pedidos entregados' : 'pedidos no cancelados'
+  };
+}
+function cantidadesTexto(c){
+  return Object.keys(c).map(function(u){ return c[u].toLocaleString('es-AR') + ' ' + u; }).join(' + ');
+}
+/* Columnas verticales (ventas por mes). Una sola serie: el título la nombra. */
+function graficoMeses(meses){
+  const W = 760, H = 250, pl = 76, pr = 12, pt = 16, pb = 34;
+  const max = Math.max.apply(null, meses.map(function(m){ return m.monto; }).concat([1]));
+  const paso = (W - pl - pr) / Math.max(meses.length, 1);
+  const ancho = Math.max(6, Math.min(40, paso - 8));
+  const y = function(v){ return pt + (1 - v / max) * (H - pt - pb); };
+  let grid = '';
+  for(let i = 0; i <= 4; i++){
+    const v = max * i / 4;
+    grid += '<line class="grid-l" x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'"/>'+
+      '<text class="eje" x="'+(pl-10)+'" y="'+(y(v)+4).toFixed(1)+'" text-anchor="end">'+money(v)+'</text>';
+  }
+  const cada = Math.ceil(meses.length / 12);
+  const barras = meses.map(function(m, i){
+    const cx = pl + paso * i + paso / 2;
+    const alto = Math.max(m.monto ? 3 : 0, (H - pt - pb) - (y(m.monto) - pt));
+    const tip = m.nombre + ': ' + money(m.monto) + ' · ' + m.pedidos + (m.pedidos === 1 ? ' pedido' : ' pedidos');
+    return '<g class="rep-barra"><title>'+esc(tip)+'</title>'+
+      '<rect class="hit" x="'+(pl + paso * i).toFixed(1)+'" y="'+pt+'" width="'+paso.toFixed(1)+'" height="'+(H-pt-pb)+'"/>'+
+      (alto ? '<rect class="col" x="'+(cx - ancho/2).toFixed(1)+'" y="'+(H - pb - alto).toFixed(1)+'" width="'+ancho.toFixed(1)+'" height="'+alto.toFixed(1)+'" rx="4"/>' : '')+
+      (i % cada === 0 ? '<text class="eje" x="'+cx.toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle">'+m.nombre+'</text>' : '')+
+    '</g>';
+  }).join('');
+  return '<svg class="rep-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Ventas por mes">'+grid+
+    '<line class="base-l" x1="'+pl+'" x2="'+(W-pr)+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'+barras+'</svg>';
+}
+/* Barras horizontales con el nombre arriba y el monto al final (ranking). */
+function barrasRanking(lista){
+  if(!lista.length) return '<div class="empty-state">Sin ventas en el período.</div>';
+  const max = lista[0].monto || 1;
+  const visibles = lista.slice(0, 8);
+  const resto = lista.slice(8);
+  const filas = visibles.slice();
+  if(resto.length){
+    const otros = { nombre: 'Otros (' + resto.length + ')', monto: 0, pedidos: 0, cantidades: {} };
+    resto.forEach(function(r){ otros.monto += r.monto; otros.pedidos += r.pedidos; Object.keys(r.cantidades).forEach(function(u){ otros.cantidades[u] = (otros.cantidades[u] || 0) + r.cantidades[u]; }); });
+    filas.push(otros);
+  }
+  return '<div class="rep-ranking">'+filas.map(function(f){
+    const pct = Math.max(1.5, f.monto / max * 100);
+    return '<div class="rep-fila" title="'+esc(f.nombre+': '+money(f.monto)+' · '+f.pedidos+' pedido(s) · '+cantidadesTexto(f.cantidades))+'">'+
+      '<div class="rep-fila-top"><span>'+esc(f.nombre)+'</span><b>'+money(f.monto)+'</b></div>'+
+      '<div class="rep-pista"><div class="rep-valor" style="width:'+pct.toFixed(1)+'%"></div></div>'+
+      '<div class="rep-sub">'+f.pedidos+(f.pedidos === 1 ? ' pedido' : ' pedidos')+' · '+cantidadesTexto(f.cantidades)+'</div>'+
+    '</div>';
+  }).join('')+'</div>';
+}
+function viewAdminReportes(){
+  const r = datosReporte();
+  const opc = function(v, actual, txt){ return '<option value="'+v+'"'+(v === actual ? ' selected' : '')+'>'+txt+'</option>'; };
+  const mejorMes = r.porMes.reduce(function(a, m){ return m.monto > (a ? a.monto : 0) ? m : a; }, null);
+  const tablaMeses = r.porMes.slice().reverse().map(function(m){
+    return '<tr><td>'+m.nombre+'</td><td>'+m.pedidos+'</td><td>'+money(m.monto)+'</td></tr>';
+  }).join('');
+  return '<div class="panel">'+
+    '<div class="panel-head split"><div><h2>Reportes de ventas</h2><p>Ventas del marketplace por mes, por producto y por productor. Descargalos en Excel o PDF para presentarlos.</p></div>'+
+      '<div class="rep-acciones"><button class="btn btn-ghost btn-sm" id="repExcel">'+icono('descargar')+'Excel</button><button class="btn btn-primary btn-sm" id="repPdf">'+icono('descargar')+'PDF</button></div></div>'+
+    '<div class="rep-filtros">'+
+      '<label>Período<select id="repPeriodo">'+opc('12m', repPeriodo, 'Últimos 12 meses')+opc('anio', repPeriodo, 'Este año')+opc('todo', repPeriodo, 'Todo el historial')+'</select></label>'+
+      '<label>Pedidos<select id="repAlcance">'+opc('activos', repAlcance, 'Todos los no cancelados')+opc('entregados', repAlcance, 'Solo entregados')+'</select></label>'+
+    '</div>'+
+    '<div class="kpi-grid">'+
+      '<div class="kpi-card"><div class="kpi-label">Ventas del período</div><div class="kpi-value">'+money(r.total)+'</div><div class="kpi-sub">'+r.filas.length+' pedidos</div></div>'+
+      '<div class="kpi-card"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">'+money(r.ticket)+'</div><div class="kpi-sub">por pedido</div></div>'+
+      '<div class="kpi-card"><div class="kpi-label">Mejor mes</div><div class="kpi-value">'+(mejorMes ? mejorMes.nombre : '—')+'</div><div class="kpi-sub">'+(mejorMes ? money(mejorMes.monto) : 'sin ventas')+'</div></div>'+
+      '<div class="kpi-card"><div class="kpi-label">Productor líder</div><div class="kpi-value rep-kpi-texto">'+esc(r.porProductor.length ? r.porProductor[0].nombre : '—')+'</div><div class="kpi-sub">'+(r.porProductor.length ? money(r.porProductor[0].monto) : 'sin ventas')+'</div></div>'+
+    '</div>'+
+    '<div class="chart-card"><h4>Ventas por mes</h4>'+(r.filas.length ? graficoMeses(r.porMes) : '<div class="empty-state">No hay ventas en el período elegido.</div>')+
+      '<details class="rep-tabla"><summary>Ver tabla</summary><table class="simple"><tr><th>Mes</th><th>Pedidos</th><th>Ventas</th></tr>'+tablaMeses+'</table></details></div>'+
+    '<div class="rep-dos">'+
+      '<div class="chart-card"><h4>Ventas por producto</h4>'+barrasRanking(r.porProducto)+'</div>'+
+      '<div class="chart-card"><h4>Ventas por productor</h4>'+barrasRanking(r.porProductor)+'</div>'+
+    '</div>'+
+  '</div>';
+}
+function bindReportes(main){
+  const per = main.querySelector('#repPeriodo');
+  if(!per) return;
+  per.addEventListener('change', function(){ repPeriodo = per.value; renderMain(); });
+  const alc = main.querySelector('#repAlcance');
+  alc.addEventListener('change', function(){ repAlcance = alc.value; renderMain(); });
+  main.querySelector('#repExcel').addEventListener('click', function(e){ reporteExcel(e.currentTarget); });
+  main.querySelector('#repPdf').addEventListener('click', reportePdf);
+}
+function nombreReporte(ext){ return 'CitrusCode_Reporte_ventas_' + new Date().toISOString().slice(0, 10) + '.' + ext; }
+function reporteExcel(boton){
+  boton.disabled = true;
+  cargarScript(LIBS.xlsx).then(function(){
+    const r = datosReporte();
+    const X = window.XLSX;
+    const libro = X.utils.book_new();
+    const hoja = function(nombre, filas, anchos){
+      const h = X.utils.aoa_to_sheet(filas);
+      h['!cols'] = anchos.map(function(w){ return { wch: w }; });
+      X.utils.book_append_sheet(libro, h, nombre);
+    };
+    hoja('Resumen', [
+      ['CitrusCode — Reporte de ventas'], [],
+      ['Período', r.textoPeriodo], ['Incluye', r.textoAlcance], ['Generado', new Date().toLocaleString('es-AR')], [],
+      ['Ventas totales ($)', r.total], ['Pedidos', r.filas.length], ['Ticket promedio ($)', Math.round(r.ticket)]
+    ], [24, 30]);
+    hoja('Por mes', [['Mes', 'Pedidos', 'Ventas ($)']].concat(r.porMes.map(function(m){ return [m.nombre, m.pedidos, m.monto]; })), [12, 10, 16]);
+    hoja('Por producto', [['Producto', 'Pedidos', 'Cantidad', 'Ventas ($)']].concat(r.porProducto.map(function(f){ return [f.nombre, f.pedidos, cantidadesTexto(f.cantidades), f.monto]; })), [30, 10, 20, 16]);
+    hoja('Por productor', [['Productor', 'Pedidos', 'Cantidad', 'Ventas ($)']].concat(r.porProductor.map(function(f){ return [f.nombre, f.pedidos, cantidadesTexto(f.cantidades), f.monto]; })), [30, 10, 20, 16]);
+    hoja('Detalle', [['Pedido', 'Fecha', 'Producto', 'Productor', 'Mayorista', 'Cantidad', 'Unidad', 'Precio unitario ($)', 'Monto ($)', 'Estado']].concat(r.filas.map(function(f){
+      return [f.numero, f.fecha, f.producto, f.productor, f.mayorista, f.cantidad, f.unidad, f.precio, f.monto, f.estado];
+    })), [10, 12, 26, 26, 26, 10, 8, 16, 14, 14]);
+    // Se arma en memoria y se descarga como enlace, igual que los PDF (así anda también en las apps).
+    const datos = X.write(libro, { bookType: 'xlsx', type: 'array', cellDates: true });
+    const blob = new Blob([datos], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombreReporte('xlsx');
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    registrar('Reporte descargado', 'Excel · ' + r.textoPeriodo);
+    showToast('Reporte en Excel descargado');
+  }).catch(function(err){ showToast(err.message); }).finally(function(){ boton.disabled = false; });
+}
+function reportePdf(){
+  if(typeof window.jspdf === 'undefined'){ showToast('No se pudo cargar el generador de PDF'); return; }
+  const r = datosReporte();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pesos = function(v){ return '$ ' + Math.round(v).toLocaleString('es-AR'); };
+  doc.setFillColor(18, 53, 36); doc.rect(0, 0, 210, 30, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text('CitrusCode', 15, 17);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.text('Reporte de ventas · ' + r.textoPeriodo + ' · ' + r.textoAlcance, 15, 24);
+  doc.setTextColor(21, 32, 24);
+  let y = 42;
+  // Resumen en tres recuadros.
+  [['Ventas', pesos(r.total)], ['Pedidos', String(r.filas.length)], ['Ticket promedio', pesos(r.ticket)]].forEach(function(k, i){
+    const x = 15 + i * 61;
+    doc.setDrawColor(228, 225, 213); doc.setFillColor(250, 248, 238); doc.roundedRect(x, y, 57, 20, 3, 3, 'FD');
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(90, 110, 98); doc.text(k[0].toUpperCase(), x + 4, y + 7);
+    doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(21, 32, 24); doc.text(k[1], x + 4, y + 15);
+  });
+  y += 30;
+  function titulo(t){
+    if(y > 260){ doc.addPage(); y = 20; }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(21, 32, 24); doc.text(t, 15, y); y += 7;
+  }
+  // Ventas por mes: columnas.
+  titulo('Ventas por mes');
+  const maxMes = Math.max.apply(null, r.porMes.map(function(m){ return m.monto; }).concat([1]));
+  const altoG = 46, anchoG = 180, paso = anchoG / Math.max(r.porMes.length, 1), cada = Math.ceil(r.porMes.length / 12);
+  doc.setDrawColor(228, 225, 213); doc.line(15, y + altoG, 15 + anchoG, y + altoG);
+  r.porMes.forEach(function(m, i){
+    const h = m.monto / maxMes * (altoG - 6);
+    const x = 15 + paso * i + paso * 0.18;
+    if(h > 0){ doc.setFillColor(46, 125, 62); doc.rect(x, y + altoG - h, paso * 0.64, h, 'F'); }
+    if(i % cada === 0){ doc.setFontSize(6.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(90, 110, 98); doc.text(m.nombre, x + paso * 0.32, y + altoG + 4, { align: 'center' }); }
+  });
+  doc.setFontSize(7); doc.setTextColor(90, 110, 98); doc.text('Máximo: ' + pesos(maxMes), 15 + anchoG, y - 1, { align: 'right' });
+  y += altoG + 12;
+  function tabla(encabezado, filas, anchos){
+    const fila = function(celdas, negrita){
+      if(y > 280){ doc.addPage(); y = 20; }
+      doc.setFont('helvetica', negrita ? 'bold' : 'normal'); doc.setFontSize(8.5); doc.setTextColor(21, 32, 24);
+      let x = 15;
+      celdas.forEach(function(c, i){
+        const txt = doc.splitTextToSize(String(c), anchos[i] - 2)[0];
+        if(i === celdas.length - 1) doc.text(txt, x + anchos[i] - 2, y, { align: 'right' });
+        else doc.text(txt, x, y);
+        x += anchos[i];
+      });
+      y += 5.5;
+      doc.setDrawColor(236, 233, 222); doc.line(15, y - 3.6, 195, y - 3.6);
+    };
+    fila(encabezado, true);
+    filas.forEach(function(f){ fila(f, false); });
+    y += 6;
+  }
+  titulo('Por producto');
+  tabla(['Producto', 'Pedidos', 'Cantidad', 'Ventas'], r.porProducto.map(function(f){ return [f.nombre, f.pedidos, cantidadesTexto(f.cantidades), pesos(f.monto)]; }), [70, 20, 50, 40]);
+  titulo('Por productor');
+  tabla(['Productor', 'Pedidos', 'Cantidad', 'Ventas'], r.porProductor.map(function(f){ return [f.nombre, f.pedidos, cantidadesTexto(f.cantidades), pesos(f.monto)]; }), [70, 20, 50, 40]);
+  titulo('Por mes');
+  tabla(['Mes', 'Pedidos', '', 'Ventas'], r.porMes.map(function(m){ return [m.nombre, m.pedidos, '', pesos(m.monto)]; }), [70, 20, 50, 40]);
+  const paginas = doc.getNumberOfPages();
+  for(let i = 1; i <= paginas; i++){
+    doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120, 130, 120);
+    doc.text('Generado el ' + new Date().toLocaleString('es-AR') + ' · CitrusCode · Página ' + i + ' de ' + paginas, 105, 292, { align: 'center' });
+  }
+  doc.save(nombreReporte('pdf'));
+  registrar('Reporte descargado', 'PDF · ' + r.textoPeriodo);
+}
+
+/* ============================================================
    VISTA ADMIN — SOFTWARE A MEDIDA
    ============================================================ */
 function viewAdminMedida(){
@@ -3685,8 +4403,14 @@ function viewBitacora(){
    precio especial y, si el mayorista acepta, se genera el pedido con ese precio.
    También se usan para reservar cosecha futura desde el calendario.
    ============================================================ */
-const COT_ESTADOS = { pendiente:'Esperando precio', cotizada:'Precio recibido', aceptada:'Aceptada', rechazada:'Rechazada', cancelada:'Cancelada' };
+const COT_ESTADOS = { pendiente:'Esperando precio', cotizada:'Precio recibido', contraoferta:'Contraoferta', aceptada:'Aceptada', rechazada:'Rechazada', cancelada:'Cancelada' };
 let cotizFormAbierto = false;
+const MAX_RONDAS = 10;   // propuestas de precio por cotización (las reglas de Firestore ponen el mismo tope)
+function rondasDe(c){
+  if(c.rondas && c.rondas.length) return c.rondas;
+  // Cotizaciones de antes de las contraofertas: su único precio cuenta como primera propuesta.
+  return c.precioOfertado ? [{ de: 'productor', precio: c.precioOfertado }] : [];
+}
 function cotizacionesDeConv(convId){
   return S.cotizaciones.filter(function(c){ return c.convId === convId; })
     .sort(function(a, b){ return msDe(b.creado) - msDe(a.creado); });
@@ -3695,7 +4419,7 @@ function cotizacionesDeConv(convId){
 function cotizacionesPorAtender(){
   if(!currentUser) return [];
   return S.cotizaciones.filter(function(c){
-    return currentUser.rol === 'productor' ? (c.productorUid === currentUser.uid && c.estado === 'pendiente')
+    return currentUser.rol === 'productor' ? (c.productorUid === currentUser.uid && (c.estado === 'pendiente' || c.estado === 'contraoferta'))
       : (c.mayoristaUid === currentUser.uid && c.estado === 'cotizada');
   });
 }
@@ -3789,17 +4513,40 @@ function cajaCotizaciones(otroUid){
       if(c.estado === 'pendiente'){
         cuerpo = esMay
           ? '<div class="cot-acc"><span>Esperando que el productor responda con un precio.</span><button class="btn btn-ghost btn-sm cancel-btn" data-cot-cancelar="'+c.id+'">Cancelar</button></div>'
-          : '<div class="cot-acc"><input type="number" min="1" step="1" id="cotPrecio-'+c.id+'" placeholder="Precio por '+esc(c.unit || 'kg')+'"'+(lote ? ' value="'+lote.price+'"' : '')+'>'+
+          : '<div class="cot-acc" data-keep><input type="number" min="1" step="1" id="cotPrecio-'+c.id+'" placeholder="Precio por '+esc(c.unit || 'kg')+'"'+(lote ? ' value="'+lote.price+'"' : '')+'>'+
               '<button class="btn btn-primary btn-sm" data-cot-responder="'+c.id+'">Enviar precio</button>'+
               '<button class="btn btn-ghost btn-sm cancel-btn" data-cot-rechazar="'+c.id+'">Rechazar</button></div>';
       } else if(c.estado === 'cotizada'){
         const lista = lote ? lote.price : null;
         const desc = lista && lista > c.precioOfertado ? ' · '+Math.round((1 - c.precioOfertado / lista) * 100)+' % menos que el precio de lista' : '';
-        cuerpo = '<div class="cot-precio"><b>'+money(c.precioOfertado)+' / '+esc(c.unit || 'kg')+'</b> · total '+money(c.precioOfertado * c.qty)+desc+'</div>'+
+        const unidad = esc(c.unit || 'kg');
+        cuerpo = '<div class="cot-precio"><b>'+money(c.precioOfertado)+' / '+unidad+'</b> · total '+money(c.precioOfertado * c.qty)+desc+'</div>'+
+          (c.acordado ? '<div class="cot-acuerdo">🤝 '+(esMay ? 'El productor aceptó tu precio.' : 'Aceptaste el precio del mayorista.')+'</div>' : '')+
           (esMay
-            ? '<div class="cot-acc"><button class="btn btn-primary btn-sm" data-cot-aceptar="'+c.id+'">'+(c.origen === 'cosecha' ? 'Confirmar reserva' : 'Aceptar y generar pedido')+'</button>'+
-                '<button class="btn btn-ghost btn-sm cancel-btn" data-cot-rechazar="'+c.id+'">Rechazar</button></div>'
-            : '<div class="cot-acc"><span>Esperando que el mayorista acepte.</span></div>');
+            ? '<div class="cot-acc"><button class="btn btn-primary btn-sm" data-cot-aceptar="'+c.id+'">'+(c.origen === 'cosecha' ? 'Confirmar reserva' : (c.acordado ? 'Generar pedido' : 'Aceptar y generar pedido'))+'</button>'+
+                '<button class="btn btn-ghost btn-sm cancel-btn" data-cot-rechazar="'+c.id+'">Rechazar</button></div>'+
+                (c.acordado || rondasDe(c).length >= MAX_RONDAS ? '' :
+                '<div class="cot-acc cot-contra" data-keep><input type="number" min="1" step="1" id="cotContra-'+c.id+'" placeholder="Tu precio por '+unidad+'">'+
+                  '<button class="btn btn-ghost btn-sm" data-cot-contra="'+c.id+'">Proponer otro precio</button></div>')
+            : '<div class="cot-acc"><span>'+(c.acordado ? 'Esperando que el mayorista genere el pedido.' : 'Esperando que el mayorista acepte o proponga otro precio.')+'</span></div>');
+      } else if(c.estado === 'contraoferta'){
+        const unidad = esc(c.unit || 'kg');
+        cuerpo = '<div class="cot-precio">'+(esMay ? 'Propusiste' : 'El mayorista propone')+' <b>'+money(c.precioContraoferta)+' / '+unidad+'</b> · total '+money(c.precioContraoferta * c.qty)+
+            (c.precioOfertado ? ' <span class="cot-antes">(antes '+money(c.precioOfertado)+')</span>' : '')+'</div>'+
+          (esMay
+            ? '<div class="cot-acc"><span>Esperando la respuesta del productor.</span><button class="btn btn-ghost btn-sm cancel-btn" data-cot-cancelar="'+c.id+'">Retirar</button></div>'
+            : '<div class="cot-acc"><button class="btn btn-primary btn-sm" data-cot-acepta-contra="'+c.id+'">Aceptar '+money(c.precioContraoferta)+'</button>'+
+                '<button class="btn btn-ghost btn-sm cancel-btn" data-cot-rechazar="'+c.id+'">Rechazar</button></div>'+
+              (rondasDe(c).length >= MAX_RONDAS ? '' :
+              '<div class="cot-acc cot-contra" data-keep><input type="number" min="1" step="1" id="cotPrecio-'+c.id+'" placeholder="Otro precio por '+unidad+'">'+
+                '<button class="btn btn-ghost btn-sm" data-cot-responder="'+c.id+'">Contraofertar</button></div>'));
+      }
+      const rondas = rondasDe(c);
+      if(rondas.length > 1){
+        cuerpo += '<details class="cot-hist"><summary>Negociación ('+rondas.length+' propuestas)</summary><ol>'+rondas.map(function(r){
+          return '<li><b>'+(r.de === 'mayorista' ? esc(c.mayoristaNombre || 'Mayorista') : esc(c.productorNombre || 'Productor'))+'</b>: '+money(r.precio)+' / '+esc(c.unit || 'kg')+(r.acepta ? ' ✓ aceptado' : '')+
+            (r.fecha ? ' <span>· '+new Date(r.fecha).toLocaleString('es-AR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })+'</span>' : '')+'</li>';
+        }).join('')+'</ol></details>';
       } else if(c.estado === 'aceptada'){
         cuerpo = '<div class="cot-precio"><b>'+money(c.precioOfertado)+' / '+esc(c.unit || 'kg')+'</b> · '+
           (c.numeroPedido ? 'se generó el pedido <b>CC-'+c.numeroPedido+'</b>' : 'reserva confirmada para '+MESES[c.mes])+'</div>';
@@ -3839,14 +4586,55 @@ function bindCotizaciones(main){
       const c = S.cotizaciones.find(function(x){ return x.id === b.dataset.cotResponder; });
       const precio = parseFloat((document.getElementById('cotPrecio-' + c.id) || {}).value);
       if(!(precio > 0)){ showToast('Escribí el precio que le ofrecés'); return; }
+      const contra = c.estado === 'contraoferta';
       b.disabled = true;
-      db.collection('cotizaciones').doc(c.id).update({ estado: 'cotizada', precioOfertado: precio, actualizado: FieldValue.serverTimestamp() })
+      guardar(db.collection('cotizaciones').doc(c.id).update({
+        estado: 'cotizada', precioOfertado: precio, acordado: false,
+        rondas: rondasDe(c).concat([{ de: 'productor', precio: precio, fecha: Date.now() }]),
+        actualizado: FieldValue.serverTimestamp()
+      }))
         .then(function(){
-          registrar('Cotización respondida', descripcionCot(c) + ' a ' + money(precio) + '/' + (c.unit || 'kg'));
-          return enviarTextoA(c.mayoristaUid, '💲 Te cotizo ' + descripcionCot(c) + ' a ' + money(precio) + ' por ' + (c.unit || 'kg') + ' (total ' + money(precio * c.qty) + ').');
+          registrar(contra ? 'Contraoferta del productor' : 'Cotización respondida', descripcionCot(c) + ' a ' + money(precio) + '/' + (c.unit || 'kg'));
+          return enviarTextoA(c.mayoristaUid, (contra ? '↩️ No llego a ' + money(c.precioContraoferta) + '. Te propongo ' : '💲 Te cotizo ' + descripcionCot(c) + ' a ') + money(precio) + ' por ' + (c.unit || 'kg') + ' (total ' + money(precio * c.qty) + ').');
         })
         .then(function(){ showToast('Precio enviado al mayorista'); })
         .catch(function(err){ showToast(errorFirestore(err, 'responder')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-cot-contra]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const c = S.cotizaciones.find(function(x){ return x.id === b.dataset.cotContra; });
+      if(!c) return;
+      const precio = parseFloat((document.getElementById('cotContra-' + c.id) || {}).value);
+      if(!(precio > 0)){ showToast('Escribí el precio que proponés'); return; }
+      if(precio >= c.precioOfertado){ showToast('Para pagar ' + money(c.precioOfertado) + ' o más, aceptá directamente la cotización'); return; }
+      b.disabled = true;
+      guardar(db.collection('cotizaciones').doc(c.id).update({
+        estado: 'contraoferta', precioContraoferta: precio, acordado: false,
+        rondas: rondasDe(c).concat([{ de: 'mayorista', precio: precio, fecha: Date.now() }]),
+        actualizado: FieldValue.serverTimestamp()
+      })).then(function(){
+        registrar('Contraoferta enviada', descripcionCot(c) + ' · ' + money(c.precioOfertado) + ' → ' + money(precio) + '/' + (c.unit || 'kg'));
+        showToast('Contraoferta enviada al productor');
+        return enviarTextoA(c.productorUid, '🤝 ¿Me lo dejás a ' + money(precio) + ' por ' + (c.unit || 'kg') + '? (' + descripcionCot(c) + ', total ' + money(precio * c.qty) + ').');
+      }).catch(function(err){ showToast(errorFirestore(err, 'enviar la contraoferta')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-cot-acepta-contra]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const c = S.cotizaciones.find(function(x){ return x.id === b.dataset.cotAceptaContra; });
+      if(!c) return;
+      b.disabled = true;
+      const precio = c.precioContraoferta;
+      guardar(db.collection('cotizaciones').doc(c.id).update({
+        estado: 'cotizada', precioOfertado: precio, acordado: true,
+        rondas: rondasDe(c).concat([{ de: 'productor', precio: precio, acepta: true, fecha: Date.now() }]),
+        actualizado: FieldValue.serverTimestamp()
+      })).then(function(){
+        registrar('Contraoferta aceptada', descripcionCot(c) + ' a ' + money(precio) + '/' + (c.unit || 'kg'));
+        showToast('Aceptaste el precio. El mayorista ya puede generar el pedido.');
+        return enviarTextoA(c.mayoristaUid, '🤝 Trato hecho: ' + descripcionCot(c) + ' a ' + money(precio) + ' por ' + (c.unit || 'kg') + '. Ya podés generar el pedido.');
+      }).catch(function(err){ showToast(errorFirestore(err, 'aceptar la contraoferta')); b.disabled = false; });
     });
   });
   main.querySelectorAll('[data-cot-rechazar],[data-cot-cancelar]').forEach(function(b){
@@ -3856,7 +4644,7 @@ function bindCotizaciones(main){
       const estado = b.dataset.cotCancelar ? 'cancelada' : 'rechazada';
       if(!window.confirm(estado === 'cancelada' ? '¿Cancelar este pedido de cotización?' : '¿Rechazar esta cotización?')) return;
       b.disabled = true;
-      db.collection('cotizaciones').doc(c.id).update({ estado: estado, actualizado: FieldValue.serverTimestamp() })
+      guardar(db.collection('cotizaciones').doc(c.id).update({ estado: estado, actualizado: FieldValue.serverTimestamp() }))
         .then(function(){
           registrar(estado === 'cancelada' ? 'Cotización cancelada' : 'Cotización rechazada', descripcionCot(c));
           return enviarTextoA(otroDeCot(c), (estado === 'cancelada' ? 'Cancelé' : 'Rechacé') + ' la cotización de ' + descripcionCot(c) + '.');
@@ -4010,7 +4798,7 @@ function bindCosecha(main){
       creado: FieldValue.serverTimestamp()
     };
     pub.disabled = true;
-    db.collection('cosechas').add(datos).then(function(){
+    guardar(db.collection('cosechas').add(datos)).then(function(){
       registrar('Cosecha anunciada', producto + ' · ' + rangoTexto(datos) + ' · ~' + volumen.toLocaleString('es-AR') + ' ' + datos.unit);
       ['cosProducto','cosVolumen','cosNotas'].forEach(function(id){ const el = document.getElementById(id); if(el) el.value = ''; });
       pub.disabled = false;
@@ -4022,7 +4810,7 @@ function bindCosecha(main){
       const c = S.cosechas.find(function(x){ return x.id === b.dataset.cosBorrar; });
       if(!c || !window.confirm('¿Quitar ' + c.producto + ' del calendario?')) return;
       b.disabled = true;
-      db.collection('cosechas').doc(c.id).delete()
+      guardar(db.collection('cosechas').doc(c.id).delete())
         .then(function(){ registrar('Cosecha quitada', c.producto + ' · ' + rangoTexto(c)); showToast('Quitada del calendario'); })
         .catch(function(err){ showToast(errorFirestore(err, 'quitarla')); b.disabled = false; });
     });
@@ -4240,7 +5028,8 @@ function ubicacionDe(u, direccionAlternativa, coordsAlternativas, provDefecto){
    ============================================================ */
 const storage = (firebase.storage && firebaseConfig.storageBucket) ? firebase.storage() : null;
 function subirFoto(dataUrl, lotId){
-  if(!storage) return Promise.resolve(dataUrl);
+  // Sin señal la foto queda dentro del lote y viaja con él al sincronizar.
+  if(!storage || !navigator.onLine) return Promise.resolve(dataUrl);
   const ruta = 'lotes/' + currentUser.uid + '/' + (lotId || 'nuevo') + '-' + Date.now() + '.jpg';
   const subida = storage.ref(ruta).putString(dataUrl, 'data_url', { contentType: 'image/jpeg' })
     .then(function(snap){ return snap.ref.getDownloadURL(); });
@@ -4256,6 +5045,7 @@ function borrarFotoStorage(url){
 }
 
 function bindExtras(main){
+  bindReportes(main);
   bindCotizaciones(main);
   bindCosecha(main);
   bindAlertas(main);
@@ -4387,7 +5177,7 @@ function bindMainEvents(){
       procesarFoto(file).then(function(data){
         return subirFoto(data, inp.dataset.subirFoto);
       }).then(function(foto){
-        return db.collection('lotes').doc(inp.dataset.subirFoto).update({ fotoPropia: foto });
+        return guardar(db.collection('lotes').doc(inp.dataset.subirFoto).update({ fotoPropia: foto }));
       }).then(function(){
         borrarFotoStorage(anterior);
         showToast('Foto actualizada: los mayoristas ya la ven en el catálogo');
@@ -4400,7 +5190,7 @@ function bindMainEvents(){
     b.addEventListener('click', function(){
       b.disabled = true;
       const anterior = (lotById(b.dataset.usarIa) || {}).fotoPropia;
-      db.collection('lotes').doc(b.dataset.usarIa).update({ fotoPropia: FieldValue.delete() })
+      guardar(db.collection('lotes').doc(b.dataset.usarIa).update({ fotoPropia: FieldValue.delete() }))
         .then(function(){ borrarFotoStorage(anterior); showToast('Volviste a la foto generada con IA'); })
         .catch(function(err){ showToast('No se pudo cambiar la foto: ' + err.message); b.disabled = false; });
     });
@@ -4412,7 +5202,7 @@ function bindMainEvents(){
       if(!l) return;
       b.disabled = true;
       const nueva = urlFotoIA(l.name, l.cat, Math.floor(Math.random() * 1000000));
-      db.collection('lotes').doc(l.id).update({ imagenUrl: nueva }).then(function(){
+      guardar(db.collection('lotes').doc(l.id).update({ imagenUrl: nueva })).then(function(){
         new Image().src = nueva;
         showToast('Generando una foto nueva… puede tardar unos segundos');
       }).catch(function(err){ showToast('No se pudo cambiar la foto: ' + err.message); b.disabled = false; });
@@ -4520,7 +5310,7 @@ function bindMainEvents(){
       addLotBtn.disabled = true;
       const fotoElegida = fotoNueva;
       // La foto propia se sube primero a Firebase Storage (si está habilitado).
-      (fotoElegida ? subirFoto(fotoElegida, null) : Promise.resolve(null)).then(function(foto){ return db.collection('lotes').add({
+      (fotoElegida ? subirFoto(fotoElegida, null) : Promise.resolve(null)).then(function(foto){ return guardar(db.collection('lotes').add({
         name: name, productorUid: currentUser.uid, productorNombre: currentUser.entidad || currentUser.nombre,
         cat: cat, price: price, unit: unit, stock: stock, stockInicial: stock, min: min,
         color: palette[cat] || '#8A5FB0',
@@ -4528,7 +5318,7 @@ function bindMainEvents(){
         fotoPropia: foto || null,
         historialPrecios: [{ precio: price, fecha: Date.now() }],
         archivado: false, createdAt: FieldValue.serverTimestamp()
-      }); }).then(function(){
+      })); }).then(function(){
         registrar('Publicación creada', name + ' · ' + money(price) + ' / ' + unit + ' · stock ' + stock.toLocaleString('es-AR') + ' ' + unit);
         const conFoto = !!fotoElegida;
         fotoNueva = null;
@@ -4644,7 +5434,7 @@ function bindMainEvents(){
           ? FieldValue.arrayUnion({ precio: price, fecha: Date.now() })
           : [{ precio: lote.price, fecha: (lote.createdAt && lote.createdAt.toMillis) ? lote.createdAt.toMillis() : Date.now() - 60000 }, { precio: price, fecha: Date.now() }];
       }
-      db.collection('lotes').doc(lote.id).update(cambios).then(function(){
+      guardar(db.collection('lotes').doc(lote.id).update(cambios)).then(function(){
         const dif = stock - antes;
         registrar(price !== lote.price ? 'Precio modificado' : 'Publicación editada',
           name + (price !== lote.price ? ' · ' + money(lote.price) + ' → ' + money(price) + ' / ' + unit : '') + (dif ? ' · stock ' + (dif > 0 ? '+' : '') + dif.toLocaleString('es-AR') + ' ' + unit : ''));
@@ -4669,7 +5459,7 @@ function bindMainEvents(){
       if(!window.confirm('¿Eliminar esta publicación? Dejará de verse en el catálogo. Los pedidos ya realizados sobre este producto se conservan.')) return;
       b.disabled = true;
       const ld = lotById(b.dataset.deleteLot);
-      db.collection('lotes').doc(b.dataset.deleteLot).update({ archivado: true })
+      guardar(db.collection('lotes').doc(b.dataset.deleteLot).update({ archivado: true }))
         .then(function(){ showToast('Publicación eliminada'); registrar('Publicación eliminada', ld ? ld.name : ''); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
@@ -4768,6 +5558,8 @@ function bindMainEvents(){
         let msg;
         if(err && err.esDeNegocio){
           msg = err.message;
+        } else if(!navigator.onLine || (err && err.code === 'unavailable')){
+          msg = 'Confirmar un pedido necesita conexión, porque descuenta stock en el momento. Probá de nuevo cuando vuelva la señal.';
         } else if(err && (err.code === 'permission-denied' || /insufficient permissions/i.test(err.message || ''))){
           msg = 'Firestore rechazó la operación por permisos. Hay que publicar las reglas actualizadas en la consola de Firebase.';
         } else {
@@ -4785,14 +5577,48 @@ function bindMainEvents(){
       const o = S.orders.find(function(x){ return x.id === b.dataset.advance; });
       if(!o) return;
       b.disabled = true;
-      const traceIdx = o.traceIdx + 1;
-      const statusIdx = traceStatusIdx(traceIdx);
-      const update = { traceIdx: traceIdx, statusIdx: statusIdx };
-      if(statusIdx === 4 && !o.invoice){ update.invoice = genInvoice(o); }
-      db.collection('pedidos').doc(o.id).update(update).then(function(){
-        registrar(statusIdx === 4 ? 'Pedido entregado' : 'Trazabilidad avanzada', 'CC-' + o.numero + ' · ' + TRACE_LABELS[traceIdx] + (statusIdx === 4 ? ' · factura CAE ' + update.invoice.cae : ''));
-        showToast(statusIdx === 4 ? 'Pedido entregado — factura generada automáticamente' : 'Trazabilidad actualizada: ' + TRACE_LABELS[traceIdx]);
+      avanzarTrazabilidad(o).then(function(r){
+        showToast(r.statusIdx === 4 ? 'Pedido entregado — factura generada automáticamente' : 'Trazabilidad actualizada: ' + TRACE_LABELS[r.traceIdx]);
       }).catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
+    });
+  });
+
+  main.querySelectorAll('[data-escanear]').forEach(function(b){ b.addEventListener('click', abrirEscaner); });
+
+  main.querySelectorAll('[data-suspender]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const u = S.users.find(function(x){ return x.uid === b.dataset.suspender; });
+      if(!u) return;
+      const motivo = window.prompt('Vas a suspender a ' + (u.nombre || u.email) + '. No va a poder entrar ni operar, pero su historial se conserva.\n\nMotivo (lo ve el usuario):', '');
+      if(motivo === null) return;
+      b.disabled = true;
+      db.collection('usuarios').doc(u.uid).update({
+        suspendido: true, motivoSuspension: motivo.trim().slice(0, 200),
+        suspendidoPor: currentUser.uid, suspendidoEn: FieldValue.serverTimestamp()
+      }).then(function(){
+        registrar('Cuenta suspendida', (u.nombre || u.email) + ' (' + u.rol + ')' + (motivo.trim() ? ' · ' + motivo.trim().slice(0, 200) : ''));
+        showToast('Cuenta de ' + (u.nombre || u.email) + ' suspendida');
+      }).catch(function(err){ showToast(errorFirestore(err, 'suspender la cuenta')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-reactivar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const u = S.users.find(function(x){ return x.uid === b.dataset.reactivar; });
+      if(!u || !window.confirm('¿Reactivar la cuenta de ' + (u.nombre || u.email) + '?')) return;
+      b.disabled = true;
+      db.collection('usuarios').doc(u.uid).update({
+        suspendido: false, motivoSuspension: FieldValue.delete(),
+        suspendidoPor: currentUser.uid, suspendidoEn: FieldValue.delete()
+      }).then(function(){
+        registrar('Cuenta reactivada', (u.nombre || u.email) + ' (' + u.rol + ')');
+        showToast('Cuenta de ' + (u.nombre || u.email) + ' reactivada');
+      }).catch(function(err){ showToast(errorFirestore(err, 'reactivar la cuenta')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-etiqueta]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const o = S.orders.find(function(x){ return x.id === b.dataset.etiqueta; });
+      if(o) imprimirEtiqueta(o);
     });
   });
 
@@ -4801,7 +5627,7 @@ function bindMainEvents(){
       if(!window.confirm('¿Seguro que querés cancelar este pedido? Esta acción no se puede deshacer.')) return;
       b.disabled = true;
       const oc = S.orders.find(function(x){ return x.id === b.dataset.cancelOrder; });
-      db.collection('pedidos').doc(b.dataset.cancelOrder).update({ cancelado: true })
+      guardar(db.collection('pedidos').doc(b.dataset.cancelOrder).update({ cancelado: true }))
         .then(function(){ showToast('Pedido cancelado'); registrar('Pedido cancelado', oc ? 'CC-' + oc.numero : ''); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
@@ -4811,7 +5637,7 @@ function bindMainEvents(){
     b.addEventListener('click', function(){
       if(!window.confirm('¿Quitar este pedido de tu lista? Solo se oculta de tu vista, el registro sigue guardado en el sistema.')) return;
       b.disabled = true;
-      db.collection('pedidos').doc(b.dataset.hideOrder).update({ ocultoMayorista: true })
+      guardar(db.collection('pedidos').doc(b.dataset.hideOrder).update({ ocultoMayorista: true }))
         .then(function(){ showToast('Pedido quitado de la lista'); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
@@ -4855,7 +5681,7 @@ function bindMainEvents(){
     b.addEventListener('click', function(){
       if(!window.confirm('¿Quitar este pedido de tu lista? Solo se oculta de tu vista, el registro sigue guardado en el sistema.')) return;
       b.disabled = true;
-      db.collection('pedidos').doc(b.dataset.hideOrderProductor).update({ ocultoProductor: true })
+      guardar(db.collection('pedidos').doc(b.dataset.hideOrderProductor).update({ ocultoProductor: true }))
         .then(function(){ showToast('Pedido quitado de la lista'); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
@@ -4893,6 +5719,11 @@ auth.onAuthStateChanged(function(user){
         return;
       }
       const data = doc.data();
+      if(data.suspendido === true){
+        avisoSuspension = textoSuspension(data);
+        auth.signOut();
+        return;
+      }
       // Se carga el perfil completo: la dirección y el teléfono viajan con cada pedido.
       currentUser = Object.assign({}, data, { uid: user.uid });
       if(loginManual){ loginManual = false; registrar('Inicio de sesión', currentUser.email || ''); }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -38,9 +40,11 @@ public class MainActivity extends Activity {
     static final String SISTEMA = "https://citruscode.netlify.app/";
     private static final String HOST = "citruscode.netlify.app";
     private static final int ELEGIR_ARCHIVO = 1;
+    private static final int PERMISO_CAMARA = 2;
 
     private WebView web;
     private ValueCallback<Uri[]> archivoPendiente;
+    private PermissionRequest camaraPendiente;
 
     /* Las descargas del sistema (PDF de comprobantes y CSV) son blobs generados
        en la página: el WebView no sabe guardarlos, así que se leen en JS y se
@@ -156,6 +160,29 @@ public class MainActivity extends Activity {
     }
 
     private class Cromo extends WebChromeClient {
+        /* El escáner de QR del sistema pide la cámara: se le da solo al sitio de CitrusCode. */
+        @Override
+        public void onPermissionRequest(PermissionRequest pedido) {
+            runOnUiThread(() -> {
+                Uri origen = pedido.getOrigin();
+                boolean esCamara = false;
+                for (String r : pedido.getResources()) {
+                    if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(r)) esCamara = true;
+                }
+                if (!esCamara || origen == null || !HOST.equals(origen.getHost())) {
+                    pedido.deny();
+                    return;
+                }
+                if (checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    pedido.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+                } else {
+                    if (camaraPendiente != null) camaraPendiente.deny();
+                    camaraPendiente = pedido;
+                    requestPermissions(new String[]{android.Manifest.permission.CAMERA}, PERMISO_CAMARA);
+                }
+            });
+        }
+
         @Override
         public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> callback, FileChooserParams params) {
             if (archivoPendiente != null) archivoPendiente.onReceiveValue(null);
@@ -168,6 +195,20 @@ public class MainActivity extends Activity {
             }
             return true;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int pedido, String[] permisos, int[] resultados) {
+        if (pedido == PERMISO_CAMARA && camaraPendiente != null) {
+            if (resultados.length > 0 && resultados[0] == PackageManager.PERMISSION_GRANTED) {
+                camaraPendiente.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+            } else {
+                camaraPendiente.deny();
+            }
+            camaraPendiente = null;
+            return;
+        }
+        super.onRequestPermissionsResult(pedido, permisos, resultados);
     }
 
     @Override
