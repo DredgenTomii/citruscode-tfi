@@ -366,6 +366,8 @@
   .sl-item.bajo .sl-val{color:var(--c-naranja);}
   .sl-item.bajo .sl-bar span{background:linear-gradient(90deg,var(--c-limon),var(--c-naranja));}
   .sl-item.agotado .sl-val{color:var(--rojo);}
+  .sl-pron{font-size:.7rem; color:var(--texto-suave); margin-top:7px; line-height:1.35;}
+  .sl-item.bajo .sl-pron{color:var(--c-naranja); font-weight:600;}
   .sl-item.agotado .sl-bar span{background:var(--rojo);}
 
   /* Carrito */
@@ -1009,6 +1011,7 @@
   .alerta-lista button{display:inline-flex; align-items:center; gap:6px; font-size:.74rem; font-weight:600; padding:5px 11px; border-radius:20px; border:1px solid var(--limon-borde); background:var(--surface); color:var(--texto); transition:.2s;}
   .alerta-lista button:hover{border-color:var(--c-naranja); color:var(--c-naranja);}
   .alerta-lista button em{font-style:normal; font-weight:800; color:var(--c-naranja);}
+  .alerta-nota{margin:8px 0 0; font-size:.74rem; color:var(--texto-suave); line-height:1.45;}
 
   /* ============================================================
      MAPA DE RECORRIDO
@@ -1026,6 +1029,46 @@
   [data-theme="dark"] .leaflet-bar a{background:var(--surface); color:var(--texto); border-color:var(--borde);}
   [data-theme="dark"] .leaflet-control-attribution{background:rgba(16,23,14,.75) !important; color:var(--texto-suave);}
   [data-theme="dark"] .leaflet-control-attribution a{color:var(--acento);}
+  /* ============================================================
+     MAPA DE PRODUCTORES (CATÁLOGO)
+     ============================================================ */
+  .cat-meta-acc{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .cat-meta-acc .btn .ic{width:15px; height:15px;}
+  .btn.on{border-color:var(--acento); color:var(--acento); background:var(--limon-bg);}
+  .cat-mapa-wrap{margin-bottom:22px;}
+  .trace-map.cat-map{height:380px;}
+  .map-pin.prod{position:relative;}
+  .map-pin.prod .mp-n{position:absolute; top:-7px; right:-9px; min-width:20px; height:20px; padding:0 5px; border-radius:10px; background:var(--c-verde); color:#fff; font:700 .68rem/20px Inter,sans-serif; box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .map-pin.prod.sel{border-color:var(--c-naranja); box-shadow:0 0 0 5px rgba(232,137,43,.35), 0 4px 12px rgba(0,0,0,.25);}
+  .map-pin.prod.sel .mp-n{background:var(--c-naranja);}
+  .mp-pop{display:grid; gap:4px; font-family:'Inter',sans-serif; font-size:.8rem; min-width:190px;}
+  .mp-pop b{font-size:.92rem;}
+  .mp-pop .mp-lugar, .mp-pop .mp-rate{color:#5d6b57; font-size:.74rem;}
+  .mp-pop ul{margin:4px 0; padding-left:16px;}
+  .mp-pop li em{font-style:normal; font-weight:700; color:#2f7a35;}
+  .mp-pop button{margin-top:4px; padding:7px 10px; border-radius:9px; border:0; background:#2f7a35; color:#fff; font:600 .78rem Inter,sans-serif; cursor:pointer;}
+  .mp-pop button:focus-visible{outline:2px solid #E8892B; outline-offset:2px;}
+
+  /* ============================================================
+     PEDIDOS PROGRAMADOS
+     ============================================================ */
+  .prog-box{border:1px solid var(--borde); background:var(--surface-2); border-radius:16px; padding:16px 18px; margin-bottom:20px; display:grid; gap:10px;}
+  .prog-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .prog-head h4{display:flex; align-items:center; gap:8px; font-size:.95rem; margin:0;}
+  .prog-head h4 .ic{width:18px; height:18px; color:var(--acento);}
+  .prog-n{font-size:.72rem; font-weight:700; color:var(--acento); background:var(--limon-bg); border:1px solid var(--limon-borde); border-radius:20px; padding:3px 10px;}
+  .prog-item{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 14px; border-radius:12px; background:var(--surface); border:1px solid var(--borde);}
+  .prog-item.pausado{opacity:.7;}
+  .prog-info{display:grid; gap:2px; min-width:0;}
+  .prog-info b{font-size:.88rem;}
+  .prog-info span{font-size:.76rem; color:var(--texto-suave);}
+  .prog-info .prog-prox b{font-size:inherit; color:var(--acento);}
+  .prog-info .prog-ult{font-style:italic;}
+  .prog-acc{display:flex; gap:6px; flex-wrap:wrap;}
+  .prog-hint{margin:0; font-size:.76rem; color:var(--texto-suave); line-height:1.45;}
+  .prog-form{margin-top:12px; padding:14px 16px; border-radius:14px; border:1px dashed var(--limon-borde); background:var(--limon-bg); display:grid; gap:10px;}
+  .prog-form h5{margin:0; font-size:.86rem;}
+  .chip-prog{display:inline-block; vertical-align:middle; margin-left:6px; font-size:.66rem; font-weight:700; padding:2px 8px; border-radius:20px; background:var(--limon-bg); border:1px solid var(--limon-borde); color:var(--texto);}
   .map-leyenda{display:flex; gap:14px; flex-wrap:wrap; font-size:.74rem; color:var(--texto-suave); margin-top:8px;}
 
   /* ============================================================
@@ -1300,7 +1343,7 @@ function textoSuspension(d){
   return 'Tu cuenta está suspendida por la administración de CitrusCode' + (d && d.motivoSuspension ? ': ' + d.motivoSuspension : '') +
     '. Tu historial se conserva. Escribinos para revisarlo.';
 }
-let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [] };
+let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [] };
 let califDisponible = true;  // false si Firestore todavía no tiene las reglas de calificaciones
 let editandoLote = null;   // id del lote que se está editando, o null
 let catFilter = 'todos';
@@ -1308,6 +1351,9 @@ let prodFilter = 'todos';   // productorUid elegido en el catálogo del mayorist
 let itemFilter = 'todos';   // nombre de producto (normalizado) elegido en el catálogo
 let catBusqueda = '';       // texto libre del buscador del catálogo
 let catOrden = 'recientes'; // criterio de orden del catálogo
+let provFilter = 'todos';   // provincia de la finca elegida en el catálogo
+let catMapa = false;        // mapa de productores visible en el catálogo
+let datosMapaCat = [];      // productores que muestra ese mapa (según los filtros)
 let precioSel = null;       // lote elegido en "Evolución de precios"
 let fotoNueva = null;       // foto propia elegida para el lote que se está por publicar (data URL)
 let chatAbierto = null, chatMsgs = [], chatError = false, unsubChat = null;  // mensajes del pedido abierto
@@ -1320,7 +1366,7 @@ const avisadosStock = {};   // lotes con stock bajo ya avisados en esta sesión
 let authMode = 'login';
 let loginManual = false;   // para registrar en la bitácora solo los ingresos desde el formulario
 let unsubLotes = null, unsubPedidos = null, unsubProyectos = null, unsubUsuarios = null, unsubCalif = null;
-let unsubConvs = null, unsubContactos = null, unsubCotiz = null, unsubCosechas = null, unsubBitacora = null;
+let unsubConvs = null, unsubContactos = null, unsubCotiz = null, unsubCosechas = null, unsubBitacora = null, unsubProgramados = null;
 
 /* ============================================================
    HELPERS
@@ -1581,12 +1627,43 @@ function chipTendencia(v){
   return '<span class="trend '+(up ? 'up' : 'down')+'" title="Variación contra el precio anterior">'+(up ? '▲' : '▼')+' '+Math.abs(v).toFixed(0)+' %</span>';
 }
 
-/* ---------- Stock bajo (productor) ---------- */
+/* ---------- Stock bajo (productor) ----------
+   Cada lote avisa cuando su stock baja del límite que eligió el productor (o del
+   25 % de lo publicado si no eligió ninguno) y también cuando, al ritmo de venta
+   del último mes, se agotaría en una semana o menos. */
+const DIAS_AVISO_AGOTAR = 7;
+function umbralStock(l){
+  if(l.alertaStock > 0) return l.alertaStock;
+  const inicial = (l.stockInicial && l.stockInicial > 0) ? l.stockInicial : Math.max(l.stock, 1);
+  return inicial * 0.25;
+}
+/* Unidades por día vendidas del lote, según los pedidos confirmados de los últimos 30 días. */
+function ritmoVenta(l){
+  const desde = Date.now() - 30 * 86400e3;
+  let total = 0;
+  S.orders.forEach(function(o){
+    if(o.lotId === l.id && !o.cancelado && o.statusIdx >= 1 && msDe(o.createdAt) >= desde) total += Number(o.qty) || 0;
+  });
+  return total / 30;
+}
+/* Días que faltan para que se agote al ritmo actual, o null si no hubo ventas recientes. */
+function diasParaAgotar(l){
+  const r = ritmoVenta(l);
+  if(!(r > 0) || !(l.stock > 0)) return null;
+  return Math.max(1, Math.round(l.stock / r));
+}
+function textoDias(d){ return '~' + d + (d === 1 ? ' día' : ' días'); }
+function motivoStockBajo(l){
+  if(l.stock === 0) return 'agotado';
+  const dias = diasParaAgotar(l);
+  if(l.stock <= umbralStock(l)) return 'quedan ' + l.stock.toLocaleString('es-AR') + ' ' + l.unit + (dias !== null ? ' · ' + textoDias(dias) : '');
+  if(dias !== null && dias <= DIAS_AVISO_AGOTAR) return 'se agota en ' + textoDias(dias);
+  return null;
+}
 function lotesStockBajo(){
   return S.lots.filter(function(l){
     if(l.archivado || l.productorUid !== currentUser.uid) return false;
-    const inicial = (l.stockInicial && l.stockInicial > 0) ? l.stockInicial : Math.max(l.stock, 1);
-    return l.stock === 0 || l.stock / inicial <= 0.25;
+    return motivoStockBajo(l) !== null;
   });
 }
 function revisarStockBajo(){
@@ -1596,7 +1673,7 @@ function revisarStockBajo(){
   Object.keys(avisadosStock).forEach(function(id){ if(!bajos.some(function(l){ return l.id === id; })) delete avisadosStock[id]; });
   nuevos.forEach(function(l){ avisadosStock[l.id] = true; });
   if(nuevos.length){
-    showToast('⚠ Stock bajo: ' + nuevos.map(function(l){ return l.name + (l.stock === 0 ? ' (agotado)' : ''); }).join(', ') + '. Reponelo desde Mis publicaciones.');
+    showToast('⚠ Stock bajo: ' + nuevos.map(function(l){ return l.name + ' (' + motivoStockBajo(l) + ')'; }).join(', ') + '. Reponelo desde Mis publicaciones.');
   }
 }
 
@@ -1848,6 +1925,88 @@ function botonMapa(o){
 function cajaMapa(o){
   if(mapaAbierto !== o.id) return '';
   return '<div class="trace-map" id="mapa-'+o.id+'"><div class="map-cargando">Cargando mapa…</div></div>';
+}
+/* ---------- Mapa de productores del catálogo ---------- */
+function provinciaProductor(uid){
+  const u = contactoPorUid(uid);
+  return (u && u.provincia) || '';
+}
+function popupProductor(g){
+  const rep = reputacion().porUid[g.uid];
+  const lotes = g.lotes.slice().sort(function(a, b){ return a.name.localeCompare(b.name, 'es'); });
+  return '<div class="mp-pop">'+
+    '<b>'+esc(g.nombre)+'</b>'+
+    '<span class="mp-lugar">'+esc(g.lugar || '')+(g.exacta ? '' : ' (aprox.)')+'</span>'+
+    (rep && rep.n ? '<span class="mp-rate">★ '+fmtProm(rep.prom)+' · '+rep.n+(rep.n === 1 ? ' calificación' : ' calificaciones')+'</span>' : '')+
+    '<ul>'+lotes.slice(0, 5).map(function(l){
+      return '<li>'+esc(l.name)+' <em>'+money(l.price)+'/'+esc(l.unit)+'</em></li>';
+    }).join('')+(lotes.length > 5 ? '<li>y '+(lotes.length - 5)+' más</li>' : '')+'</ul>'+
+    '<button type="button" data-mapa-prod="'+esc(g.uid)+'">Ver sus productos</button>'+
+  '</div>';
+}
+function dibujarMapaCatalogo(){
+  Promise.all([cargarLeaflet()]).then(function(){
+    const el = document.getElementById('mapa-catalogo');
+    if(!el || el._mapa) return;
+    el.innerHTML = '';
+    const mapa = L.map(el, { scrollWheelZoom: false });
+    el._mapa = mapa;
+    el._tiles = tilesMapa().addTo(mapa);
+    mapa.setView([-26.6, -65.2], 6);
+    const capa = L.layerGroup().addTo(mapa);
+    let encuadrado = false, pedido = 0, firma = '';
+    el._actualizar = function(){
+      // Solo se redibujan las marcas si cambió lo que muestran (así no se cierra un popup abierto).
+      const nueva = prodFilter + '|' + datosMapaCat.map(function(g){ return g.uid + ':' + g.lotes.map(function(l){ return l.id + '/' + l.price; }).join(','); }).join(';');
+      if(nueva === firma) return;
+      firma = nueva;
+      const n = ++pedido;
+      Promise.all(datosMapaCat.map(function(g){
+        return ubicacionDe(contactoPorUid(g.uid), null, null, 'Tucumán').then(function(u){
+          return Object.assign({}, g, { pos: u.p, lugar: u.etiqueta, exacta: u.exacta });
+        });
+      })).then(function(res){
+        if(n !== pedido || !el._mapa) return;
+        capa.clearLayers();
+        // Fincas en el mismo punto (por ejemplo, ubicadas por la capital provincial) se separan un poco.
+        const usados = [];
+        res.forEach(function(g){
+          let pos = g.pos.slice(), vuelta = 0;
+          while(usados.some(function(u){ return Math.abs(u[0] - pos[0]) + Math.abs(u[1] - pos[1]) < 0.04; }) && vuelta < 12){
+            vuelta++;
+            pos = [g.pos[0] + Math.sin(vuelta * 2.1) * 0.07 * Math.ceil(vuelta / 6), g.pos[1] + Math.cos(vuelta * 2.1) * 0.07 * Math.ceil(vuelta / 6)];
+          }
+          usados.push(pos);
+          const sel = prodFilter === g.uid;
+          L.marker(pos, { icon: L.divIcon({ className: 'map-pin prod' + (sel ? ' sel' : ''), html: '🌿<span class="mp-n">' + g.lotes.length + '</span>', iconSize: [36, 36] }), zIndexOffset: sel ? 500 : 0 })
+            .addTo(capa)
+            .bindTooltip(esc(g.nombre), { direction: 'top', offset: [0, -16] })
+            .bindPopup(popupProductor(g), { maxWidth: 260 });
+        });
+        if(!encuadrado && usados.length){
+          encuadrado = true;
+          if(usados.length === 1) mapa.setView(usados[0], 9);
+          else mapa.fitBounds(L.latLngBounds(usados).pad(0.3), { maxZoom: 9 });
+        }
+      });
+    };
+    // Los popups de Leaflet frenan los clics, así que el botón se engancha al abrirse.
+    mapa.on('popupopen', function(e){
+      const b = e.popup.getElement() && e.popup.getElement().querySelector('[data-mapa-prod]');
+      if(!b) return;
+      b.addEventListener('click', function(){
+        prodFilter = b.dataset.mapaProd; itemFilter = 'todos';
+        mapa.closePopup();
+        renderMain();
+        const grid = document.getElementById('catGrid');
+        if(grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+    el._actualizar();
+  }).catch(function(err){
+    const el = document.getElementById('mapa-catalogo');
+    if(el) el.innerHTML = '<div class="map-cargando">No se pudo cargar el mapa: ' + esc(err.message) + '</div>';
+  });
 }
 /* El tema del mapa lo resuelve el CSS; se deja el gancho por si hiciera falta. */
 function refrescarMapaTema(){}
@@ -2238,12 +2397,14 @@ function subscribeData(){
   unsubLotes = db.collection('lotes').orderBy('createdAt','desc').onSnapshot(function(snap){
     S.lots = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
     revisarStockBajo();
+    generarProgramados();
     avisarNovedades();
     renderSubnav(); renderMain();
   }, function(err){ showToast('Error leyendo productos: ' + err.message); });
 
   unsubPedidos = db.collection('pedidos').orderBy('createdAt','desc').onSnapshot(function(snap){
     S.orders = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    revisarStockBajo();   // el pronóstico de "se agota en N días" depende de las ventas
     renderSubnav(); renderMain();
     revisarQRDeEnlace();
   }, function(err){ showToast('Error leyendo pedidos: ' + err.message); });
@@ -2305,6 +2466,20 @@ function suscribirExtras(){
     renderSubnav();
     if(enVista('chats')) renderMain();
   }, function(err){ console.warn('[CitrusCode] Cotizaciones no disponibles:', err.message); });
+
+  // Pedidos programados del mayorista: al entrar se generan los que ya vencieron.
+  if(currentUser.rol === 'mayorista'){
+    unsubProgramados = db.collection('programados').where('mayoristaUid','==',currentUser.uid).onSnapshot(function(snap){
+      S.programados = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      programadosDisponible = true;
+      if(enVista('pedidos')) renderMain();
+      generarProgramados();
+    }, function(err){
+      console.warn('[CitrusCode] Pedidos programados no disponibles:', err.message);
+      programadosDisponible = false;
+      if(enVista('pedidos')) renderMain();
+    });
+  }
 
   unsubCosechas = db.collection('cosechas').onSnapshot(function(snap){
     S.cosechas = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
@@ -2387,9 +2562,12 @@ function unsubscribeData(){
   if(unsubCosechas) unsubCosechas();
   if(unsubBitacora) unsubBitacora();
   unsubCotiz = unsubCosechas = unsubBitacora = null;
+  if(unsubProgramados){ unsubProgramados(); unsubProgramados = null; }
+  programarAbierto = null; generandoProgramados = false; programadosDisponible = true;
+  catMapa = false; provFilter = 'todos';
   cotizFormAbierto = false; reservaAbierta = null; cosechaCat = 'todos'; novedadesAvisadas = false;
   bitFiltro = { rol: 'todos', accion: 'todas', q: '' };
-  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [] };
+  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [] };
 }
 
 /* ============================================================
@@ -2635,11 +2813,15 @@ function renderMain(){
 
   if(mapaAbierto){
     const lugar = document.getElementById('mapa-' + mapaAbierto);
-    const ord = S.orders.find(function(x){ return x.id === mapaAbierto; });
+    const esCatalogo = mapaAbierto === 'catalogo';
+    const ord = esCatalogo ? null : S.orders.find(function(x){ return x.id === mapaAbierto; });
     if(mapaVivo && lugar){
       lugar.replaceWith(mapaVivo);
       mapaVivo._mapa.invalidateSize();
-      if(ord && mapaVivo._actualizar) mapaVivo._actualizar(ord);
+      if(esCatalogo){ if(mapaVivo._actualizar) mapaVivo._actualizar(); }
+      else if(ord && mapaVivo._actualizar) mapaVivo._actualizar(ord);
+    } else if(lugar && esCatalogo){
+      dibujarMapaCatalogo();
     } else if(lugar && ord){
       dibujarMapa(ord);
     } else if(mapaVivo){
@@ -2768,7 +2950,13 @@ function botonExportar(nombre){
 function viewMayoristaCatalogo(){
   const cats = ['todos','limon','naranja','mandarina','pomelo','subproductos'];
   const disponibles = S.lots.filter(function(l){ return !l.archivado; });
-  const porCat = catFilter === 'todos' ? disponibles : disponibles.filter(function(l){ return l.cat === catFilter; });
+  const porCatTodas = catFilter === 'todos' ? disponibles : disponibles.filter(function(l){ return l.cat === catFilter; });
+
+  // Provincia de cada finca (sale del perfil del productor). Si la elegida ya no tiene lotes, se resetea.
+  const provincias = {};
+  porCatTodas.forEach(function(l){ const pv = provinciaProductor(l.productorUid); if(pv) provincias[pv] = (provincias[pv] || 0) + 1; });
+  if(provFilter !== 'todos' && !provincias[provFilter]) provFilter = 'todos';
+  const porCat = provFilter === 'todos' ? porCatTodas : porCatTodas.filter(function(l){ return provinciaProductor(l.productorUid) === provFilter; });
 
   // Productores con oferta en la categoría elegida. Si el elegido ya no tiene lotes, se resetea.
   const productores = {};
@@ -2812,18 +3000,40 @@ function viewMayoristaCatalogo(){
   const optsOrden = [['recientes','Más recientes'],['precio-asc','Menor precio'],['precio-desc','Mayor precio'],['stock-desc','Mayor stock'],['calificacion','Mejor calificados'],['nombre','Nombre (A-Z)']].map(function(o){
     return '<option value="'+o[0]+'"'+(o[0]===catOrden?' selected':'')+'>'+o[1]+'</option>';
   }).join('');
-  const hayFiltros = prodFilter !== 'todos' || itemFilter !== 'todos' || q !== '';
+  const optsProv = Object.keys(provincias).sort(function(a, b){ return a.localeCompare(b, 'es'); }).map(function(pv){
+    return '<option value="'+esc(pv)+'"'+(pv===provFilter?' selected':'')+'>'+esc(pv)+' ('+provincias[pv]+')</option>';
+  }).join('');
+  const hayFiltros = provFilter !== 'todos' || prodFilter !== 'todos' || itemFilter !== 'todos' || q !== '';
+
+  // Datos del mapa: una marca por finca con lo que ofrece según categoría, provincia, producto y búsqueda.
+  if(catMapa){
+    mapaAbierto = 'catalogo';
+    const grupos = {};
+    porCat.forEach(function(l){
+      if(itemFilter !== 'todos' && normNombre(l.name) !== itemFilter) return;
+      if(q && sinAcentos(l.name + ' ' + l.productorNombre).indexOf(q) === -1) return;
+      const g = grupos[l.productorUid] || (grupos[l.productorUid] = { uid: l.productorUid, nombre: l.productorNombre, lotes: [] });
+      g.lotes.push(l);
+    });
+    datosMapaCat = Object.keys(grupos).map(function(k){ return grupos[k]; });
+  }
   const toolbar = disponibles.length ?
     '<div class="cat-toolbar">'+
       '<div class="form-row search-field"><label for="catBuscar">Buscar</label>'+icono('buscar')+
         '<input type="search" id="catBuscar" placeholder="Producto o productor…" value="'+esc(catBusqueda)+'" autocomplete="off"><kbd>/</kbd></div>'+
+      '<div class="form-row"><label for="fltProvincia">Provincia</label><select id="fltProvincia"><option value="todos">Todas las provincias</option>'+optsProv+'</select></div>'+
       '<div class="form-row"><label for="fltProductor">Productor</label><select id="fltProductor"><option value="todos">Todos los productores</option>'+optsProd+'</select></div>'+
       '<div class="form-row"><label for="fltProducto">Producto</label><select id="fltProducto"><option value="todos">Todos los productos</option>'+optsItem+'</select></div>'+
       '<div class="form-row"><label for="catOrden">Ordenar por</label><select id="catOrden">'+optsOrden+'</select></div>'+
     '</div>'+
     '<div class="cat-meta"><span>Mostrando <b>'+list.length+'</b> de '+disponibles.length+' publicaciones</span>'+
-      (hayFiltros ? '<button class="btn btn-ghost btn-sm" id="fltLimpiar">Limpiar filtros</button>' : '')+
-    '</div>' : '';
+      '<span class="cat-meta-acc">'+
+        (hayFiltros ? '<button class="btn btn-ghost btn-sm" id="fltLimpiar">Limpiar filtros</button>' : '')+
+        '<button class="btn btn-ghost btn-sm'+(catMapa ? ' on' : '')+'" id="catMapaBtn" aria-pressed="'+catMapa+'">'+icono('ubicacion')+(catMapa ? 'Ocultar mapa' : 'Ver mapa de productores')+'</button>'+
+      '</span>'+
+    '</div>'+
+    (catMapa ? '<div class="cat-mapa-wrap"><div class="trace-map cat-map" id="mapa-catalogo"><div class="map-cargando">Cargando mapa…</div></div>'+
+      '<p class="map-leyenda">Cada punto es una finca y el número es la cantidad de productos que ofrece con los filtros elegidos. Tocá un punto para ver sus productos.</p></div>' : '') : '';
 
   const cards = list.length ? list.map(function(p){
     const qty = S.cart[p.id] || p.min;
@@ -2880,7 +3090,7 @@ function viewMayoristaCatalogo(){
     '<div class="panel-head"><h2>Catálogo mayorista</h2><p>Explorá la oferta de fincas y cooperativas del NOA y armá tu pedido por volumen.</p></div>'+
     '<div class="cat-filters">'+filters+'</div>'+
     toolbar+
-    '<div class="product-grid">'+cards+'</div>'+
+    '<div class="product-grid" id="catGrid">'+cards+'</div>'+
     '<div class="cart-box" id="cartBox"><h4>'+icono('carrito')+'Tu pedido</h4>'+cartHtml+'</div>'+
   '</div>'+
   '<button class="cart-fab'+(cartIds.length ? ' show' : '')+'" id="cartFab" type="button" aria-label="Ver mi pedido">'+
@@ -2902,7 +3112,7 @@ function orderStepper(order){
 function viewMayoristaPedidos(){
   const myOrders = S.orders.filter(function(o){ return o.mayoristaUid === currentUser.uid && !o.ocultoMayorista; });
   if(!myOrders.length){
-    return '<div class="panel"><div class="panel-head"><h2>Mis pedidos</h2></div><div class="empty-state"><div class="ee-icon">🧺</div>Todavía no hiciste ningún pedido.<br>Volvé al catálogo para armar el primero.</div></div>';
+    return '<div class="panel"><div class="panel-head"><h2>Mis pedidos</h2></div>'+(S.programados.length ? seccionProgramados() : '')+'<div class="empty-state"><div class="ee-icon">🧺</div>Todavía no hiciste ningún pedido.<br>Volvé al catálogo para armar el primero.</div></div>';
   }
   const limpiablesCount = myOrders.filter(function(o){ return o.cancelado || (o.statusIdx === STATUSES.length - 1); }).length;
   const headBtn = limpiablesCount ? '<button class="btn btn-ghost btn-sm" id="clearMayoristaPedidos">🧹 Vaciar cancelados y entregados</button>' : '';
@@ -2922,7 +3132,7 @@ function viewMayoristaPedidos(){
         (entregado ? cajaCalificar(o, pprod) : '');
     return '<div class="order-card">'+
       '<div class="order-top">'+
-        '<div><div class="oid">Pedido #CC-'+o.numero+'</div><div class="osub">'+esc(pname)+' · '+o.qty.toLocaleString('es-AR')+' '+unitOf(o)+' · Productor: '+esc(pprod)+'</div></div>'+
+        '<div><div class="oid">Pedido #CC-'+o.numero+(o.programadoId ? ' <span class="chip-prog" title="Generado por un pedido programado">🗓 Programado</span>' : '')+'</div><div class="osub">'+esc(pname)+' · '+o.qty.toLocaleString('es-AR')+' '+unitOf(o)+' · Productor: '+esc(pprod)+'</div></div>'+
         statusBlock+
       '</div>'+
       cuerpoEstado+
@@ -2931,13 +3141,210 @@ function viewMayoristaPedidos(){
         '<button class="btn btn-ghost btn-sm" data-comprobante-pedido="'+o.id+'">📄 Comprobante de pedido</button>'+
         (o.invoice ? '<button class="btn btn-ghost btn-sm" data-comprobante-entrega="'+o.id+'">📄 Comprobante de entrega</button>' : '')+
         (!o.cancelado ? '<button class="btn btn-ghost btn-sm" data-repeat-order="'+o.id+'">↻ Repetir pedido</button>' : '')+
+        (!o.cancelado && p && !p.archivado && programadosDisponible ? '<button class="btn btn-ghost btn-sm'+(programarAbierto === o.id ? ' on' : '')+'" data-programar="'+o.id+'">🗓 Programar</button>' : '')+
         botonChat(o)+
         (puedeQuitar ? '<button class="btn btn-ghost btn-sm cancel-btn" data-hide-order="'+o.id+'">🗑 Quitar de la lista</button>' : '')+
       '</div>'+
+      formProgramar(o)+
       cajaChat(o, pprod || 'el productor')+
     '</div>';
   }).join('');
-  return '<div class="panel"><div class="panel-head" style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;"><div><h2>Mis pedidos</h2><p>Seguimiento en tiempo real del estado y la trazabilidad de cada pedido.</p></div>'+headBtn+'</div>'+cards+'</div>';
+  return '<div class="panel"><div class="panel-head" style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;"><div><h2>Mis pedidos</h2><p>Seguimiento en tiempo real del estado y la trazabilidad de cada pedido.</p></div>'+headBtn+'</div>'+seccionProgramados()+cards+'</div>';
+}
+
+/* ============================================================
+   PEDIDOS PROGRAMADOS (mayorista)
+   El mayorista programa un pedido para que se repita cada semana, cada dos
+   semanas o cada mes. Como el sistema no tiene un servidor propio, el pedido
+   se genera solo la primera vez que el mayorista abre CitrusCode a partir de
+   la fecha que toca, con el precio vigente del producto.
+   ============================================================ */
+const FRECUENCIAS = { 7: 'Cada semana', 14: 'Cada 2 semanas', 30: 'Cada mes' };
+let programadosDisponible = true;   // false si Firestore todavía no tiene las reglas de pedidos programados
+let programarAbierto = null;        // pedido con el formulario de programación abierto
+let generandoProgramados = false;
+function inicioDelDia(ms){ const d = new Date(ms); d.setHours(0, 0, 0, 0); return d.getTime(); }
+function fechaInput(ms){ const d = new Date(ms); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fechaLarga(ms){ return new Date(ms).toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }); }
+/* Próxima fecha que toca después de hoy, salteando las que ya pasaron. */
+function siguienteFecha(desde, dias){
+  const hoy = inicioDelDia(Date.now());
+  let t = desde;
+  do { t += dias * 86400e3; } while(t <= hoy);
+  return t;
+}
+function programadosMios(){
+  return S.programados.slice().sort(function(a, b){ return (b.activo ? 1 : 0) - (a.activo ? 1 : 0) || a.proxima - b.proxima; });
+}
+
+function seccionProgramados(){
+  if(!programadosDisponible){
+    return '<div class="prog-box"><div class="prog-head"><h4>'+icono('cosecha')+'Pedidos programados</h4></div>'+
+      '<p class="prog-hint">Se habilitan cuando se publiquen las reglas nuevas de Firestore.</p></div>';
+  }
+  const lista = programadosMios();
+  const items = lista.length ? lista.map(function(pr){
+    const p = lotById(pr.lotId);
+    return '<div class="prog-item'+(pr.activo ? '' : ' pausado')+'">'+
+      '<div class="prog-info">'+
+        '<b>'+esc(pr.producto)+' · '+Number(pr.qty).toLocaleString('es-AR')+' '+esc(pr.unit || 'kg')+'</b>'+
+        '<span>'+(FRECUENCIAS[pr.frecuencia] || 'Cada ' + pr.frecuencia + ' días')+' · '+esc(pr.productorNombre || (p ? p.productorNombre : ''))+'</span>'+
+        '<span class="prog-prox">'+(pr.activo ? 'Próximo pedido: <b>'+fechaLarga(pr.proxima)+'</b>' : 'Pausado')+
+          (pr.generados ? ' · '+pr.generados+(pr.generados === 1 ? ' pedido generado' : ' pedidos generados') : '')+'</span>'+
+        (pr.ultimoResultado ? '<span class="prog-ult">Último: '+esc(pr.ultimoResultado)+'</span>' : '')+
+      '</div>'+
+      '<div class="prog-acc">'+
+        (pr.activo
+          ? '<button class="btn btn-ghost btn-sm" data-prog-pausar="'+pr.id+'">⏸ Pausar</button>'
+          : '<button class="btn btn-ghost btn-sm" data-prog-reanudar="'+pr.id+'">▶ Reanudar</button>')+
+        '<button class="btn btn-ghost btn-sm cancel-btn" data-prog-borrar="'+pr.id+'">🗑 Eliminar</button>'+
+      '</div>'+
+    '</div>';
+  }).join('') : '<p class="prog-hint">Todavía no programaste ninguno. Tocá <b>🗓 Programar</b> en un pedido para que se repita solo cada semana, cada 2 semanas o cada mes.</p>';
+  return '<div class="prog-box">'+
+    '<div class="prog-head"><h4>'+icono('cosecha')+'Pedidos programados</h4>'+
+      (lista.length ? '<span class="prog-n">'+lista.filter(function(x){ return x.activo; }).length+' activos</span>' : '')+'</div>'+
+    items+
+    (lista.length ? '<p class="prog-hint">El pedido se genera solo la primera vez que abrís CitrusCode a partir de la fecha indicada, con el precio vigente. Si no hay stock suficiente, se saltea y queda anotado.</p>' : '')+
+  '</div>';
+}
+
+function formProgramar(o){
+  if(programarAbierto !== o.id) return '';
+  const p = lotById(o.lotId);
+  if(!p) return '';
+  const manana = inicioDelDia(Date.now()) + 7 * 86400e3;
+  return '<div class="prog-form" data-keep>'+
+    '<h5>Programar '+esc(p.name)+' de '+esc(p.productorNombre)+'</h5>'+
+    '<div class="form-grid">'+
+      '<div class="form-row"><label for="progFrec-'+o.id+'">Frecuencia</label><select id="progFrec-'+o.id+'">'+
+        Object.keys(FRECUENCIAS).map(function(k){ return '<option value="'+k+'"'+(k === '7' ? ' selected' : '')+'>'+FRECUENCIAS[k]+'</option>'; }).join('')+
+      '</select></div>'+
+      '<div class="form-row"><label for="progQty-'+o.id+'">Cantidad ('+esc(p.unit)+')</label><input type="number" id="progQty-'+o.id+'" min="'+p.min+'" step="'+QTY_STEP+'" value="'+Math.max(o.qty, p.min)+'"></div>'+
+      '<div class="form-row"><label for="progDesde-'+o.id+'">Primer pedido</label><input type="date" id="progDesde-'+o.id+'" min="'+fechaInput(Date.now())+'" value="'+fechaInput(manana)+'"></div>'+
+    '</div>'+
+    '<p class="prog-hint">Se usa el precio vigente del producto en cada fecha (hoy '+money(p.price)+' / '+esc(p.unit)+'). Mínimo '+p.min.toLocaleString('es-AR')+' '+esc(p.unit)+'.</p>'+
+    '<div class="order-actions"><button class="btn btn-primary btn-sm" data-prog-crear="'+o.id+'">🗓 Programar</button><button class="btn btn-ghost btn-sm" data-prog-cerrar>Cancelar</button></div>'+
+  '</div>';
+}
+
+function bindProgramados(main){
+  main.querySelectorAll('[data-programar]').forEach(function(b){
+    b.addEventListener('click', function(){ programarAbierto = programarAbierto === b.dataset.programar ? null : b.dataset.programar; renderMain(); });
+  });
+  main.querySelectorAll('[data-prog-cerrar]').forEach(function(b){
+    b.addEventListener('click', function(){ programarAbierto = null; renderMain(); });
+  });
+  main.querySelectorAll('[data-prog-crear]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const o = S.orders.find(function(x){ return x.id === b.dataset.progCrear; });
+      const p = o ? lotById(o.lotId) : null;
+      if(!p || p.archivado){ showToast('Ese producto ya no está publicado en el catálogo'); return; }
+      const frec = parseInt(document.getElementById('progFrec-' + o.id).value, 10);
+      const qty = parseFloat(document.getElementById('progQty-' + o.id).value);
+      const desdeTxt = document.getElementById('progDesde-' + o.id).value;
+      if(!(qty >= p.min)){ showToast('La cantidad mínima de ' + p.name + ' es ' + p.min.toLocaleString('es-AR') + ' ' + p.unit); return; }
+      if(!desdeTxt){ showToast('Elegí la fecha del primer pedido'); return; }
+      const partes = desdeTxt.split('-').map(Number);
+      const desde = new Date(partes[0], partes[1] - 1, partes[2]).getTime();
+      if(desde < inicioDelDia(Date.now())){ showToast('El primer pedido no puede ser en una fecha que ya pasó'); return; }
+      b.disabled = true;
+      guardar(db.collection('programados').add({
+        mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre,
+        lotId: p.id, productorUid: p.productorUid, productorNombre: p.productorNombre,
+        producto: p.name, unit: p.unit || 'kg', qty: qty, frecuencia: frec,
+        proxima: desde, activo: true, generados: 0, creado: FieldValue.serverTimestamp()
+      })).then(function(){
+        registrar('Pedido programado', p.name + ' · ' + qty.toLocaleString('es-AR') + ' ' + p.unit + ' · ' + FRECUENCIAS[frec].toLowerCase() + ' desde el ' + fechaLarga(desde));
+        programarAbierto = null;
+        showToast('Listo: ' + p.name + ' se va a pedir solo ' + FRECUENCIAS[frec].toLowerCase() + ', desde el ' + fechaLarga(desde));
+        renderMain();
+        generarProgramados();
+      }).catch(function(err){ showToast(errorFirestore(err, 'programar el pedido')); b.disabled = false; });
+    });
+  });
+  main.querySelectorAll('[data-prog-pausar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      guardar(db.collection('programados').doc(b.dataset.progPausar).update({ activo: false }))
+        .then(function(){ showToast('Pedido programado en pausa'); })
+        .catch(function(err){ showToast(errorFirestore(err, 'pausar el pedido programado')); });
+    });
+  });
+  main.querySelectorAll('[data-prog-reanudar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const pr = S.programados.find(function(x){ return x.id === b.dataset.progReanudar; });
+      if(!pr) return;
+      // Si la fecha que tocaba ya pasó mientras estaba en pausa, se pasa a la siguiente.
+      const proxima = pr.proxima >= inicioDelDia(Date.now()) ? pr.proxima : siguienteFecha(pr.proxima, pr.frecuencia);
+      guardar(db.collection('programados').doc(pr.id).update({ activo: true, proxima: proxima }))
+        .then(function(){ showToast('Pedido programado reanudado: el próximo es el ' + fechaLarga(proxima)); })
+        .catch(function(err){ showToast(errorFirestore(err, 'reanudar el pedido programado')); });
+    });
+  });
+  main.querySelectorAll('[data-prog-borrar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const pr = S.programados.find(function(x){ return x.id === b.dataset.progBorrar; });
+      if(!pr || !window.confirm('¿Dejar de pedir ' + pr.producto + ' automáticamente? Los pedidos que ya se generaron no cambian.')) return;
+      guardar(db.collection('programados').doc(pr.id).delete())
+        .then(function(){ registrar('Pedido programado eliminado', pr.producto); showToast('Pedido programado eliminado'); })
+        .catch(function(err){ showToast(errorFirestore(err, 'eliminar el pedido programado')); });
+    });
+  });
+}
+
+/* Genera los pedidos programados que ya vencieron. Corre al entrar y cada vez que cambian los datos. */
+function generarProgramados(){
+  if(!currentUser || currentUser.rol !== 'mayorista' || generandoProgramados || !navigator.onLine || !S.lots.length) return;
+  const hoy = Date.now();
+  const vencidos = S.programados.filter(function(pr){ return pr.activo && pr.proxima <= hoy; });
+  if(!vencidos.length) return;
+  generandoProgramados = true;
+  const hechos = [], salteados = [];
+  let cadena = Promise.resolve();
+  vencidos.forEach(function(pr){
+    cadena = cadena.then(function(){ return generarProgramado(pr); }).then(function(r){
+      if(r && r.ok) hechos.push(r); else if(r) salteados.push(r);
+    }).catch(function(err){ console.warn('[CitrusCode] No se pudo generar un pedido programado:', err.message); });
+  });
+  cadena.then(function(){
+    generandoProgramados = false;
+    if(hechos.length){
+      showToast('🗓 Se generaron tus pedidos programados: ' + hechos.map(function(h){ return 'CC-' + h.numero + ' (' + h.producto + ')'; }).join(', '));
+    } else if(salteados.length){
+      showToast('🗓 No se pudo generar ' + salteados.map(function(h){ return h.producto + ': ' + h.motivo; }).join('; '));
+    }
+  });
+}
+function generarProgramado(pr){
+  const ref = db.collection('programados').doc(pr.id);
+  const p = lotById(pr.lotId);
+  const motivo = (!p || p.archivado) ? 'el producto ya no está publicado' : (p.stock < pr.qty ? 'no había stock suficiente' : null);
+  // La fecha se "toma" en una transacción: si CitrusCode está abierto en dos pestañas, el pedido se genera una sola vez.
+  return db.runTransaction(function(tx){
+    return tx.get(ref).then(function(s){
+      if(!s.exists || !s.data().activo || s.data().proxima !== pr.proxima) return false;
+      const cambios = { proxima: siguienteFecha(pr.proxima, pr.frecuencia) };
+      if(motivo){ cambios.ultimoResultado = 'el ' + fechaLarga(pr.proxima) + ' no se generó: ' + motivo; }
+      tx.update(ref, cambios);
+      return true;
+    });
+  }).then(function(tomado){
+    if(!tomado) return null;
+    if(motivo) return { ok: false, producto: pr.producto, motivo: motivo };
+    return nextOrderNumber().then(function(numero){
+      return db.collection('pedidos').add({
+        numero: numero, lotId: p.id, productorUid: p.productorUid,
+        mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre,
+        qty: pr.qty, price: p.price, unit: p.unit || 'kg', statusIdx: 0, traceIdx: -1, invoice: null,
+        programadoId: pr.id,
+        entrega: datosEntrega(),
+        createdAt: FieldValue.serverTimestamp()
+      }).then(function(){
+        registrar('Pedido creado', 'CC-' + numero + ' · ' + pr.qty.toLocaleString('es-AR') + ' ' + (p.unit || 'kg') + ' de ' + p.name + ' a ' + p.productorNombre + ' · programado');
+        return ref.update({ generados: (pr.generados || 0) + 1, ultimoResultado: 'pedido CC-' + numero + ' generado el ' + fechaLarga(Date.now()) });
+      }).then(function(){ return { ok: true, numero: numero, producto: p.name }; });
+    });
+  });
 }
 
 /* Bloque para calificar al productor cuando el pedido ya se entregó. */
@@ -3286,11 +3693,14 @@ function viewProductorPublicaciones(){
     const items = mine.map(function(l){
       const inicial = (l.stockInicial && l.stockInicial > 0) ? l.stockInicial : Math.max(l.stock, 1);
       const pct = Math.max(0, Math.min(100, Math.round((l.stock / inicial) * 100)));
-      const estado = l.stock === 0 ? ' agotado' : (pct <= 25 ? ' bajo' : '');
+      const estado = l.stock === 0 ? ' agotado' : (motivoStockBajo(l) ? ' bajo' : '');
+      const dias = diasParaAgotar(l);
       return '<div class="sl-item'+estado+'">'+
         '<div class="sl-name">'+esc(l.name)+'</div>'+
         '<div class="sl-val">'+l.stock.toLocaleString('es-AR')+' <small>'+l.unit+'</small></div>'+
         '<div class="sl-bar"><span style="width:'+pct+'%;"></span></div>'+
+        '<div class="sl-pron">'+(l.stock === 0 ? 'Sin stock' : (dias !== null ? 'Al ritmo actual dura '+textoDias(dias) : 'Sin ventas en el último mes'))+
+          ' · aviso con menos de '+Math.round(umbralStock(l)).toLocaleString('es-AR')+' '+l.unit+'</div>'+
       '</div>';
     }).join('');
     stockPanel = '<div class="stock-live">'+
@@ -3324,6 +3734,7 @@ function viewProductorPublicaciones(){
         '<div class="form-row"><label>Precio por unidad (ARS)</label><input type="number" id="newLotPrice" placeholder="Ej: 700" value="'+esc(v('price'))+'"></div>'+
         '<div class="form-row"><label>Stock disponible'+(editando ? ' <span style="color:var(--acento); font-weight:700;">(subilo para reponer)</span>' : '')+'</label><input type="number" id="newLotStock" placeholder="Ej: 2000" value="'+esc(v('stock'))+'"></div>'+
         '<div class="form-row"><label>Pedido mínimo</label><input type="number" id="newLotMin" placeholder="Ej: 300" value="'+esc(v('min'))+'"></div>'+
+        '<div class="form-row"><label for="newLotAlerta">Avisarme cuando queden menos de</label><input type="number" id="newLotAlerta" min="0" placeholder="Vacío: el 25 % del stock" value="'+esc(editando && lote.alertaStock > 0 ? String(lote.alertaStock) : '')+'"></div>'+
       '</div>'+
       (editando
         ? '<div class="order-actions" style="margin-top:16px;">'+
@@ -3336,16 +3747,16 @@ function viewProductorPublicaciones(){
   '</div>';
 }
 
-/* Aviso de publicaciones con stock bajo o agotado. */
+/* Aviso de publicaciones con stock bajo, agotadas o a punto de agotarse. */
 function alertaStockBajo(){
   const bajos = lotesStockBajo();
   if(!bajos.length) return '';
   return '<div class="alerta-stock">'+icono('info')+'<div>'+
-    '<b>'+(bajos.length === 1 ? 'Una publicación tiene' : bajos.length + ' publicaciones tienen')+' stock bajo</b>'+
+    '<b>'+(bajos.length === 1 ? 'Una publicación necesita' : bajos.length + ' publicaciones necesitan')+' reposición</b>'+
     '<div class="alerta-lista">'+bajos.map(function(l){
-      const inicial = (l.stockInicial && l.stockInicial > 0) ? l.stockInicial : Math.max(l.stock, 1);
-      return '<button data-edit-lot="'+l.id+'">'+esc(l.name)+' <em>'+(l.stock === 0 ? 'agotado' : Math.round(l.stock / inicial * 100) + ' %')+'</em> · Reponer</button>';
+      return '<button data-edit-lot="'+l.id+'">'+esc(l.name)+' <em>'+esc(motivoStockBajo(l))+'</em> · Reponer</button>';
     }).join('')+'</div>'+
+    '<p class="alerta-nota">Avisa cuando el stock baja del límite que elegiste en la publicación (si no elegiste uno, el 25 % de lo publicado) o cuando, al ritmo de ventas del último mes, se agotaría en una semana o menos.</p>'+
   '</div></div>';
 }
 
@@ -3405,7 +3816,7 @@ function viewProductorRecibidos(){
 
     return '<div class="order-card">'+
       '<div class="order-top">'+
-        '<div><div class="oid">Pedido #CC-'+o.numero+'</div><div class="osub">'+esc(p ? p.name : '—')+' · '+o.qty.toLocaleString('es-AR')+' '+unitOf(o)+' · Comprador: '+esc(o.mayoristaNombre)+'</div></div>'+
+        '<div><div class="oid">Pedido #CC-'+o.numero+(o.programadoId ? ' <span class="chip-prog" title="El comprador lo pide en forma periódica">🗓 Programado</span>' : '')+'</div><div class="osub">'+esc(p ? p.name : '—')+' · '+o.qty.toLocaleString('es-AR')+' '+unitOf(o)+' · Comprador: '+esc(o.mayoristaNombre)+'</div></div>'+
         statusBlock+
       '</div>'+
       (o.cancelado ? '' : envio)+
@@ -5046,6 +5457,7 @@ function borrarFotoStorage(url){
 
 function bindExtras(main){
   bindReportes(main);
+  bindProgramados(main);
   bindCotizaciones(main);
   bindCosecha(main);
   bindAlertas(main);
@@ -5078,7 +5490,15 @@ function bindMainEvents(){
   const fltProducto = document.getElementById('fltProducto');
   if(fltProducto) fltProducto.addEventListener('change', function(){ itemFilter = fltProducto.value; renderMain(); });
   const fltLimpiar = document.getElementById('fltLimpiar');
-  if(fltLimpiar) fltLimpiar.addEventListener('click', function(){ prodFilter = 'todos'; itemFilter = 'todos'; catBusqueda = ''; renderMain(); });
+  if(fltLimpiar) fltLimpiar.addEventListener('click', function(){ provFilter = 'todos'; prodFilter = 'todos'; itemFilter = 'todos'; catBusqueda = ''; renderMain(); });
+  const fltProvincia = document.getElementById('fltProvincia');
+  if(fltProvincia) fltProvincia.addEventListener('change', function(){ provFilter = fltProvincia.value; prodFilter = 'todos'; itemFilter = 'todos'; renderMain(); });
+  const catMapaBtn = document.getElementById('catMapaBtn');
+  if(catMapaBtn) catMapaBtn.addEventListener('click', function(){
+    catMapa = !catMapa;
+    if(!catMapa) liberarMapa();
+    renderMain();
+  });
   const catBuscar = document.getElementById('catBuscar');
   if(catBuscar){
     catBuscar.addEventListener('input', function(){ catBusqueda = catBuscar.value; renderMain(); });
@@ -5304,7 +5724,9 @@ function bindMainEvents(){
       const price = parseFloat(document.getElementById('newLotPrice').value);
       const stock = parseFloat(document.getElementById('newLotStock').value);
       const minInput = parseFloat(document.getElementById('newLotMin').value);
+      const alerta = parseFloat(document.getElementById('newLotAlerta').value);
       if(!name || !price || !stock){ showToast('Completá todos los campos para publicar'); return; }
+      if(alerta < 0){ showToast('El límite de aviso de stock no puede ser negativo'); return; }
       const min = (minInput && minInput > 0) ? Math.min(minInput, stock) : Math.min(300, stock);
       const palette = {limon:'#E8C547', naranja:'#F0A03C', mandarina:'#F5B25C', pomelo:'#E88C86', subproductos:'#B7C93C'};
       addLotBtn.disabled = true;
@@ -5313,6 +5735,7 @@ function bindMainEvents(){
       (fotoElegida ? subirFoto(fotoElegida, null) : Promise.resolve(null)).then(function(foto){ return guardar(db.collection('lotes').add({
         name: name, productorUid: currentUser.uid, productorNombre: currentUser.entidad || currentUser.nombre,
         cat: cat, price: price, unit: unit, stock: stock, stockInicial: stock, min: min,
+        alertaStock: alerta > 0 ? alerta : null,
         color: palette[cat] || '#8A5FB0',
         imagenUrl: urlFotoIA(name, cat),
         fotoPropia: foto || null,
@@ -5409,12 +5832,14 @@ function bindMainEvents(){
       const price = parseFloat(document.getElementById('newLotPrice').value);
       const stock = parseFloat(document.getElementById('newLotStock').value);
       const min = parseFloat(document.getElementById('newLotMin').value);
+      const alerta = parseFloat(document.getElementById('newLotAlerta').value);
 
       if(!name || name.length < 3){ showToast('El nombre del producto es muy corto'); return; }
       if(!(price > 0)){ showToast('El precio tiene que ser mayor a cero'); return; }
       if(!(stock >= 0)){ showToast('El stock no puede ser negativo'); return; }
       if(!(min > 0)){ showToast('El pedido mínimo tiene que ser mayor a cero'); return; }
       if(min > stock && stock > 0){ showToast('El pedido mínimo no puede superar al stock disponible'); return; }
+      if(alerta < 0){ showToast('El límite de aviso de stock no puede ser negativo'); return; }
 
       const antes = lote.stock;
       saveLotBtn.disabled = true;
@@ -5422,6 +5847,7 @@ function bindMainEvents(){
       const palette = {limon:'#E8C547', naranja:'#F0A03C', mandarina:'#F5B25C', pomelo:'#E88C86', subproductos:'#B7C93C'};
       const cambios = {
         name: name, cat: cat, unit: unit, price: price, stock: stock, min: min,
+        alertaStock: alerta > 0 ? alerta : null,
         color: palette[cat] || '#8A5FB0',
         // La barra de progreso se mide contra el máximo histórico del lote.
         stockInicial: Math.max(stock, lote.stockInicial || 0)

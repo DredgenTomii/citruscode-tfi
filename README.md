@@ -25,8 +25,8 @@ eligiendo uno de los tres roles.
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), **pedir cotizaciones** por volumen y aceptarlas con un clic, **reservar cosecha futura** desde el calendario, **seguir productores y marcar favoritos** para recibir alertas de novedades y bajas de precio, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
-| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, **responder cotizaciones** con un precio especial, anunciar sus cosechas en el **calendario de cosecha**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
+| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, provincia, productor y producto, orden por precio, stock o calificación) y el **mapa de productores**, armar un pedido por volumen, **repetir un pedido anterior** con un clic o **programarlo** para que se repita solo, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), **pedir cotizaciones** por volumen y aceptarlas con un clic, **reservar cosecha futura** desde el calendario, **seguir productores y marcar favoritos** para recibir alertas de novedades y bajas de precio, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
+| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo** (con límite propio y pronóstico de cuándo se agota), confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, **responder cotizaciones** con un precio especial, anunciar sus cosechas en el **calendario de cosecha**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
 | **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos, padrón de usuarios, **bitácora de actividad** (auditoría de quién hizo qué y cuándo), **ranking de proveedores**, evolución de precios y tablero Kanban de proyectos de software a medida. Las tablas se exportan a CSV. |
 
 ### Funciones destacadas
@@ -66,6 +66,14 @@ eligiendo uno de los tres roles.
   la conexión. Un aviso muestra cuántos cambios esperan sincronizarse.
 - **Trazabilidad por QR.** Cada lote en camino tiene un QR real y una etiqueta en PDF para imprimir. Al
   escanearla con el celular (cámara o foto) la trazabilidad avanza sola al paso siguiente.
+- **Pedidos programados.** El mayorista programa un pedido para que se repita cada semana, cada 2 semanas
+  o cada mes. Como no hay servidor propio (plan gratuito), el pedido se genera solo la primera vez que el
+  mayorista abre CitrusCode a partir de la fecha indicada, con el precio vigente; una transacción evita
+  duplicarlo si está abierto en dos pestañas. Si no hay stock, se saltea y queda anotado.
+- **Alerta de stock bajo inteligente.** Cada publicación tiene su propio límite de aviso (o el 25 % de lo
+  publicado) y el sistema calcula el ritmo de ventas del último mes para avisar cuándo se agotaría.
+- **Mapa de productores** en el catálogo: cada finca aparece en el mapa con la cantidad de productos que
+  ofrece; al tocarla se ven sus precios y se filtra el catálogo. También se puede filtrar por provincia.
 - **Reportes de ventas** para la administración: por mes, por producto y por productor, con gráficos y
   descarga en Excel o PDF.
 - **Suspensión de cuentas.** La administración bloquea a un usuario problemático sin borrar su

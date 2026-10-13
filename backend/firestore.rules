@@ -195,6 +195,24 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Pedidos programados: el mayorista programa un pedido que se repite cada
+    // 7, 14 o 30 dias. Solo el dueño los ve y los cambia; el pedido real lo
+    // genera el sistema del mayorista y pasa por las reglas de /pedidos.
+    match /programados/{progId} {
+      function datosOk() {
+        let d = request.resource.data;
+        return d.mayoristaUid == request.auth.uid
+          && d.qty is number && d.qty > 0
+          && d.frecuencia in [7, 14, 30]
+          && d.proxima is number
+          && d.activo is bool;
+      }
+      allow read: if isSignedIn() && (resource.data.mayoristaUid == request.auth.uid || getRole() == 'admin');
+      allow create: if isSignedIn() && getRole() == 'mayorista' && activo() && datosOk();
+      allow update: if isSignedIn() && activo() && resource.data.mayoristaUid == request.auth.uid && datosOk();
+      allow delete: if isSignedIn() && resource.data.mayoristaUid == request.auth.uid;
+    }
+
     // Calendario de cosecha: cada productor anuncia sus cosechas futuras.
     match /cosechas/{cosechaId} {
       function cosechaValida() {
