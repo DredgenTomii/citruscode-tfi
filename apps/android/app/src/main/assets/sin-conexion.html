@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CitrusCode</title>
+<style>
+  body{margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#FFFDF6; color:#173423; text-align:center; padding:24px; box-sizing:border-box;}
+  .caja{max-width:340px;}
+  .fruta{width:84px; height:84px; margin:0 auto 18px;}
+  h1{font-size:1.35rem; margin:0 0 8px;}
+  p{color:#4b5f52; line-height:1.45; margin:0 0 22px;}
+  button{background:#2E7D3E; color:#fff; border:0; border-radius:12px; padding:13px 26px; font-size:1rem; font-weight:600;}
+  @media (prefers-color-scheme: dark){ body{background:#0F1F16; color:#EAF3EC;} p{color:#A9BDB0;} }
+</style>
+</head>
+<body>
+<div class="caja">
+  <svg class="fruta" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="26" fill="#E8871E"/><circle cx="32" cy="34" r="21" fill="#FFFDF6"/><g stroke="#E8871E" stroke-width="2.2" stroke-linecap="round" opacity=".6"><path d="M32 34V13M32 34l15 -15M32 34h21M32 34l15 15M32 34v21M32 34L17 49M32 34H11M32 34L17 19"/></g><circle cx="32" cy="34" r="3" fill="#F0A03C"/></svg>
+  <h1>Sin conexión</h1>
+  <p>CitrusCode necesita internet para cargar los pedidos y publicaciones. Revisá el Wi-Fi o los datos móviles y volvé a intentar.</p>
+  <button type="button" onclick="CitrusCodeApp.reintentar()">Reintentar</button>
+</div>
+</body>
+</html>

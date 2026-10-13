@@ -25,8 +25,8 @@ eligiendo uno de los tres roles.
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, productor y producto, orden por precio, stock o calificación), armar un pedido por volumen, **repetir un pedido anterior** con un clic, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), **pedir cotizaciones** por volumen y aceptarlas con un clic, **reservar cosecha futura** desde el calendario, **seguir productores y marcar favoritos** para recibir alertas de novedades y bajas de precio, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
-| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo**, confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, **responder cotizaciones** con un precio especial, anunciar sus cosechas en el **calendario de cosecha**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
+| **Mayorista** | Explorar el catálogo (búsqueda, filtros por categoría, provincia, productor y producto, orden por precio, stock o calificación) y el **mapa de productores**, armar un pedido por volumen, **repetir un pedido anterior** con un clic o **programarlo** para que se repita solo, seguir su estado y el **recorrido del lote en un mapa**, **chatear con el productor** (por pedido o desde la sección **Chats**, sin necesidad de comprar), **pedir cotizaciones** por volumen y aceptarlas con un clic, **reservar cosecha futura** desde el calendario, **seguir productores y marcar favoritos** para recibir alertas de novedades y bajas de precio, cancelarlo, descargar comprobantes en PDF, ver sus facturas, **calificar al productor** de 1 a 5 estrellas y consultar la **evolución de precios**. |
+| **Productor** | Publicar, editar y eliminar lotes (en kg o litros) con **foto propia o generada con IA**, recibir **avisos de stock bajo** (con límite propio y pronóstico de cuándo se agota), confirmar los pedidos que recibe, hacer avanzar la trazabilidad, responder mensajes y **chatear con cualquier mayorista** desde la sección **Chats**, **responder cotizaciones** con un precio especial, anunciar sus cosechas en el **calendario de cosecha**, ver sus ganancias, su **reputación** y la evolución de sus precios, y pedir software a medida. |
 | **Administración** | Dashboard con KPIs del marketplace, tabla de todos los pedidos, padrón de usuarios, **bitácora de actividad** (auditoría de quién hizo qué y cuándo), **ranking de proveedores**, evolución de precios y tablero Kanban de proyectos de software a medida. Las tablas se exportan a CSV. |
 
 ### Funciones destacadas
@@ -43,8 +43,9 @@ eligiendo uno de los tres roles.
 - **Chats directos** entre mayoristas y productores, sin pedido de por medio: lista de conversaciones
   con el último mensaje, aviso de mensajes sin leer en el menú y botón *Contactar* en cada producto
   del catálogo.
-- **Cotizaciones desde el chat.** El mayorista pide precio por un volumen; el productor responde con un
-  precio especial y, si el mayorista acepta, se genera el pedido con ese precio.
+- **Cotizaciones desde el chat, con contraofertas.** El mayorista pide precio por un volumen; el productor
+  responde con un precio especial. El mayorista puede aceptarlo (se genera el pedido con ese precio),
+  rechazarlo o proponer otro precio, y así ida y vuelta (hasta 10 propuestas) hasta cerrar el trato.
 - **Calendario de cosecha.** Cada productor anuncia qué va a tener y en qué meses; el mayorista reserva
   con anticipación y la reserva llega al chat para acordar el precio.
 - **Seguimiento y alertas.** El mayorista sigue productores y marca productos favoritos (♡); el sistema
@@ -59,6 +60,24 @@ eligiendo uno de los tres roles.
   trazabilidad.
 - **Modo claro / oscuro** en el sitio y en el sistema, con la misma paleta de la marca.
 - **App instalable (PWA)** en computadora y Android, con manifiesto y *service worker*.
+- **Apps de Android y Windows** (`apps/`), con descarga desde la pantalla de inicio del sistema.
+- **Modo sin conexión (Offline-First).** Firestore guarda los datos en el dispositivo: sin señal se puede
+  seguir cargando (publicaciones, trazabilidad, cosechas, mensajes) y todo se sincroniza solo al volver
+  la conexión. Un aviso muestra cuántos cambios esperan sincronizarse.
+- **Trazabilidad por QR.** Cada lote en camino tiene un QR real y una etiqueta en PDF para imprimir. Al
+  escanearla con el celular (cámara o foto) la trazabilidad avanza sola al paso siguiente.
+- **Pedidos programados.** El mayorista programa un pedido para que se repita cada semana, cada 2 semanas
+  o cada mes. Como no hay servidor propio (plan gratuito), el pedido se genera solo la primera vez que el
+  mayorista abre CitrusCode a partir de la fecha indicada, con el precio vigente; una transacción evita
+  duplicarlo si está abierto en dos pestañas. Si no hay stock, se saltea y queda anotado.
+- **Alerta de stock bajo inteligente.** Cada publicación tiene su propio límite de aviso (o el 25 % de lo
+  publicado) y el sistema calcula el ritmo de ventas del último mes para avisar cuándo se agotaría.
+- **Mapa de productores** en el catálogo: cada finca aparece en el mapa con la cantidad de productos que
+  ofrece; al tocarla se ven sus precios y se filtra el catálogo. También se puede filtrar por provincia.
+- **Reportes de ventas** para la administración: por mes, por producto y por productor, con gráficos y
+  descarga en Excel o PDF.
+- **Suspensión de cuentas.** La administración bloquea a un usuario problemático sin borrar su
+  historial; las reglas de Firestore le impiden crear o modificar datos mientras esté suspendido.
 
 El rol de administración está restringido: además del código que pide el formulario, las
 reglas de Firestore validan que el correo esté en una lista de habilitados
@@ -191,10 +210,10 @@ Las dejamos documentadas a propósito, porque forman parte del análisis del tra
   Cloud Functions con *custom claims* de Firebase.
 - La facturación electrónica está **simulada**: se genera un CAE ficticio en lugar de
   consumir la API real de AFIP.
-- La trazabilidad avanza por acción manual del productor; en producción se dispararía al
-  escanear el QR desde el celular en el empaque.
-- El modo Offline-First descrito en el TFI está implementado solo en parte: la app se instala y
-  abre sin conexión, pero los datos (pedidos, stock) necesitan internet.
+- Sin conexión se puede consultar y cargar casi todo, pero **confirmar un pedido** necesita internet,
+  porque descuenta stock en una transacción del servidor y así se evita vender dos veces lo mismo.
+  Para entrar sin señal hay que haber iniciado sesión antes en ese dispositivo.
+- Las notificaciones al celular o por mail no están hechas: necesitan Cloud Functions (plan Blaze).
 - El generador gratuito de imágenes limita cuántas fotos nuevas crea por persona. Mientras una
   foto no está lista se muestra una ilustración, y el sistema la reintenta en segundo plano;
   una vez generada, queda en caché para todos.
