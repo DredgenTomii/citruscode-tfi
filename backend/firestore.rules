@@ -34,7 +34,7 @@ service cloud.firestore {
     match /usuarios/{uid} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.auth.uid == uid
-                    && request.resource.data.rol in ['mayorista', 'productor', 'admin']
+                    && request.resource.data.rol in ['mayorista', 'productor', 'admin', 'transportista']
                     && (request.resource.data.rol != 'admin'
                         || request.auth.token.email in adminsHabilitados());
       // El propio usuario edita sus datos, pero no puede cambiar su rol ni levantarse una suspension.
@@ -93,6 +93,45 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Licitaciones: el mayorista publica lo que necesita y elige la mejor oferta.
+    match /licitaciones/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && getRole() == 'mayorista' && activo()
+                    && request.resource.data.mayoristaUid == request.auth.uid
+                    && request.resource.data.estado == 'abierta';
+      allow update: if isSignedIn() && activo() && resource.data.mayoristaUid == request.auth.uid
+                    && request.resource.data.mayoristaUid == resource.data.mayoristaUid;
+      allow delete: if false;
+    }
+    // Ofertas a una licitacion: cada productor ve las suyas y el mayorista las que recibio.
+    match /ofertasLicit/{id} {
+      function licit(lid) { return get(/databases/$(database)/documents/licitaciones/$(lid)).data; }
+      allow read: if isSignedIn() && (resource.data.productorUid == request.auth.uid
+                    || resource.data.mayoristaUid == request.auth.uid || getRole() == 'admin');
+      allow create: if isSignedIn() && getRole() == 'productor' && activo()
+                    && request.resource.data.productorUid == request.auth.uid
+                    && licit(request.resource.data.licitacionId).estado == 'abierta'
+                    && licit(request.resource.data.licitacionId).cierre > request.time.toMillis()
+                    && licit(request.resource.data.licitacionId).mayoristaUid == request.resource.data.mayoristaUid
+                    && request.resource.data.precio is number && request.resource.data.precio > 0;
+      allow update: if isSignedIn() && activo() && (
+                      (resource.data.productorUid == request.auth.uid
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['precio', 'cantidad', 'comentario', 'actualizado', 'vistaGanadora'])
+                        && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['vistaGanadora'])
+                            || (licit(resource.data.licitacionId).estado == 'abierta' && licit(resource.data.licitacionId).cierre > request.time.toMillis())))
+                      || (resource.data.mayoristaUid == request.auth.uid
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado'])));
+      allow delete: if false;
+    }
+    // Trazabilidad publica: la lee cualquiera que escanee la caja (sin cuenta).
+    // Solo escriben el productor o el transportista del pedido.
+    match /trazas/{orderId} {
+      allow read: if true;
+      allow write: if isSignedIn() && activo()
+                   && (get(/databases/$(database)/documents/pedidos/$(orderId)).data.productorUid == request.auth.uid
+                       || get(/databases/$(database)/documents/pedidos/$(orderId)).data.get('transportistaUid', '') == request.auth.uid);
+    }
+
     // Productos publicados por productores.
     // El dueño del lote y la administracion pueden editarlo libremente.
     // Ademas, un mayorista puede descontar stock al confirmarse un pedido:
@@ -122,7 +161,18 @@ service cloud.firestore {
                     (getRole() == 'admin' ||
                      (getRole() == 'productor' && resource.data.productorUid == request.auth.uid) ||
                      (getRole() == 'mayorista' && resource.data.mayoristaUid == request.auth.uid
-                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cancelado', 'ocultoMayorista'])));
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cancelado', 'ocultoMayorista'])) ||
+                     // El transportista toma un viaje libre (pedido confirmado o en preparacion)...
+                     (getRole() == 'transportista' && resource.data.get('transportistaUid', null) == null
+                      && resource.data.get('cancelado', false) != true
+                      && resource.data.statusIdx >= 1 && resource.data.statusIdx <= 2
+                      && request.resource.data.transportistaUid == request.auth.uid
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['transportistaUid', 'transportistaNombre', 'transportistaTel', 'tomadoEn'])) ||
+                     // ...y despues avanza el envio de a un paso, desde el despacho en adelante.
+                     (getRole() == 'transportista' && resource.data.get('transportistaUid', null) == request.auth.uid
+                      && request.resource.data.traceIdx == resource.data.traceIdx + 1
+                      && request.resource.data.traceIdx >= 2
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['traceIdx', 'statusIdx', 'invoice'])));
       allow delete: if false;
     }
 
