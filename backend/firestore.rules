@@ -41,8 +41,14 @@ service cloud.firestore {
       allow update: if isSignedIn() && request.auth.uid == uid
                     && request.resource.data.rol == resource.data.rol // el rol no se puede cambiar despues de creado
                     && !request.resource.data.diff(resource.data).affectedKeys().hasAny(camposSuspension())
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verificado'])
                     && fotoPerfilValida()
                     && activo();
+      // La administracion marca o desmarca a un productor como verificado.
+      allow update: if isSignedIn() && getRole() == 'admin' && activo()
+                    && resource.data.rol == 'productor'
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verificado'])
+                    && request.resource.data.verificado is bool;
       // La administracion suspende o reactiva cuentas de mayoristas y productores (nunca de otro admin
       // ni la propia), tocando solo los campos de la suspension.
       allow update: if isSignedIn() && getRole() == 'admin' && activo()
@@ -70,6 +76,21 @@ service cloud.firestore {
                    && getRole() == 'productor'
                    && request.resource.data.fotos is list
                    && request.resource.data.fotos.size() <= 4;
+    }
+
+    // Denuncias de publicaciones: las hace un mayorista y las revisa la administracion.
+    match /denuncias/{id} {
+      allow read: if isSignedIn() && (getRole() == 'admin' || resource.data.denuncianteUid == request.auth.uid);
+      allow create: if isSignedIn() && getRole() == 'mayorista' && activo()
+                    && request.resource.data.denuncianteUid == request.auth.uid
+                    && request.resource.data.estado == 'abierta'
+                    && request.resource.data.motivo is string
+                    && request.resource.data.motivo.size() > 0
+                    && request.resource.data.motivo.size() <= 300;
+      allow update: if isSignedIn() && getRole() == 'admin' && activo()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'revisadaPor', 'revisadaEn'])
+                    && request.resource.data.estado in ['resuelta', 'descartada'];
+      allow delete: if false;
     }
 
     // Productos publicados por productores.

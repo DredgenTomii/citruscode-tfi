@@ -1233,6 +1233,52 @@
   .ficha-lotes{display:grid; gap:6px;}
   .ficha-lotes div{display:flex; justify-content:space-between; gap:10px; font-size:.84rem; border-bottom:1px solid var(--borde); padding:6px 0;}
   .ficha-lotes small{color:var(--texto-suave);}
+
+  /* ============================================================
+     VERIFICADO, OFERTAS, CLIMA, CAMPANITA, FLETE, LISTAS, DENUNCIAS Y METAS
+     ============================================================ */
+  .verif{display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; background:#1d9bf0; color:#fff; font-size:.6rem; font-weight:800; flex:none; margin-left:3px; vertical-align:middle;}
+  .verif-lg{width:20px; height:20px; font-size:.75rem;}
+  .badge-oferta{position:absolute; left:10px; bottom:10px; z-index:3; background:#d9381e; color:#fff; font-size:.7rem; font-weight:700; padding:4px 9px; border-radius:20px; box-shadow:0 4px 10px rgba(0,0,0,.2);}
+  .precio-lista{font-size:.8rem; color:var(--texto-suave); text-decoration:line-through; font-weight:500; margin-right:4px;}
+  .oferta-box{background:var(--surface-2); border:1px solid var(--borde); border-radius:14px; padding:14px 16px; margin:18px 0;}
+  .oferta-box h4{margin:0 0 4px;}
+  .oferta-box .form-grid{grid-template-columns:2fr 1fr 1fr auto; align-items:end;}
+  .oferta-activa{display:flex; justify-content:space-between; gap:10px; align-items:center; font-size:.82rem; padding:6px 0; border-top:1px solid var(--borde);}
+  .clima{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin:6px 0;}
+  .clima-dia{background:var(--surface-2); border:1px solid var(--borde); border-radius:12px; padding:8px 4px; text-align:center; font-size:.72rem; line-height:1.35;}
+  .clima-dia b{display:block; font-size:1.25rem;}
+  .clima-dia small{color:var(--texto-suave); display:block;}
+  .clima-aviso{font-size:.78rem; margin:4px 0 0; color:var(--texto);}
+  .clima-box{margin-bottom:18px;}
+  .campana-wrap{position:relative;}
+  .campana-btn{position:relative; width:38px; height:38px; border-radius:50%; border:1px solid var(--borde); background:var(--surface); color:var(--texto); cursor:pointer; display:grid; place-items:center;}
+  .campana-btn .ic{width:18px; height:18px;}
+  .campana-n{position:absolute; top:-4px; right:-4px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#d9381e; color:#fff; font-size:.65rem; font-weight:700; display:grid; place-items:center;}
+  .campana-panel{position:absolute; right:0; top:46px; z-index:250; width:300px; max-width:calc(100vw - 24px); background:var(--surface); border:1px solid var(--borde); border-radius:16px; box-shadow:var(--sombra-fuerte); padding:8px;}
+  .campana-panel h5{margin:6px 8px 8px; font-size:.85rem;}
+  .campana-n[hidden], .campana-panel[hidden]{display:none;}
+  .campana-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; background:none; border:0; color:var(--texto); padding:9px 8px; border-radius:10px; cursor:pointer; font-size:.8rem;}
+  .campana-item:hover{background:var(--surface-2);}
+  .campana-item b{min-width:26px; height:26px; border-radius:8px; background:var(--limon-bg); display:grid; place-items:center; font-size:.78rem;}
+  .campana-vacia{padding:14px 8px; font-size:.8rem; color:var(--texto-suave);}
+  .flete-box, .listas-box{margin-top:14px; padding-top:12px; border-top:1px dashed var(--borde); font-size:.8rem;}
+  .flete-box h5, .listas-box h5{margin:0 0 6px; font-size:.82rem;}
+  .flete-linea{display:flex; justify-content:space-between; gap:8px; color:var(--texto-suave);}
+  .flete-total{display:flex; justify-content:space-between; font-weight:700; margin-top:4px;}
+  .flete-tarifa{display:flex; align-items:center; gap:6px; margin-top:6px; color:var(--texto-suave);}
+  .flete-tarifa input{width:80px; padding:4px 6px; border:1px solid var(--borde); border-radius:8px; background:var(--input-bg); color:var(--texto);}
+  .listas-fila{display:flex; gap:6px; margin-top:6px;}
+  .listas-fila select{flex:1; min-width:0; padding:6px; border:1px solid var(--borde); border-radius:8px; background:var(--input-bg); color:var(--texto);}
+  .btn-denunciar{flex:none; border:1px solid var(--borde); background:var(--surface); color:var(--texto-suave); border-radius:20px; font-size:.7rem; padding:3px 8px; cursor:pointer;}
+  .btn-denunciar:hover{color:#d9381e; border-color:#d9381e;}
+  .meta-box{background:var(--surface); border:1px solid var(--borde); border-radius:16px; padding:16px 18px; margin:16px 0;}
+  .meta-box h4{margin:0 0 8px;}
+  .meta-barra{height:12px; border-radius:6px; background:var(--surface-2); overflow:hidden; margin:8px 0;}
+  .meta-barra span{display:block; height:100%; background:linear-gradient(90deg,var(--c-limon),var(--c-verde-claro)); border-radius:6px; transition:width .6s var(--easing);}
+  .meta-fila{display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:.82rem;}
+  .meta-fila input{width:160px; padding:7px 10px; border:1px solid var(--borde); border-radius:10px; background:var(--input-bg); color:var(--texto);}
+  @media (max-width:700px){ .oferta-box .form-grid{grid-template-columns:1fr 1fr;} .clima{grid-template-columns:repeat(4,1fr);} }
 </style>
 </head>
 <body>
@@ -1379,11 +1425,12 @@ function direccionDe(u){
 let currentUser = null;   // {uid, nombre, email, rol, entidad}
 let avisoSuspension = null;   // se muestra en la pantalla de ingreso al cerrar la sesión de una cuenta suspendida
 let unsubYo = null;
+let unsubDenuncias = null;
 function textoSuspension(d){
   return 'Tu cuenta está suspendida por la administración de CitrusCode' + (d && d.motivoSuspension ? ': ' + d.motivoSuspension : '') +
     '. Tu historial se conserva. Escribinos para revisarlo.';
 }
-let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [] };
+let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [], denuncias: [] };
 let califDisponible = true;  // false si Firestore todavía no tiene las reglas de calificaciones
 let editandoLote = null;   // id del lote que se está editando, o null
 let catFilter = 'todos';
@@ -1426,6 +1473,8 @@ function fruitSVG(color){
 }
 /* Íconos de línea (estilo uniforme en toda la interfaz). */
 const ICONOS = {
+  moderacion:'<path d="M4 22V4"/><path d="M4 4h13l-2.5 4 2.5 4H4"/>',
+  campana:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   catalogo:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
   pedidos:'<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
   trazabilidad:'<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H16"/>',
@@ -2237,6 +2286,7 @@ function renderHeaderRight(){
   if(currentUser){
     el.innerHTML =
       '<span class="live-pill'+(navigator.onLine ? '' : ' sin-red')+'" id="livePill"><span class="dotpulse"></span><span>'+(navigator.onLine ? 'Conectado' : 'Sin conexión')+'</span></span>'+
+      '<div class="campana-wrap"><button class="campana-btn" id="campanaBtn" type="button" aria-label="Notificaciones" title="Notificaciones">'+icono('campana')+'<span class="campana-n" id="campanaN" hidden></span></button><div class="campana-panel" id="campanaPanel" hidden></div></div>'+
       '<button class="acc-pill" id="perfilBtn" title="Ver y editar mis datos" style="cursor:pointer;"><span class="acc-name">'+esc(currentUser.nombre)+'</span><span class="acc-role">'+esc(currentUser.rol)+'</span></button>'+
       '<button class="logout-btn" id="logoutBtn">Cerrar sesión</button>';
     document.getElementById('logoutBtn').addEventListener('click', function(){ auth.signOut(); });
@@ -2473,6 +2523,14 @@ function subscribeData(){
       renderSubnav(); renderMain();
     }, function(err){ showToast('Error leyendo usuarios: ' + err.message); });
 
+    // Denuncias de publicaciones para moderar.
+    unsubDenuncias = db.collection('denuncias').onSnapshot(function(snap){
+      S.denuncias = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); })
+        .sort(function(a, b){ return msDe(b.createdAt) - msDe(a.createdAt); });
+      renderSubnav();
+      if(view.admin === 'moderacion') renderMain();
+    }, function(err){ console.warn('[CitrusCode] Denuncias no disponibles:', err.message); });
+
     // La administración ve todos los proyectos.
     unsubProyectos = db.collection('proyectos').orderBy('createdAt','desc').onSnapshot(function(snap){
       S.projects = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
@@ -2594,6 +2652,8 @@ function unsubscribeData(){
   Object.keys(avisadosStock).forEach(function(k){ delete avisadosStock[k]; });
   unsubLotes = unsubPedidos = unsubProyectos = unsubUsuarios = unsubCalif = null;
   if(unsubYo){ unsubYo(); unsubYo = null; }
+  if(unsubDenuncias){ unsubDenuncias(); unsubDenuncias = null; }
+  campanaAbierta = false;
   editandoLote = null;
   catFilter = prodFilter = itemFilter = 'todos';
   catBusqueda = ''; catOrden = 'recientes';
@@ -2612,7 +2672,7 @@ function unsubscribeData(){
   catMapa = false; provFilter = 'todos';
   cotizFormAbierto = false; reservaAbierta = null; cosechaCat = 'todos'; novedadesAvisadas = false;
   bitFiltro = { rol: 'todos', accion: 'todas', q: '' };
-  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [] };
+  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [], denuncias: [] };
 }
 
 /* ============================================================
@@ -2742,6 +2802,7 @@ function renderSubnav(){
       {k:'reportes', label:'Reportes de ventas'},
       {k:'pedidos', label:'Todos los pedidos'},
       {k:'usuarios', label:'Usuarios', badge: S.users.length || null},
+      {k:'moderacion', label:'Moderación', badge: S.denuncias.filter(function(d){ return d.estado === 'abierta'; }).length || null},
       {k:'bitacora', label:'Bitácora de actividad'},
       {k:'precios', label:'Evolución de precios'},
       {k:'ranking', label:'Ranking de proveedores'},
@@ -2756,6 +2817,7 @@ function renderSubnav(){
   nav.querySelectorAll('button').forEach(function(b){
     b.addEventListener('click', function(){ view[currentUser.rol] = b.dataset.view; renderSubnav(); renderMain(); });
   });
+  actualizarCampana();
 }
 
 let ultimaVista = null;   // sección dibujada la última vez (para animar solo al cambiar)
@@ -2835,6 +2897,7 @@ function renderMain(){
     else if(view.admin === 'pedidos') main.innerHTML = viewAdminPedidos();
     else if(view.admin === 'usuarios') main.innerHTML = viewAdminUsuarios();
     else if(view.admin === 'reportes') main.innerHTML = viewAdminReportes();
+    else if(view.admin === 'moderacion') main.innerHTML = viewAdminModeracion();
     else main.innerHTML = viewAdminMedida();
   }
   if(mismaVista){
@@ -3020,8 +3083,8 @@ function viewMayoristaCatalogo(){
   const q = sinAcentos(catBusqueda.trim());
   if(q) list = list.filter(function(l){ return sinAcentos(l.name + ' ' + l.productorNombre).indexOf(q) !== -1; });
   const ordenes = {
-    'precio-asc': function(a, b){ return a.price - b.price; },
-    'precio-desc': function(a, b){ return b.price - a.price; },
+    'precio-asc': function(a, b){ return precioDe(a) - precioDe(b); },
+    'precio-desc': function(a, b){ return precioDe(b) - precioDe(a); },
     'stock-desc': function(a, b){ return b.stock - a.stock; },
     'nombre': function(a, b){ return a.name.localeCompare(b.name, 'es'); }
   };
@@ -3092,17 +3155,19 @@ function viewMayoristaCatalogo(){
         imgFoto(fotoDe(p), 'product-photo', 'Foto de '+p.name)+
         (p.fotoPropia ? '' : '<span class="ia-chip" title="Imagen generada con inteligencia artificial">✨ Imagen IA</span>')+
         '<span class="badge-cat">'+p.cat+'</span>'+
+        (ofertaVigente(p) ? '<span class="badge-oferta">−'+p.oferta.pct+'% · termina en <span data-cuenta="'+p.oferta.hasta+'">'+restanteTxt(p.oferta.hasta - Date.now())+'</span></span>' : '')+
         (nivel === 'agotado' ? '<span class="badge-stock agotado">Agotado</span>' : (nivel === 'bajo' ? '<span class="badge-stock bajo">Últimas unidades</span>' : ''))+
       '</div>'+
       '<div class="product-info">'+
         '<h4>'+esc(p.name)+'</h4>'+
         '<div class="origin">'+(function(){ const pu = contactoPorUid(p.productorUid); return pu && pu.foto ? avatarDe(pu, '', 'mini-av') : icono('ubicacion'); })()+
-          '<button class="btn-ficha" data-ficha="'+esc(p.productorUid)+'" title="Ver la ficha de '+esc(p.productorNombre)+'">'+esc(p.productorNombre)+'</button>'+
+          '<button class="btn-ficha" data-ficha="'+esc(p.productorUid)+'" title="Ver la ficha de '+esc(p.productorNombre)+'">'+esc(p.productorNombre)+'</button>'+verifDeUid(p.productorUid)+
           (rep[p.productorUid] && rep[p.productorUid].n ? '<span class="origin-rate" title="Calificación promedio del productor">'+estrellas(rep[p.productorUid].prom, 'sm')+' '+fmtProm(rep[p.productorUid].prom)+' <small>('+rep[p.productorUid].n+')</small></span>' : '')+
           '<button class="btn-contactar" data-contactar="'+esc(p.productorUid)+'" title="Escribirle a '+esc(p.productorNombre)+'">💬 Contactar</button>'+
           '<button class="btn-fav'+(esFavorito(p.id) ? ' on' : '')+'" data-fav="'+p.id+'" title="'+(esFavorito(p.id) ? 'Quitar de favoritos' : 'Agregar a favoritos y avisarme si baja el precio')+'" aria-label="Favorito">'+(esFavorito(p.id) ? '♥' : '♡')+'</button>'+
+          '<button class="btn-denunciar" data-denunciar="'+p.id+'" title="Denunciar esta publicación" aria-label="Denunciar">⚑</button>'+
         '</div>'+
-        '<div class="product-price">'+money(p.price)+' <span style="font-size:.7rem;color:var(--texto-suave);font-weight:500;font-family:Inter,sans-serif;">/ '+p.unit+'</span>'+chipTendencia(tendenciaPrecio(p))+'</div>'+
+        '<div class="product-price">'+(ofertaVigente(p) ? '<span class="precio-lista">'+money(p.price)+'</span>' : '')+money(precioDe(p))+' <span style="font-size:.7rem;color:var(--texto-suave);font-weight:500;font-family:Inter,sans-serif;">/ '+p.unit+'</span>'+chipTendencia(tendenciaPrecio(p))+'</div>'+
         '<div class="product-stock">Stock: <span class="stock-num" data-stock-id="'+p.id+'" data-real="'+p.stock+'">'+p.stock.toLocaleString('es-AR')+'</span> '+p.unit+' · mín. '+p.min.toLocaleString('es-AR')+'</div>'+
         '<div class="stock-meter '+nivel+'" title="'+pct+'% del stock publicado"><span style="width:'+pct+'%;"></span></div>'+
         '<div class="qty-row">'+
@@ -3125,13 +3190,15 @@ function viewMayoristaCatalogo(){
     const lines = cartIds.map(function(id){
       const p = lotById(id);
       const q = S.cart[id];
-      const lt = q * p.price;
+      const lt = q * precioDe(p);
       subtotal += lt;
       return '<div class="cart-line"><span>'+esc(p.name)+' — '+q.toLocaleString('es-AR')+' '+p.unit+'</span><span>'+money(lt)+' <button data-remove="'+id+'">Quitar</button></span></div>';
     }).join('');
     cartHtml = lines + '<div class="cart-total"><span>Total del pedido</span><b>'+money(subtotal)+'</b></div>'+
-      '<button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" id="placeOrderBtn">Solicitar pedido mayorista</button>';
+      '<button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" id="placeOrderBtn">Solicitar pedido mayorista</button>'+
+      cajaFlete(cartIds);
   }
+  cartHtml += cajaListas(cartIds.length);
 
   return '<div class="panel">'+
     '<div class="panel-head"><h2>Catálogo mayorista</h2><p>Explorá la oferta de fincas y cooperativas del NOA y armá tu pedido por volumen.</p></div>'+
@@ -3382,7 +3449,7 @@ function generarProgramado(pr){
       return db.collection('pedidos').add({
         numero: numero, lotId: p.id, productorUid: p.productorUid,
         mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre,
-        qty: pr.qty, price: p.price, unit: p.unit || 'kg', statusIdx: 0, traceIdx: -1, invoice: null,
+        qty: pr.qty, price: precioDe(p), unit: p.unit || 'kg', statusIdx: 0, traceIdx: -1, invoice: null,
         programadoId: pr.id,
         entrega: datosEntrega(),
         createdAt: FieldValue.serverTimestamp()
@@ -3437,6 +3504,147 @@ function avatarDe(u, nombre, clase){
   if(u && u.foto) return '<span class="'+clase+' av-foto"><img src="'+esc(u.foto)+'" alt=""></span>';
   return '<span class="'+clase+'">'+esc(inicialesDe(nombre))+'</span>';
 }
+/* Insignia azul de productor verificado por la administración. */
+function insigniaVerif(u, grande){ return u && u.verificado ? '<span class="verif'+(grande ? ' verif-lg' : '')+'" title="Productor verificado por CitrusCode">✓</span>' : ''; }
+function verifDeUid(uid){ return insigniaVerif(perfilDe(uid)); }
+/* Coordenadas de un usuario: las exactas o, si no, la capital de su provincia. */
+function coordsDe(u){
+  if(u && typeof u.lat === 'number' && typeof u.lng === 'number') return [u.lat, u.lng];
+  return u && COORDS_PROV[u.provincia] ? COORDS_PROV[u.provincia] : null;
+}
+function kmEntre(a, b){
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * rad, dLng = (b[1] - a[1]) * rad;
+  const h = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(a[0]*rad) * Math.cos(b[0]*rad) * Math.sin(dLng/2) * Math.sin(dLng/2);
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/* ---------- Ofertas por tiempo limitado ---------- */
+function ofertaVigente(l){ return l && l.oferta && l.oferta.pct > 0 && l.oferta.hasta > Date.now() ? l.oferta : null; }
+function precioDe(l){ const o = ofertaVigente(l); return o ? Math.round(l.price * (1 - o.pct / 100)) : l.price; }
+function restanteTxt(ms){
+  const m = Math.max(0, Math.round(ms / 60000));
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
+  return d ? d + 'd ' + h + 'h' : (h ? h + 'h ' + mm + 'm' : mm + 'm');
+}
+// Cuenta regresiva de las ofertas: se actualiza sola y, al vencer una, se redibuja la vista.
+setInterval(function(){
+  let vencio = false;
+  document.querySelectorAll('[data-cuenta]').forEach(function(el){
+    const falta = Number(el.dataset.cuenta) - Date.now();
+    if(falta <= 0) vencio = true;
+    else el.textContent = restanteTxt(falta);
+  });
+  if(vencio && currentUser) renderMain();
+}, 30000);
+
+/* ---------- Clima en la finca (Open-Meteo, gratis y sin clave) ---------- */
+const climaCache = {};
+const CLIMA_COD = [[0,'☀️','Despejado'],[2,'🌤️','Algo nublado'],[3,'☁️','Nublado'],[48,'🌫️','Niebla'],[57,'🌦️','Llovizna'],[67,'🌧️','Lluvia'],[77,'❄️','Nieve'],[82,'🌧️','Chaparrones'],[99,'⛈️','Tormenta']];
+function climaDeCodigo(c){ for(let i = 0; i < CLIMA_COD.length; i++) if(c <= CLIMA_COD[i][0]) return CLIMA_COD[i]; return CLIMA_COD[CLIMA_COD.length - 1]; }
+function climaHtml(d){
+  if(!d) return '<p class="clima-aviso" style="color:var(--texto-suave);">No se pudo cargar el pronóstico.</p>';
+  const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const avisos = [];
+  const html = '<div class="clima">'+d.time.map(function(t, i){
+    const f = new Date(t + 'T12:00:00');
+    const c = climaDeCodigo(d.weathercode[i]);
+    const min = Math.round(d.temperature_2m_min[i]), max = Math.round(d.temperature_2m_max[i]);
+    const lluvia = d.precipitation_probability_max ? d.precipitation_probability_max[i] : null;
+    const nombre = i === 0 ? 'Hoy' : dias[f.getDay()];
+    if(min <= 2) avisos.push('🥶 Riesgo de helada ' + (i === 0 ? 'hoy' : 'el ' + nombre.toLowerCase()) + ' (' + min + ' °C).');
+    if(lluvia >= 70) avisos.push('🌧️ Lluvia probable ' + (i === 0 ? 'hoy' : 'el ' + nombre.toLowerCase()) + ' (' + lluvia + ' %): conviene no cosechar.');
+    return '<div class="clima-dia" title="'+c[2]+'">'+nombre+'<b>'+c[1]+'</b>'+max+'° / '+min+'°'+(lluvia != null ? '<small>💧 '+lluvia+'%</small>' : '')+'</div>';
+  }).join('')+'</div>';
+  return html + avisos.slice(0, 3).map(function(a){ return '<p class="clima-aviso">'+a+'</p>'; }).join('');
+}
+/* Completa los recuadros [data-clima="lat,lng"] que haya en la pantalla. */
+function llenarClima(raiz){
+  (raiz || document).querySelectorAll('[data-clima]').forEach(function(el){
+    const clave = el.dataset.clima;
+    const c = climaCache[clave];
+    if(c && Date.now() - c.t < 30 * 60000){ el.innerHTML = climaHtml(c.d); return; }
+    if(el.dataset.pidiendo) return;
+    el.dataset.pidiendo = '1';
+    const ll = clave.split(',');
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + ll[0] + '&longitude=' + ll[1] +
+      '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=7')
+      .then(function(r){ return r.json(); })
+      .then(function(j){ climaCache[clave] = { t: Date.now(), d: j.daily || null }; })
+      .catch(function(){ climaCache[clave] = { t: Date.now() - 25 * 60000, d: null }; })
+      .then(function(){ document.querySelectorAll('[data-clima="'+clave+'"]').forEach(function(x){ x.innerHTML = climaHtml(climaCache[clave].d); }); });
+  });
+}
+function cajaClima(coords){
+  if(!coords) return '';
+  const clave = coords[0].toFixed(2) + ',' + coords[1].toFixed(2);
+  const c = climaCache[clave];
+  return '<div data-clima="'+clave+'">'+(c ? climaHtml(c.d) : '<p class="clima-aviso" style="color:var(--texto-suave);">Cargando pronóstico…</p>')+'</div>';
+}
+
+/* ---------- Campanita de notificaciones ---------- */
+function ofertasVistas(){ try { return JSON.parse(localStorage.getItem('cc-ofertas-vistas') || '{}'); } catch(_){ return {}; } }
+function ofertasNuevas(){
+  const vistas = ofertasVistas();
+  return S.lots.filter(function(l){ const o = ofertaVigente(l); return o && !l.archivado && vistas[l.id] !== o.hasta; });
+}
+function itemsCampana(){
+  if(!currentUser) return [];
+  const r = currentUser.rol, it = [];
+  const add = function(n, txt, vista){ if(n) it.push({ n: n, txt: txt, vista: vista }); };
+  if(r !== 'admin'){
+    add(chatsNoLeidos(), 'chat(s) con mensajes sin leer', 'chats');
+    add(cotizacionesPorAtender().length, 'cotización(es) esperando respuesta', 'chats');
+  }
+  if(r === 'mayorista'){
+    add(novedades().length, 'novedad(es) de productores que seguís', 'alertas');
+    add(ofertasNuevas().length, 'oferta(s) por tiempo limitado en el catálogo', 'catalogo');
+  } else if(r === 'productor'){
+    add(S.orders.filter(function(o){ return o.statusIdx === 0 && !o.cancelado && !o.ocultoProductor && o.productorUid === currentUser.uid; }).length, 'pedido(s) esperando tu confirmación', 'recibidos');
+    add(lotesStockBajo().length, 'publicación(es) con stock bajo', 'publicaciones');
+  } else {
+    add(S.denuncias.filter(function(d){ return d.estado === 'abierta'; }).length, 'denuncia(s) para revisar', 'moderacion');
+    add(S.users.filter(function(u){ return u.rol === 'productor' && !u.verificado && !u.suspendido; }).length, 'productor(es) sin verificar', 'usuarios');
+  }
+  return it;
+}
+let campanaAbierta = false;
+function actualizarCampana(){
+  const n = document.getElementById('campanaN');
+  if(!n || !currentUser) return;
+  const items = itemsCampana();
+  const total = items.reduce(function(a, x){ return a + x.n; }, 0);
+  n.hidden = !total;
+  n.textContent = total > 99 ? '99+' : total;
+  const panel = document.getElementById('campanaPanel');
+  if(panel){
+    panel.hidden = !campanaAbierta;
+    panel.innerHTML = '<h5>Notificaciones</h5>' + (items.length ? items.map(function(x){
+      return '<button class="campana-item" data-campana-ir="'+x.vista+'"><b>'+x.n+'</b><span>'+x.txt+'</span></button>';
+    }).join('') : '<div class="campana-vacia">Estás al día. No hay nada nuevo.</div>');
+  }
+}
+document.addEventListener('click', function(e){
+  if(!currentUser) return;
+  const btn = e.target.closest && e.target.closest('#campanaBtn');
+  const ir = e.target.closest && e.target.closest('[data-campana-ir]');
+  if(btn){ campanaAbierta = !campanaAbierta; actualizarCampana(); return; }
+  if(ir){
+    const vista = ir.dataset.campanaIr;
+    if(vista === 'catalogo'){
+      // Al revisar las ofertas, se marcan como vistas.
+      const vistas = ofertasVistas();
+      S.lots.forEach(function(l){ const o = ofertaVigente(l); if(o) vistas[l.id] = o.hasta; });
+      try { localStorage.setItem('cc-ofertas-vistas', JSON.stringify(vistas)); } catch(_){}
+    }
+    campanaAbierta = false;
+    view[currentUser.rol] = vista;
+    renderSubnav(); renderMain();
+    return;
+  }
+  if(campanaAbierta && !(e.target.closest && e.target.closest('#campanaPanel'))){ campanaAbierta = false; actualizarCampana(); }
+});
+
 function perfilDe(uid){
   if(currentUser && uid === currentUser.uid) return currentUser;
   return contactoPorUid(uid) || S.users.find(function(u){ return u.uid === uid; }) || null;
@@ -3559,7 +3767,7 @@ function viewRanking(){
     html += '<div class="podio">'+conVotos.slice(0,3).map(function(m, i){
       return '<div class="podio-card p'+(i+1)+(m.uid === currentUser.uid ? ' yo' : '')+'">'+
         '<div class="podio-pos">'+(i+1)+'</div>'+
-        '<div class="podio-name"><button class="btn-ficha" data-ficha="'+esc(m.uid)+'">'+esc(m.nombre)+'</button></div>'+
+        '<div class="podio-name"><button class="btn-ficha" data-ficha="'+esc(m.uid)+'">'+esc(m.nombre)+'</button>'+verifDeUid(m.uid)+'</div>'+
         estrellas(m.prom, 'lg')+
         '<div class="podio-prom">'+fmtProm(m.prom)+'</div>'+
         '<div class="podio-n">'+m.n+' calificación'+(m.n>1?'es':'')+'</div>'+
@@ -3573,7 +3781,7 @@ function viewRanking(){
       const yo = m.uid === currentUser.uid;
       return '<div class="rk-row'+(yo ? ' yo' : '')+'">'+
         '<span class="rk-pos">'+(m.puesto || '–')+'</span>'+
-        '<span class="rk-name"><b><button class="btn-ficha" data-ficha="'+esc(m.uid)+'">'+esc(m.nombre)+'</button>'+(yo ? '<span class="rk-tag">Vos</span>' : '')+'</b>'+
+        '<span class="rk-name"><b><button class="btn-ficha" data-ficha="'+esc(m.uid)+'">'+esc(m.nombre)+'</button>'+verifDeUid(m.uid)+(yo ? '<span class="rk-tag">Vos</span>' : '')+'</b>'+
           (m.opiniones.length ? '<small>'+m.opiniones.length+' comentario'+(m.opiniones.length>1?'s':'')+'</small>' : '')+'</span>'+
         (m.n ? estrellas(m.prom) : '<span class="rk-sin">Sin calificaciones aún</span>')+
         '<span class="rk-prom">'+(m.n ? fmtProm(m.prom) : '—')+'</span>'+
@@ -3729,7 +3937,7 @@ function viewProductorPublicaciones(){
     const sinStock = l.stock === 0;
     return '<tr'+(l.id === editandoLote ? ' style="background:var(--limon-bg);"' : '')+'>'+
       '<td>'+imgFoto(fotoDe(l), 'lot-thumb', '')+esc(l.name)+(sinStock ? ' <span class="status-badge st-cancel" style="margin-left:6px;">Sin stock</span>' : '')+'</td>'+
-      '<td>'+l.cat+'</td><td>'+money(l.price)+' / '+l.unit+'</td>'+
+      '<td>'+l.cat+'</td><td>'+(ofertaVigente(l) ? '<span class="precio-lista">'+money(l.price)+'</span>'+money(precioDe(l))+' <small style="color:#d9381e; font-weight:700;">−'+l.oferta.pct+'%</small>' : money(l.price))+' / '+l.unit+'</td>'+
       '<td>'+l.stock.toLocaleString('es-AR')+' '+l.unit+'</td>'+
       '<td>'+l.min.toLocaleString('es-AR')+' '+l.unit+'</td>'+
       '<td style="text-align:right; white-space:nowrap;">'+
@@ -3799,6 +4007,7 @@ function viewProductorPublicaciones(){
           '</div>'
         : '<button class="btn btn-primary btn-sm" id="addLotBtn" style="margin-top:16px;">Publicar producto</button>')+
     '</div>'+
+    bloqueOfertas(mine)+
     '<table class="simple"><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Pedido mínimo</th><th></th></tr>'+rows+'</table>'+
   '</div>';
 }
@@ -4312,6 +4521,111 @@ function viewPerfil(){
   '</div>';
 }
 
+/* Panel del productor para lanzar ofertas por tiempo limitado. */
+function bloqueOfertas(mine){
+  const disponibles = mine.filter(function(l){ return l.stock > 0; });
+  if(!disponibles.length) return '';
+  const activas = mine.filter(ofertaVigente);
+  return '<div class="oferta-box" data-keep><h4>🏷 Ofertas por tiempo limitado</h4>'+
+    '<p style="font-size:.8rem; color:var(--texto-suave); margin:0 0 10px;">El descuento se ve en el catálogo con una cuenta regresiva y les avisa a los mayoristas por la campanita.</p>'+
+    '<div class="form-grid">'+
+      '<div class="form-row"><label>Producto</label><select id="ofLote">'+disponibles.map(function(l){ return '<option value="'+l.id+'">'+esc(l.name)+' — '+money(l.price)+'/'+l.unit+'</option>'; }).join('')+'</select></div>'+
+      '<div class="form-row"><label>Descuento</label><select id="ofPct">'+[5,10,15,20,25,30,40,50].map(function(x){ return '<option value="'+x+'"'+(x === 15 ? ' selected' : '')+'>'+x+' %</option>'; }).join('')+'</select></div>'+
+      '<div class="form-row"><label>Dura</label><select id="ofHoras"><option value="24">24 horas</option><option value="48">48 horas</option><option value="72">3 días</option><option value="168">7 días</option></select></div>'+
+      '<div class="form-row"><button class="btn btn-primary btn-sm" id="ofLanzar" type="button">Lanzar oferta</button></div>'+
+    '</div>'+
+    activas.map(function(l){
+      return '<div class="oferta-activa"><span><b>'+esc(l.name)+'</b> −'+l.oferta.pct+'% · '+money(precioDe(l))+'/'+l.unit+' · termina en <span data-cuenta="'+l.oferta.hasta+'">'+restanteTxt(l.oferta.hasta - Date.now())+'</span></span>'+
+        '<button class="btn btn-ghost btn-sm" data-fin-oferta="'+l.id+'">Terminar</button></div>';
+    }).join('')+
+  '</div>';
+}
+
+/* Flete estimado del carrito: distancia en ruta aproximada (línea recta × 1,3) por toneladas. */
+function tarifaFlete(){ try { const t = Number(localStorage.getItem('cc-tarifa-flete')); return t > 0 ? t : 150; } catch(_){ return 150; } }
+function cajaFlete(cartIds){
+  const destino = coordsDe(currentUser);
+  if(!destino) return '<div class="flete-box"><h5>🚚 Flete estimado</h5>Cargá tu dirección en Mi perfil para calcularlo.</div>';
+  const tarifa = tarifaFlete();
+  const porProd = {};
+  cartIds.forEach(function(id){
+    const p = lotById(id);
+    const g = porProd[p.productorUid] || (porProd[p.productorUid] = { nombre: p.productorNombre, t: 0 });
+    g.t += S.cart[id] / 1000;
+  });
+  let total = 0;
+  const lineas = Object.keys(porProd).map(function(uid){
+    const g = porProd[uid];
+    const origen = coordsDe(perfilDe(uid));
+    if(!origen) return '<div class="flete-linea"><span>'+esc(g.nombre)+'</span><span>sin ubicación</span></div>';
+    const km = Math.max(5, Math.round(kmEntre(origen, destino) * 1.3));
+    const costo = Math.round(km * Math.max(g.t, 1) * tarifa);
+    total += costo;
+    return '<div class="flete-linea"><span>'+esc(g.nombre)+' · '+km.toLocaleString('es-AR')+' km · '+g.t.toLocaleString('es-AR', { maximumFractionDigits: 1 })+' t</span><span>'+money(costo)+'</span></div>';
+  }).join('');
+  return '<div class="flete-box"><h5>🚚 Flete estimado</h5>'+lineas+
+    '<div class="flete-total"><span>Total aproximado</span><span>'+money(total)+'</span></div>'+
+    '<label class="flete-tarifa">Tarifa $ por tonelada y km <input type="number" min="1" step="1" id="fleteTarifa" value="'+tarifa+'"></label>'+
+    '<small style="color:var(--texto-suave);">Es una referencia: se cobra mínimo 1 t por productor. Coordiná el precio final con el transportista.</small></div>';
+}
+
+/* Listas de compras guardadas del mayorista (se guardan en su perfil). */
+function cajaListas(hayCarrito){
+  const listas = Array.isArray(currentUser.listas) ? currentUser.listas : [];
+  if(!listas.length && !hayCarrito) return '';
+  return '<div class="listas-box"><h5>📋 Mis listas de compras</h5>'+
+    (listas.length ? '<div class="listas-fila"><select id="listaSel" aria-label="Lista guardada">'+listas.map(function(l, i){ return '<option value="'+i+'">'+esc(l.nombre)+' ('+Object.keys(l.items || {}).length+' productos)</option>'; }).join('')+'</select>'+
+      '<button class="btn btn-ghost btn-sm" id="listaCargar" type="button">Cargar</button><button class="btn btn-ghost btn-sm" id="listaBorrar" type="button" title="Borrar la lista">🗑</button></div>' : '')+
+    (hayCarrito ? '<button class="btn btn-ghost btn-sm" id="listaGuardar" type="button" style="margin-top:8px; width:100%; justify-content:center;">Guardar este pedido como lista</button>' : '')+
+  '</div>';
+}
+
+/* Meta de ventas del mes del productor. */
+function bloqueMeta(mios){
+  const hoy = new Date();
+  const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1).getTime();
+  const diasMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+  const ventas = mios.filter(function(o){ return o.statusIdx >= 1 && msDe(o.createdAt) >= inicio; })
+    .reduce(function(a, o){ return a + o.qty * o.price; }, 0);
+  const meta = Number(currentUser.metaMensual) || 0;
+  const pct = meta ? Math.round(ventas / meta * 100) : 0;
+  const proyeccion = Math.round(ventas / hoy.getDate() * diasMes);
+  const mes = hoy.toLocaleDateString('es-AR', { month: 'long' });
+  return '<div class="meta-box" data-keep><h4>🎯 Meta de ventas de '+mes+'</h4>'+
+    (meta
+      ? '<div class="meta-fila"><b>'+money(ventas)+'</b> de '+money(meta)+' · '+pct+' %</div>'+
+        '<div class="meta-barra"><span style="width:'+Math.min(100, pct)+'%;"></span></div>'+
+        '<div class="meta-fila" style="color:var(--texto-suave);">'+(pct >= 100 ? '🎉 ¡Cumpliste la meta del mes!' : 'Al ritmo actual cerrás el mes en '+money(proyeccion)+' ('+Math.round(proyeccion / meta * 100)+' % de la meta).')+'</div>'
+      : '<div class="meta-fila" style="color:var(--texto-suave);">Llevás '+money(ventas)+' vendidos este mes. Poné una meta para seguir tu avance.</div>')+
+    '<div class="meta-fila" style="margin-top:10px;"><input type="number" min="0" step="1000" id="metaMonto" placeholder="Meta en $" value="'+(meta || '')+'"><button class="btn btn-ghost btn-sm" id="metaGuardar" type="button">Guardar meta</button></div>'+
+    '<small style="color:var(--texto-suave);">Cuenta los pedidos confirmados del mes, sin los cancelados.</small>'+
+  '</div>';
+}
+
+/* ============================================================
+   VISTA ADMIN — MODERACIÓN DE PUBLICACIONES
+   ============================================================ */
+function viewAdminModeracion(){
+  const abiertas = S.denuncias.filter(function(d){ return d.estado === 'abierta'; });
+  const cerradas = S.denuncias.filter(function(d){ return d.estado !== 'abierta'; }).slice(0, 30);
+  const fila = function(d, conAcciones){
+    const l = lotById(d.lotId);
+    return '<tr><td>'+fechaCorta(d.createdAt)+'</td>'+
+      '<td>'+esc(d.loteNombre || '—')+(l && l.archivado ? ' <small>(oculta)</small>' : '')+'</td>'+
+      '<td><button class="btn-ficha" data-ficha="'+esc(d.productorUid)+'">'+esc(d.productorNombre || '—')+'</button></td>'+
+      '<td>'+esc(d.denuncianteNombre || '—')+'</td>'+
+      '<td>'+esc(d.motivo || '')+'</td>'+
+      '<td>'+(conAcciones
+        ? '<button class="btn btn-ghost btn-sm cancel-btn" data-den-ocultar="'+d.id+'">Ocultar publicación</button> <button class="btn btn-ghost btn-sm" data-den-descartar="'+d.id+'">Descartar</button>'
+        : (d.estado === 'resuelta' ? 'Publicación ocultada' : 'Descartada'))+'</td></tr>';
+  };
+  const cab = '<tr><th>Fecha</th><th>Publicación</th><th>Productor</th><th>Denunció</th><th>Motivo</th><th></th></tr>';
+  return '<div class="panel"><div class="panel-head"><h2>Moderación</h2><p>Publicaciones que los mayoristas denunciaron. Podés ocultarlas del catálogo o descartar la denuncia.</p></div>'+
+    '<table class="simple">'+cab+(abiertas.length ? abiertas.map(function(d){ return fila(d, true); }).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--texto-suave);">No hay denuncias pendientes.</td></tr>')+'</table>'+
+    (cerradas.length ? '<h4 style="margin:24px 0 8px;">Revisadas</h4><table class="simple">'+cab+cerradas.map(function(d){ return fila(d, false); }).join('')+'</table>' : '')+
+  '</div>';
+}
+
 /* ============================================================
    FICHA PÚBLICA DEL PRODUCTOR
    ============================================================ */
@@ -4341,7 +4655,7 @@ function abrirFicha(uid){
     '<div class="qr-modal-card ficha-card" role="dialog" aria-modal="true" aria-label="Ficha de '+esc(nombre)+'">'+
       '<div class="qr-modal-head">'+
         '<div class="ficha-top">'+avatarDe(u, nombre, 'pf-avatar')+
-          '<div><h3>'+esc(nombre)+'</h3>'+
+          '<div><h3>'+esc(nombre)+' '+insigniaVerif(u, true)+'</h3>'+
             '<small>'+(u && u.entidad && u.nombre && u.entidad !== u.nombre ? esc(u.nombre)+' · ' : '')+(lugar ? '📍 '+esc(lugar) : 'Productor')+'</small>'+
             (rep && rep.n ? '<small>'+estrellas(rep.prom, 'sm')+' '+fmtProm(rep.prom)+' ('+rep.n+' opiniones)'+(rep.puesto ? ' · #'+rep.puesto+' del ranking' : '')+'</small>' : '<small>Todavía sin calificaciones</small>')+
           '</div>'+
@@ -4356,9 +4670,10 @@ function abrirFicha(uid){
       (redes.length ? '<div class="ficha-redes">'+redes.join('')+'</div>' : '')+
       '<div id="fichaGaleria"></div>'+
       (tieneMapa ? '<h4>Ubicación</h4><iframe class="ficha-mapa" loading="lazy" title="Ubicación de '+esc(nombre)+'" src="https://www.openstreetmap.org/export/embed.html?bbox='+(u.lng-0.06)+','+(u.lat-0.035)+','+(u.lng+0.06)+','+(u.lat+0.035)+'&layer=mapnik&marker='+u.lat+','+u.lng+'"></iframe>' : '')+
+      (coordsDe(u) ? '<h4>Clima en la zona</h4>'+cajaClima(coordsDe(u)) : '')+
       '<h4>Publicaciones activas ('+lotes.length+')</h4>'+
       (lotes.length ? '<div class="ficha-lotes">'+lotes.slice(0, 8).map(function(l){
-        return '<div><span>'+esc(l.name)+' <small>· '+esc(l.cat || '')+'</small></span><span><b>'+money(l.price)+'</b> / '+esc(l.unit)+' <small>· stock '+l.stock.toLocaleString('es-AR')+'</small></span></div>';
+        return '<div><span>'+esc(l.name)+' <small>· '+esc(l.cat || '')+'</small></span><span>'+(ofertaVigente(l) ? '<span class="precio-lista">'+money(l.price)+'</span>' : '')+'<b>'+money(precioDe(l))+'</b> / '+esc(l.unit)+' <small>· stock '+l.stock.toLocaleString('es-AR')+'</small></span></div>';
       }).join('')+'</div>' : '<p style="font-size:.82rem; color:var(--texto-suave); margin:0;">No tiene productos publicados en este momento.</p>')+
       (currentUser && currentUser.rol === 'mayorista' ? '<div class="order-actions"><button type="button" class="btn btn-primary btn-sm" id="fichaContactar">💬 Contactar</button></div>' : '')+
     '</div>';
@@ -4366,6 +4681,7 @@ function abrirFicha(uid){
   document.body.classList.add('modal-abierto');
   caja.addEventListener('click', function(e){ if(e.target === caja) cerrarFicha(); });
   document.getElementById('fichaCerrar').addEventListener('click', cerrarFicha);
+  llenarClima(caja);
   const contactar = document.getElementById('fichaContactar');
   if(contactar) contactar.addEventListener('click', function(){
     cerrarFicha();
@@ -4419,11 +4735,15 @@ function viewAdminUsuarios(){
     const estado = u.suspendido
       ? '<span class="status-badge st-cancel" title="'+esc(u.motivoSuspension || 'Sin motivo cargado')+'">Suspendida</span>'
       : '<span class="status-badge st-4">Activa</span>';
-    const accion = !suspendible ? '' : (u.suspendido
+    const accion = (u.rol === 'productor'
+      ? (u.verificado
+        ? '<button class="btn btn-ghost btn-sm" data-verificar="'+u.uid+'" data-valor="0">Quitar verificación</button> '
+        : '<button class="btn btn-ghost btn-sm" data-verificar="'+u.uid+'" data-valor="1">✓ Verificar</button> ')
+      : '') + (!suspendible ? '' : (u.suspendido
       ? '<button class="btn btn-ghost btn-sm" data-reactivar="'+u.uid+'">Reactivar</button>'
-      : '<button class="btn btn-ghost btn-sm cancel-btn" data-suspender="'+u.uid+'">Suspender</button>');
+      : '<button class="btn btn-ghost btn-sm cancel-btn" data-suspender="'+u.uid+'">Suspender</button>'));
     return '<tr'+(u.suspendido ? ' class="fila-suspendida"' : '')+'>'+
-      '<td>'+esc(u.nombre||'—')+(u.suspendido && u.motivoSuspension ? '<div class="motivo-susp">'+esc(u.motivoSuspension)+'</div>' : '')+'</td>'+
+      '<td>'+esc(u.nombre||'—')+insigniaVerif(u)+(u.suspendido && u.motivoSuspension ? '<div class="motivo-susp">'+esc(u.motivoSuspension)+'</div>' : '')+'</td>'+
       '<td><span class="status-badge '+(u.rol==='admin'?'st-2':(u.rol==='productor'?'st-4':'st-1'))+'">'+esc(u.rol)+'</span></td>'+
       '<td>'+esc(u.entidad||'—')+'</td>'+
       '<td>'+esc(u.email||'—')+'</td>'+
@@ -4505,7 +4825,7 @@ function viewProductorDashboard(){
     '<div class="kpi-card"><div class="kpi-label">Por cobrar (en curso)</div><div class="kpi-value">'+money(porCobrar)+'</div><div class="kpi-sub">'+enCurso.length+' en preparación o tránsito</div></div>'+
     '<div class="kpi-card"><div class="kpi-label">A confirmar</div><div class="kpi-value">'+money(potencial)+'</div><div class="kpi-sub">'+pendientes.length+' esperando tu confirmación</div></div>'+
     '<div class="kpi-card"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">'+money(ticket)+'</div><div class="kpi-sub">sobre '+mios.length+' pedido(s)</div></div>'+
-  '</div>';
+  '</div>' + bloqueMeta(mios);
 
   // Ingresos por producto
   const porProducto = {};
@@ -5341,8 +5661,9 @@ function viewCosecha(){
 
   let html = '<div class="panel"><div class="panel-head"><h2>Calendario de cosecha</h2><p>'+
     (esProd ? 'Anunciá cuándo vas a tener cada producto y cuánto estimás cosechar. Los mayoristas lo ven y pueden reservar con anticipación; las reservas te llegan por el chat para que les pases el precio.'
-            : 'Qué va a tener cada productor y en qué meses. Reservá con anticipación: el productor te responde con el precio por el chat.')+
-    '</p></div>';
+            : 'Qué va a tener cada productor y en qué meses. Reservá con anticipación: el productor te responde con el precio por el chat.')+'</p>'+
+    (esProd ? '<div class="clima-box"><h4 style="margin:10px 0 6px;">Pronóstico en tu finca</h4>'+(coordsDe(currentUser) ? cajaClima(coordsDe(currentUser)) : '<p class="clima-aviso" style="color:var(--texto-suave);">Cargá tu dirección en Mi perfil para ver el pronóstico.</p>')+'</div>' : '')+
+    '</div>';
   if(!cosechasDisponible){
     html += '<div class="envio-box" style="margin-bottom:20px;"><b>Falta un paso de configuración</b>Para usar el calendario hay que publicar las reglas nuevas de Firestore (archivo <code>backend/firestore.rules</code>) en la consola de Firebase.</div>';
   }
@@ -5895,7 +6216,7 @@ function bindMainEvents(){
               numero: numero, lotId: p.id,
               productorUid: p.productorUid,
               mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre,
-              qty: S.cart[id], price: p.price, unit: p.unit || 'kg', statusIdx:0, traceIdx:-1, invoice:null,
+              qty: S.cart[id], price: precioDe(p), unit: p.unit || 'kg', statusIdx:0, traceIdx:-1, invoice:null,
               entrega: datosEntrega(),
               createdAt: FieldValue.serverTimestamp()
             }).then(function(){
@@ -5962,6 +6283,151 @@ function bindMainEvents(){
       renderSubnav(); renderMain();
     });
   }
+
+  // Ofertas por tiempo limitado
+  const ofLanzar = document.getElementById('ofLanzar');
+  if(ofLanzar){
+    ofLanzar.addEventListener('click', function(){
+      const l = lotById(document.getElementById('ofLote').value);
+      const pct = parseInt(document.getElementById('ofPct').value, 10);
+      const horas = parseInt(document.getElementById('ofHoras').value, 10);
+      if(!l) return;
+      const oferta = { pct: pct, hasta: Date.now() + horas * 3600000 };
+      ofLanzar.disabled = true;
+      db.collection('lotes').doc(l.id).update({ oferta: oferta }).then(function(){
+        registrar('Oferta lanzada', l.name + ' · −' + pct + '% por ' + horas + ' h');
+        showToast('Oferta lanzada: ' + l.name + ' −' + pct + '%');
+      }).catch(function(err){ showToast('No se pudo lanzar la oferta: ' + err.message); ofLanzar.disabled = false; });
+    });
+  }
+  main.querySelectorAll('[data-fin-oferta]').forEach(function(b){
+    b.addEventListener('click', function(){
+      db.collection('lotes').doc(b.dataset.finOferta).update({ oferta: firebase.firestore.FieldValue.delete() })
+        .then(function(){ showToast('Oferta terminada'); })
+        .catch(function(err){ showToast(err.message); });
+    });
+  });
+
+  // Flete: la tarifa se recuerda en el navegador.
+  const fleteTarifa = document.getElementById('fleteTarifa');
+  if(fleteTarifa){
+    fleteTarifa.addEventListener('change', function(){
+      const t = Math.round(Number(fleteTarifa.value));
+      if(t > 0){ try { localStorage.setItem('cc-tarifa-flete', String(t)); } catch(_){} }
+      renderMain();
+    });
+  }
+
+  // Listas de compras
+  const guardarListas = function(listas, aviso){
+    return db.collection('usuarios').doc(currentUser.uid).update({ listas: listas }).then(function(){
+      currentUser.listas = listas;
+      showToast(aviso);
+      renderMain();
+    }).catch(function(err){ showToast('No se pudo guardar la lista: ' + err.message); });
+  };
+  const listaGuardar = document.getElementById('listaGuardar');
+  if(listaGuardar){
+    listaGuardar.addEventListener('click', function(){
+      const nombre = (prompt('¿Cómo se llama la lista? (por ejemplo: Pedido semanal)') || '').trim().slice(0, 40);
+      if(!nombre) return;
+      const items = {};
+      Object.keys(S.cart).forEach(function(id){ if(lotById(id)) items[id] = S.cart[id]; });
+      const listas = (currentUser.listas || []).filter(function(l){ return l.nombre !== nombre; });
+      listas.unshift({ nombre: nombre, items: items });
+      guardarListas(listas.slice(0, 10), 'Lista «' + nombre + '» guardada');
+    });
+  }
+  const listaCargar = document.getElementById('listaCargar');
+  if(listaCargar){
+    listaCargar.addEventListener('click', function(){
+      const l = (currentUser.listas || [])[parseInt(document.getElementById('listaSel').value, 10)];
+      if(!l) return;
+      let cargados = 0, faltan = 0;
+      Object.keys(l.items || {}).forEach(function(id){
+        const p = lotById(id);
+        if(!p || p.archivado || p.stock < p.min){ faltan++; return; }
+        S.cart[id] = Math.max(p.min, Math.min(p.stock, l.items[id]));
+        cargados++;
+      });
+      showToast(cargados + ' producto(s) cargados' + (faltan ? '; ' + faltan + ' ya no están disponibles' : ''));
+      renderMain();
+    });
+  }
+  const listaBorrar = document.getElementById('listaBorrar');
+  if(listaBorrar){
+    listaBorrar.addEventListener('click', function(){
+      const i = parseInt(document.getElementById('listaSel').value, 10);
+      const listas = (currentUser.listas || []).slice();
+      const l = listas[i];
+      if(!l || !confirm('¿Borrar la lista «' + l.nombre + '»?')) return;
+      listas.splice(i, 1);
+      guardarListas(listas, 'Lista borrada');
+    });
+  }
+
+  // Denunciar una publicación
+  main.querySelectorAll('[data-denunciar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const l = lotById(b.dataset.denunciar);
+      if(!l) return;
+      const motivo = (prompt('¿Por qué denunciás «' + l.name + '»? (precio engañoso, producto que no existe, fotos falsas, etc.)') || '').trim().slice(0, 300);
+      if(!motivo) return;
+      db.collection('denuncias').add({
+        lotId: l.id, loteNombre: l.name, productorUid: l.productorUid, productorNombre: l.productorNombre,
+        denuncianteUid: currentUser.uid, denuncianteNombre: currentUser.entidad || currentUser.nombre,
+        motivo: motivo, estado: 'abierta', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(){
+        registrar('Publicación denunciada', l.name);
+        showToast('Gracias. La administración va a revisar la publicación.');
+      }).catch(function(err){ showToast(err.code === 'permission-denied' ? 'Firestore rechazó la denuncia: publicá las reglas nuevas.' : err.message); });
+    });
+  });
+  // Moderación (administración)
+  const cerrarDenuncia = function(id, estado){
+    return db.collection('denuncias').doc(id).update({ estado: estado, revisadaPor: currentUser.uid, revisadaEn: firebase.firestore.FieldValue.serverTimestamp() });
+  };
+  main.querySelectorAll('[data-den-ocultar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const d = S.denuncias.find(function(x){ return x.id === b.dataset.denOcultar; });
+      if(!d || !confirm('¿Ocultar «' + d.loteNombre + '» del catálogo?')) return;
+      db.collection('lotes').doc(d.lotId).update({ archivado: true }).then(function(){
+        return cerrarDenuncia(d.id, 'resuelta');
+      }).then(function(){
+        registrar('Publicación ocultada por denuncia', d.loteNombre + ' · ' + d.productorNombre);
+        showToast('Publicación ocultada');
+      }).catch(function(err){ showToast(err.message); });
+    });
+  });
+  main.querySelectorAll('[data-den-descartar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      cerrarDenuncia(b.dataset.denDescartar, 'descartada').then(function(){ showToast('Denuncia descartada'); }).catch(function(err){ showToast(err.message); });
+    });
+  });
+  // Productor verificado (administración)
+  main.querySelectorAll('[data-verificar]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const valor = b.dataset.valor === '1';
+      const u = S.users.find(function(x){ return x.uid === b.dataset.verificar; });
+      db.collection('usuarios').doc(b.dataset.verificar).update({ verificado: valor }).then(function(){
+        registrar(valor ? 'Productor verificado' : 'Verificación quitada', u ? (u.entidad || u.nombre) : '');
+        showToast(valor ? 'Productor verificado' : 'Verificación quitada');
+      }).catch(function(err){ showToast(err.code === 'permission-denied' ? 'Firestore rechazó el cambio: publicá las reglas nuevas.' : err.message); });
+    });
+  });
+  // Meta de ventas
+  const metaGuardar = document.getElementById('metaGuardar');
+  if(metaGuardar){
+    metaGuardar.addEventListener('click', function(){
+      const meta = Math.max(0, Math.round(Number(document.getElementById('metaMonto').value) || 0));
+      db.collection('usuarios').doc(currentUser.uid).update({ metaMensual: meta }).then(function(){
+        currentUser.metaMensual = meta;
+        showToast(meta ? 'Meta guardada' : 'Meta quitada');
+        renderMain();
+      }).catch(function(err){ showToast(err.message); });
+    });
+  }
+  llenarClima(main);
 
   const pfFoto = document.getElementById('pfFoto');
   if(pfFoto){
