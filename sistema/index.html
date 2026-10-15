@@ -1488,6 +1488,8 @@ const STATUSES = ['Solicitado','Confirmado','En preparación','En tránsito','En
 const QTY_STEP = 100;   // el pedido sube/baja de a 100 (kg o L), desde el mínimo del lote
 const UNIDADES = ['kg','L'];
 const TRACE_LABELS = ['Cosecha en finca','Escaneo en empaque','Despacho y ruta','Entrega al mayorista'];
+// Después de la última etapa el pedido queda entregado (traceIdx 4).
+function etiquetaTraza(i){ return TRACE_LABELS[i] || 'Entregado'; }
 const PROJECT_STAGES = ['Relevamiento','Desarrollo','QA','Entregado'];
 const PROVINCIAS = ['Buenos Aires','CABA','Catamarca','Chaco','Chubut','Córdoba','Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones','Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe','Santiago del Estero','Tierra del Fuego','Tucumán'];
 
@@ -4272,7 +4274,7 @@ function viewProductorRecibidos(){
     } else if(o.statusIdx === 0){
       actions = '<div class="order-actions"><button class="btn btn-primary btn-sm" data-confirm="'+o.id+'">Confirmar pedido</button></div>';
     } else if(o.statusIdx < 4){
-      actions = '<div class="order-actions"><button class="btn btn-ghost btn-sm" data-advance="'+o.id+'">Avanzar trazabilidad → '+TRACE_LABELS[o.traceIdx+1]+'</button></div>';
+      actions = '<div class="order-actions"><button class="btn btn-ghost btn-sm" data-advance="'+o.id+'">Avanzar trazabilidad → '+etiquetaTraza(o.traceIdx+1)+'</button></div>';
     } else {
       actions = '<div class="order-meta">✓ Pedido entregado y facturado.</div>';
       const calif = S.ratings.find(function(r){ return r.id === o.id; });
@@ -4428,7 +4430,7 @@ function avanzarTrazabilidad(o, via){
   publicarTraza(o, traceIdx);
   return guardar(db.collection('pedidos').doc(o.id).update(update)).then(function(){
     registrar(statusIdx === 4 ? 'Pedido entregado' : 'Trazabilidad avanzada',
-      'CC-' + o.numero + ' · ' + TRACE_LABELS[traceIdx] + (via ? ' · ' + via : '') + (statusIdx === 4 ? ' · factura CAE ' + update.invoice.cae : ''));
+      'CC-' + o.numero + ' · ' + etiquetaTraza(traceIdx) + (via ? ' · ' + via : '') + (statusIdx === 4 ? ' · factura CAE ' + update.invoice.cae : ''));
     return { traceIdx: traceIdx, statusIdx: statusIdx };
   });
 }
@@ -4490,17 +4492,17 @@ function procesarQR(texto){
   if(esMiViaje && !o.cancelado && o.statusIdx < 4){
     if(o.traceIdx < 1) return Promise.resolve({ ok: false, msg: nombre + ': el productor todavía no lo pasó por empaque.' });
     return avanzarTrazabilidad(o, 'escaneo QR del transportista').then(function(r){
-      return { ok: true, avanzo: true, msg: nombre + ' → ' + TRACE_LABELS[r.traceIdx] + (r.statusIdx === 4 ? '. Entregado.' : '.') };
+      return { ok: true, avanzo: true, msg: nombre + ' → ' + etiquetaTraza(r.traceIdx) + (r.statusIdx === 4 ? '. Entregado.' : '.') };
     }).catch(function(err){ return { ok: false, msg: 'No se pudo actualizar: ' + err.message }; });
   }
   if(currentUser.rol !== 'productor' || o.productorUid !== currentUser.uid){
-    return Promise.resolve({ ok: true, msg: nombre + ': ' + (o.cancelado ? 'pedido cancelado.' : (o.traceIdx >= 0 ? TRACE_LABELS[o.traceIdx] : STATUSES[o.statusIdx]) + '.'), ver: o });
+    return Promise.resolve({ ok: true, msg: nombre + ': ' + (o.cancelado ? 'pedido cancelado.' : (o.traceIdx >= 0 ? etiquetaTraza(o.traceIdx) : STATUSES[o.statusIdx]) + '.'), ver: o });
   }
   if(o.cancelado) return Promise.resolve({ ok: false, msg: nombre + ': el pedido está cancelado.' });
   if(o.statusIdx === 0) return Promise.resolve({ ok: false, msg: nombre + ': primero confirmá el pedido en Pedidos recibidos.' });
   if(o.statusIdx >= 4) return Promise.resolve({ ok: true, msg: nombre + ': ya fue entregado. La trazabilidad está cerrada.' });
   return avanzarTrazabilidad(o, 'escaneo QR').then(function(r){
-    return { ok: true, avanzo: true, msg: nombre + ' → ' + TRACE_LABELS[r.traceIdx] + (r.statusIdx === 4 ? '. Entregado y facturado.' : '.') };
+    return { ok: true, avanzo: true, msg: nombre + ' → ' + etiquetaTraza(r.traceIdx) + (r.statusIdx === 4 ? '. Entregado y facturado.' : '.') };
   }).catch(function(err){ return { ok: false, msg: 'No se pudo actualizar: ' + err.message }; });
 }
 
@@ -4654,7 +4656,7 @@ function revisarQRDeEnlace(){
   const o = S.orders.find(function(x){ return x.id === id; });
   if(!o){ showToast('No encontramos el lote de ese QR.'); return; }
   if(currentUser.rol === 'productor' && o.productorUid === currentUser.uid && !o.cancelado && o.statusIdx > 0 && o.statusIdx < 4){
-    if(window.confirm('Lote CC-' + o.numero + ': ¿avanzar la trazabilidad a "' + TRACE_LABELS[o.traceIdx + 1] + '"?')){
+    if(window.confirm('Lote CC-' + o.numero + ': ¿avanzar la trazabilidad a "' + etiquetaTraza(o.traceIdx + 1) + '"?')){
       procesarQR(URL_SISTEMA + '#qr=' + id).then(function(r){ showToast(r.msg); });
     }
   }
@@ -5114,7 +5116,7 @@ function viewTransportista(){
   if(!lista.length) return html + '<div class="empty-state"><div class="ee-icon">🚚</div>'+(disp ? 'No hay viajes esperando transporte.' : 'Todavía no tomaste viajes.')+'</div></div>';
   html += lista.map(function(o){
     const r = rutaDe(o);
-    const sigue = o.traceIdx + 1 < TRACE_LABELS.length ? TRACE_LABELS[o.traceIdx + 1] : null;
+    const sigue = etiquetaTraza(o.traceIdx + 1);
     let acciones = '';
     if(disp) acciones = '<button class="btn btn-primary btn-sm" data-tomar-viaje="'+o.id+'">Tomar viaje</button>';
     else if(o.statusIdx >= 4) acciones = '<span class="cc-ok">✓ Entregado</span>';
@@ -5123,7 +5125,7 @@ function viewTransportista(){
     return '<div class="viaje-card"><div class="viaje-top"><div><h4>CC-'+o.numero+' · '+esc(r.producto)+'</h4>'+
         '<div class="viaje-meta">'+o.qty.toLocaleString('es-AR')+' '+unitOf(o)+' (≈ '+r.t.toLocaleString('es-AR', { maximumFractionDigits: 1 })+' t)'+(r.km ? ' · '+r.km.toLocaleString('es-AR')+' km' : '')+
           (r.pago ? ' · flete estimado <b>'+money(r.pago)+'</b>' : '')+'</div></div>'+
-        '<span class="status-badge st-'+o.statusIdx+'">'+(o.traceIdx >= 0 ? TRACE_LABELS[o.traceIdx] : STATUSES[o.statusIdx])+'</span></div>'+
+        '<span class="status-badge st-'+o.statusIdx+'">'+(o.traceIdx >= 0 ? etiquetaTraza(o.traceIdx) : STATUSES[o.statusIdx])+'</span></div>'+
       '<div class="viaje-ruta"><b>📦 '+esc(r.origen)+'</b> → <b>🏁 '+esc(r.destino)+'</b></div>'+
       (!disp && o.entrega && o.entrega.telefono ? '<div class="viaje-meta">Recibe: '+esc(o.entrega.contacto || o.mayoristaNombre || '')+' · '+esc(o.entrega.telefono)+'</div>' : '')+
       '<div class="order-actions" style="margin-top:10px;">'+acciones+'</div></div>';
@@ -7066,8 +7068,8 @@ function bindMainEvents(){
   main.querySelectorAll('[data-avanzar-viaje]').forEach(function(b){
     b.addEventListener('click', function(){
       const o = S.orders.find(function(x){ return x.id === b.dataset.avanzarViaje; });
-      if(!o || !confirm('CC-' + o.numero + ': ¿marcar "' + TRACE_LABELS[o.traceIdx + 1] + '"?')) return;
-      avanzarTrazabilidad(o, 'transportista').then(function(r){ showToast(r.statusIdx === 4 ? 'Pedido entregado' : 'Envío actualizado: ' + TRACE_LABELS[r.traceIdx]); })
+      if(!o || !confirm('CC-' + o.numero + ': ¿marcar "' + etiquetaTraza(o.traceIdx + 1) + '"?')) return;
+      avanzarTrazabilidad(o, 'transportista').then(function(r){ showToast(r.statusIdx === 4 ? 'Pedido entregado' : 'Envío actualizado: ' + etiquetaTraza(r.traceIdx)); })
         .catch(function(err){ showToast(err.message); });
     });
   });
@@ -7567,7 +7569,7 @@ function bindMainEvents(){
       if(!o) return;
       b.disabled = true;
       avanzarTrazabilidad(o).then(function(r){
-        showToast(r.statusIdx === 4 ? 'Pedido entregado — factura generada automáticamente' : 'Trazabilidad actualizada: ' + TRACE_LABELS[r.traceIdx]);
+        showToast(r.statusIdx === 4 ? 'Pedido entregado — factura generada automáticamente' : 'Trazabilidad actualizada: ' + etiquetaTraza(r.traceIdx));
       }).catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });
