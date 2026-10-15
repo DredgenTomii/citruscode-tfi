@@ -23,6 +23,16 @@
     if(!t){ try { t = localStorage.getItem('cc-theme'); } catch(e){} }
     if(t !== 'dark' && t !== 'light') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', t);
+    // Preferencias de accesibilidad guardadas en este navegador.
+    try {
+      const pr = JSON.parse(localStorage.getItem('cc-prefs') || '{}');
+      const h = document.documentElement;
+      if(pr.letra) h.style.fontSize = pr.letra + '%';
+      h.classList.toggle('pref-contraste', !!pr.contraste);
+      h.classList.toggle('pref-sin-movimiento', !!pr.movimiento);
+      h.classList.toggle('pref-subrayar', !!pr.subrayar);
+      h.classList.toggle('pref-foco', !!pr.foco);
+    } catch(e){}
   })();
 </script>
 <title>CitrusCode — Sistema</title>
@@ -1318,6 +1328,48 @@
   .tp-pasos li span{width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:var(--surface-2); border:1px solid var(--borde); flex:none;}
   .tp-pasos li.ok span{background:var(--c-verde-claro); color:#fff; border-color:transparent;}
   .tp-pasos li small{display:block; color:var(--texto-suave); font-size:.75rem;}
+
+  /* ============================================================
+     CHAT: ADJUNTOS, ESCRIBIENDO, VISTO Y REACCIONES · CONFIGURACIÓN · DESHACER
+     ============================================================ */
+  .msg{position:relative;}
+  .msg-img{display:block; max-width:220px; max-height:220px; border-radius:10px; margin:4px 0; cursor:zoom-in; object-fit:cover;}
+  .msg-pdf{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:10px; background:var(--surface-2); border:1px solid var(--borde); color:inherit; text-decoration:none; font-weight:600; margin:4px 0;}
+  .msg-check{font-size:.68rem; margin-left:6px; opacity:.7; letter-spacing:-2px;}
+  .msg-check.visto{color:#1d9bf0; opacity:1;}
+  .msg-reac{display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;}
+  .msg-reac span{background:var(--surface-2); border:1px solid var(--borde); border-radius:12px; font-size:.72rem; padding:1px 6px;}
+  .msg-reac-opc{position:absolute; top:-16px; right:6px; display:none; gap:2px; background:var(--surface); border:1px solid var(--borde); border-radius:16px; padding:2px 4px; box-shadow:var(--sombra-sm); z-index:2;}
+  .msg:hover .msg-reac-opc, .msg:focus-within .msg-reac-opc{display:flex;}
+  .msg-reac-opc button{border:0; background:none; cursor:pointer; font-size:.9rem; padding:1px 3px; border-radius:8px;}
+  .msg-reac-opc button:hover, .msg-reac-opc button.mia{background:var(--limon-bg);}
+  .chat-adj{display:grid; place-items:center; width:40px; flex:none; border:1px solid var(--borde); border-radius:10px; cursor:pointer; background:var(--surface); font-size:1.05rem;}
+  .conv-escribiendo{color:var(--acento) !important; font-style:italic;}
+  .visor-img{max-width:100%; max-height:75vh; border-radius:14px; display:block; margin:auto;}
+  .cfg-grid{display:grid; gap:16px;}
+  .cfg-card{background:var(--surface); border:1px solid var(--borde); border-radius:16px; padding:18px 20px;}
+  .cfg-card h3{margin:0 0 4px; font-size:1rem; display:flex; align-items:center; gap:8px;}
+  .cfg-card > p{margin:0 0 12px; font-size:.8rem; color:var(--texto-suave);}
+  .cfg-fila{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:10px 0; border-top:1px solid var(--borde); font-size:.86rem;}
+  .cfg-fila small{display:block; color:var(--texto-suave); font-size:.75rem;}
+  .cfg-seg{display:inline-flex; border:1px solid var(--borde); border-radius:10px; overflow:hidden; flex:none;}
+  .cfg-seg button{border:0; background:var(--surface); color:var(--texto); padding:6px 11px; cursor:pointer; font-size:.8rem;}
+  .cfg-seg button.on{background:var(--c-verde-claro); color:#fff; font-weight:700;}
+  .cfg-switch{position:relative; width:44px; height:24px; flex:none;}
+  .cfg-switch input{opacity:0; width:0; height:0; position:absolute;}
+  .cfg-switch span{position:absolute; inset:0; border-radius:12px; background:var(--surface-2); border:1px solid var(--borde); cursor:pointer; transition:.2s;}
+  .cfg-switch span::after{content:''; position:absolute; width:18px; height:18px; top:2px; left:2px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:.2s;}
+  .cfg-switch input:checked + span{background:var(--c-verde-claro);}
+  .cfg-switch input:checked + span::after{left:22px;}
+  .cfg-switch input:focus-visible + span{outline:3px solid #1d9bf0; outline-offset:2px;}
+  .cfg-atajos kbd{background:var(--surface-2); border:1px solid var(--borde); border-radius:6px; padding:1px 6px; font-size:.75rem;}
+  html.pref-contraste{--texto-suave:var(--texto);}
+  html.pref-contraste body{filter:contrast(1.18);}
+  html.pref-sin-movimiento *, html.pref-sin-movimiento *::before, html.pref-sin-movimiento *::after{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+  html.pref-subrayar a, html.pref-subrayar .btn-ficha{text-decoration:underline !important;}
+  html.pref-foco :focus-visible{outline:3px solid #1d9bf0 !important; outline-offset:2px !important;}
+  .toast .toast-undo{margin-left:12px; background:#fff; color:#123524; border:0; border-radius:8px; padding:4px 10px; font-weight:700; cursor:pointer; pointer-events:auto;}
+  .toast.con-undo{pointer-events:auto;}
 </style>
 </head>
 <body>
@@ -1512,6 +1564,7 @@ function fruitSVG(color){
 }
 /* Íconos de línea (estilo uniforme en toda la interfaz). */
 const ICONOS = {
+  config:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68 1.65 1.65 0 0 0 10 3.17V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
   licitaciones:'<path d="M14 3l7 7"/><path d="M11 6l7 7"/><path d="M12.5 4.5l-6 6 3 3 6-6"/><path d="M8 12l-5 5 3 3 5-5"/><path d="M14 21h7"/>',
   cuenta:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/>',
   misviajes:'<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M6 11l2 2 4-4"/>',
@@ -1815,12 +1868,60 @@ function revisarStockBajo(){
 }
 
 /* ---------- Mensajes del pedido ---------- */
-function burbujaMsg(m, otro){
+const REACCIONES = ['👍','❤️','😂','😮','🙏'];
+function burbujaMsg(m, otro, vistoOtroMs, conReacciones){
   const mio = m.autorUid === currentUser.uid;
   let hora = '';
   try { hora = m.fecha && m.fecha.toDate ? m.fecha.toDate().toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : 'enviando…'; } catch(_){}
-  return '<div class="msg'+(mio ? ' mio' : '')+'"><span class="msg-meta">'+(mio ? 'Vos' : esc(m.autorNombre || otro))+' · '+hora+'</span>'+esc(m.texto)+'</div>';
+  let adj = '';
+  if(m.adjunto && m.adjunto.data){
+    adj = m.adjunto.tipo === 'imagen'
+      ? '<img class="msg-img" src="'+esc(m.adjunto.data)+'" alt="'+esc(m.adjunto.nombre || 'Foto')+'" data-ver-img>'
+      : '<a class="msg-pdf" href="'+esc(m.adjunto.data)+'" download="'+esc(m.adjunto.nombre || 'archivo.pdf')+'">📄 '+esc(m.adjunto.nombre || 'Archivo PDF')+'</a>';
+  }
+  const texto = m.adjunto && /^📎 /.test(m.texto || '') ? '' : esc(m.texto);
+  // Visto: ✓ enviado, ✓✓ azul cuando la otra parte abrió la conversación después del mensaje.
+  let check = '';
+  if(mio && vistoOtroMs !== undefined){
+    const visto = vistoOtroMs && m.fecha && m.fecha.toMillis && vistoOtroMs >= m.fecha.toMillis();
+    check = '<span class="msg-check'+(visto ? ' visto' : '')+'" title="'+(visto ? 'Visto' : 'Enviado')+'">'+(visto ? '✓✓' : '✓')+'</span>';
+  }
+  let reac = '';
+  if(conReacciones && m.id){
+    const r = m.reacciones || {};
+    const cuenta = {};
+    Object.keys(r).forEach(function(uid){ cuenta[r[uid]] = (cuenta[r[uid]] || 0) + 1; });
+    const mia = r[currentUser.uid];
+    reac = (Object.keys(cuenta).length ? '<div class="msg-reac">'+Object.keys(cuenta).map(function(e){ return '<span>'+e+(cuenta[e] > 1 ? ' '+cuenta[e] : '')+'</span>'; }).join('')+'</div>' : '')+
+      '<div class="msg-reac-opc">'+REACCIONES.map(function(e){ return '<button type="button" data-reac="'+m.id+'" data-emoji="'+e+'" class="'+(mia === e ? 'mia' : '')+'" aria-label="Reaccionar '+e+'">'+e+'</button>'; }).join('')+'</div>';
+  }
+  return '<div class="msg'+(mio ? ' mio' : '')+'"><span class="msg-meta">'+(mio ? 'Vos' : esc(m.autorNombre || otro))+' · '+hora+check+'</span>'+adj+texto+reac+'</div>';
 }
+/* Visor de imágenes (fotos del chat y de la galería de la finca). */
+function verImagen(src){
+  cerrarVisor();
+  const caja = document.createElement('div');
+  caja.className = 'qr-modal'; caja.id = 'visorImg';
+  caja.innerHTML = '<div class="qr-modal-card" style="max-width:860px;"><div class="qr-modal-head"><b>Foto</b><button type="button" class="qr-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button></div><img class="visor-img" src="'+esc(src)+'" alt=""></div>';
+  document.body.appendChild(caja);
+  caja.addEventListener('click', function(e){ if(e.target === caja) cerrarVisor(); });
+  document.getElementById('visorCerrar').addEventListener('click', cerrarVisor);
+}
+function cerrarVisor(){ const v = document.getElementById('visorImg'); if(v) v.remove(); }
+document.addEventListener('click', function(e){
+  const img = e.target.closest && e.target.closest('[data-ver-img]');
+  if(img){ e.preventDefault(); verImagen(img.getAttribute('src') || img.dataset.verImg); return; }
+  const r = e.target.closest && e.target.closest('[data-reac]');
+  if(r && convAbierta){
+    const m = convMsgs.find(function(x){ return x.id === r.dataset.reac; });
+    if(!m) return;
+    const upd = {};
+    upd['reacciones.' + currentUser.uid] = (m.reacciones || {})[currentUser.uid] === r.dataset.emoji ? FieldValue.delete() : r.dataset.emoji;
+    db.collection('conversaciones').doc(convAbierta).collection('mensajes').doc(m.id).update(upd)
+      .catch(function(err){ showToast(err.code === 'permission-denied' ? 'Firestore rechazó la reacción: publicá las reglas nuevas.' : err.message); });
+  }
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') cerrarVisor(); });
 function cerrarChat(){
   if(unsubChat) unsubChat();
   unsubChat = null; chatAbierto = null; chatMsgs = []; chatError = false;
@@ -1897,6 +1998,36 @@ function convNoLeida(c){
   return !!c.ultimoAutorUid && c.ultimoAutorUid !== currentUser.uid && msDe(c.actualizado) > msDe(c[campoVisto()]);
 }
 function chatsNoLeidos(){ return S.convs.filter(convNoLeida).length; }
+function otroEscribiendo(c){
+  if(!c || !currentUser) return false;
+  const ms = c[currentUser.rol === 'mayorista' ? 'escribiendoProductor' : 'escribiendoMayorista'];
+  return typeof ms === 'number' && Date.now() - ms < 6000;
+}
+let ultimoAvisoEscribiendo = 0;
+function avisarEscribiendo(){
+  if(!convAbierta || Date.now() - ultimoAvisoEscribiendo < 3000) return;
+  if(!S.convs.some(function(c){ return c.id === convAbierta; })) return;   // la conversación todavía no existe
+  ultimoAvisoEscribiendo = Date.now();
+  const upd = {}; upd[currentUser.rol === 'mayorista' ? 'escribiendoMayorista' : 'escribiendoProductor'] = Date.now();
+  db.collection('conversaciones').doc(convAbierta).update(upd).catch(function(){});
+}
+setInterval(function(){
+  const el = document.getElementById('convEscribiendo');
+  if(!el || !convAbierta) return;
+  el.textContent = otroEscribiendo(S.convs.find(function(c){ return c.id === convAbierta; })) ? 'escribiendo…' : '';
+}, 1500);
+/* Sonido corto de aviso (opcional, desde Configuración). */
+function sonarAviso(){
+  if(!prefs().sonido) return;
+  try {
+    const A = window.AudioContext || window.webkitAudioContext;
+    const ctx = new A(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = 880; g.gain.value = 0.06;
+    o.connect(g); g.connect(ctx.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+    o.stop(ctx.currentTime + 0.26);
+  } catch(_){}
+}
 function marcarVista(c){
   if(!convNoLeida(c) || marcandoVista[c.id]) return;
   marcandoVista[c.id] = true;
@@ -2153,6 +2284,8 @@ function sinAcentos(s){ return String(s || '').toLowerCase().normalize('NFD').re
 let toastTimer;
 function showToast(msg){
   const t = document.getElementById('toast');
+  clearTimeout(typeof undoTimer !== 'undefined' ? undoTimer : null);
+  t.classList.remove('con-undo');
   t.textContent = msg;
   t.classList.toggle('alt');   // alterna la animación para que la barra de tiempo reinicie
   t.classList.add('show');
@@ -2668,13 +2801,29 @@ function suscribirChats(){
       snap.docChanges().forEach(function(ch){
         if(ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) return;
         const c = ch.doc.data();
-        if(c.ultimoAutorUid && c.ultimoAutorUid !== currentUser.uid && ch.doc.id !== convAbierta){
-          showToast('💬 Nuevo mensaje de ' + nombreOtroEnConv(Object.assign({id: ch.doc.id}, c)));
+        const antes = S.convs.find(function(x){ return x.id === ch.doc.id; });
+        const nuevoMsg = !antes || antes.ultimoMensaje !== c.ultimoMensaje || msDe(antes.actualizado) !== msDe(c.actualizado);
+        if(nuevoMsg && c.ultimoAutorUid && c.ultimoAutorUid !== currentUser.uid){
+          sonarAviso();
+          if(ch.doc.id !== convAbierta && prefs().avisosChat !== false) showToast('💬 Nuevo mensaje de ' + nombreOtroEnConv(Object.assign({id: ch.doc.id}, c)));
         }
       });
     }
+    // Si solo cambió el "escribiendo…", se actualiza el aviso sin redibujar la pantalla.
+    const firma = function(c){ return [c.id, c.ultimoMensaje, msDe(c.actualizado), msDe(c.vistoMayorista), msDe(c.vistoProductor)].join('|'); };
+    const nuevas = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); });
+    const soloEscribiendo = convsCargadas && nuevas.length === S.convs.length && nuevas.every(function(c){
+      const a = S.convs.find(function(x){ return x.id === c.id; });
+      return a && firma(a) === firma(c);
+    });
     convsCargadas = true;
-    S.convs = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); });
+    S.convs = nuevas;
+    if(soloEscribiendo){
+      S.convs.sort(function(a, b){ return msDe(b.actualizado) - msDe(a.actualizado); });
+      const el = document.getElementById('convEscribiendo');
+      if(el) el.textContent = otroEscribiendo(S.convs.find(function(c){ return c.id === convAbierta; })) ? 'escribiendo…' : '';
+      return;
+    }
     S.convs.sort(function(a, b){ return msDe(b.actualizado) - msDe(a.actualizado); });
     chatsDisponible = true;
     const abierta = convAbierta && S.convs.find(function(c){ return c.id === convAbierta; });
@@ -2831,6 +2980,7 @@ function renderSubnav(){
       {k:'facturas', label:'Facturas'},
       {k:'precios', label:'Evolución de precios'},
       {k:'ranking', label:'Ranking de proveedores'},
+      {k:'config', label:'Configuración'},
     ];
   } else if(currentUser.rol === 'productor'){
     const reqPendientes = S.projects.filter(function(pr){
@@ -2848,12 +2998,14 @@ function renderSubnav(){
       {k:'precios', label:'Evolución de precios'},
       {k:'ranking', label:'Mi reputación'},
       {k:'medida', label:'Software a medida', badge: reqPendientes || null},
+      {k:'config', label:'Configuración'},
     ];
   } else if(currentUser.rol === 'transportista'){
     tabs = [
       {k:'viajes', label:'Viajes disponibles', badge: viajesDisponibles().length || null},
       {k:'misviajes', label:'Mis viajes', badge: misViajes().filter(function(o){ return o.statusIdx < 4; }).length || null},
       {k:'precios', label:'Evolución de precios'},
+      {k:'config', label:'Configuración'},
     ];
   } else {
     tabs = [
@@ -2866,6 +3018,7 @@ function renderSubnav(){
       {k:'precios', label:'Evolución de precios'},
       {k:'ranking', label:'Ranking de proveedores'},
       {k:'medida', label:'Software a medida'},
+      {k:'config', label:'Configuración'},
     ];
   }
   nav.innerHTML = tabs.map(function(t){
@@ -2932,6 +3085,8 @@ function renderMain(){
     main.innerHTML = viewRanking();
   } else if(view[currentUser.rol] === 'precios'){
     main.innerHTML = viewPrecios();
+  } else if(view[currentUser.rol] === 'config'){
+    main.innerHTML = viewConfig();
   } else if(view[currentUser.rol] === 'licitaciones'){
     main.innerHTML = viewLicitaciones();
   } else if(view[currentUser.rol] === 'cuenta'){
@@ -3769,7 +3924,7 @@ function viewChats(){
       cuerpo = '<div class="chat-msgs" id="chatMsgs"><div class="chat-aviso">Los chats se habilitan cuando se publiquen las reglas nuevas de Firestore.</div></div>';
     } else {
       cuerpo = '<div class="chat-msgs" id="chatMsgs">'+(convMsgs.length
-        ? convMsgs.map(function(m){ return burbujaMsg(m, nombre); }).join('')
+        ? convMsgs.map(function(m){ return burbujaMsg(m, nombre, conv ? (msDe(conv[esMay ? 'vistoProductor' : 'vistoMayorista']) || 0) : 0, true); }).join('')
         : '<div class="chat-vacio">Todavía no hay mensajes con '+esc(nombre)+'.<br>'+
             (esMay ? 'Preguntá por disponibilidad, precios por volumen o calidad del lote.' : 'Escribí para ofrecer tus lotes o coordinar una entrega.')+'</div>')+
       '</div>';
@@ -3777,12 +3932,13 @@ function viewChats(){
     panel = '<div class="chats-head">'+
         '<button class="btn btn-ghost btn-sm chats-volver" id="chatsVolver" type="button" aria-label="Volver a la lista">←</button>'+
         avatarDe(u, nombre, 'conv-av')+
-        '<div><b>'+(esMay ? '<button class="btn-ficha" data-ficha="'+esc(convOtro)+'" title="Ver la ficha del productor">'+esc(nombre)+'</button>' : esc(nombre))+'</b><small>'+(esMay ? 'Productor' : 'Mayorista')+(sub ? ' · '+esc(sub) : '')+'</small></div>'+
+        '<div><b>'+(esMay ? '<button class="btn-ficha" data-ficha="'+esc(convOtro)+'" title="Ver la ficha del productor">'+esc(nombre)+'</button>' : esc(nombre))+'</b><small>'+(esMay ? 'Productor' : 'Mayorista')+(sub ? ' · '+esc(sub) : '')+'</small><small id="convEscribiendo" class="conv-escribiendo">'+(otroEscribiendo(conv) ? 'escribiendo…' : '')+'</small></div>'+
         (esMay ? '<button class="btn btn-sm '+(sigoA(convOtro) ? 'btn-primary' : 'btn-ghost')+' chats-seguir" data-seguir-chat="'+esc(convOtro)+'">'+(sigoA(convOtro) ? '✓ Siguiendo' : '+ Seguir')+'</button>' : '')+
       '</div>'+
       cajaCotizaciones(convOtro)+
       cuerpo+
       '<form class="chat-form" id="convForm">'+
+        '<label class="chat-adj" title="Adjuntar una foto o un PDF">📎<input type="file" id="convAdjunto" accept="image/*,application/pdf" hidden></label>'+
         '<input type="text" id="convInput" maxlength="500" autocomplete="off" placeholder="Escribí un mensaje para '+esc(nombre)+'…">'+
         '<button class="btn btn-primary btn-sm" type="submit">Enviar</button>'+
       '</form>';
@@ -4646,7 +4802,7 @@ function viewPerfil(){
     '<p style="font-size:.78rem; color:var(--texto-suave); margin-top:14px;">📍 '+(typeof u.lat === 'number'
       ? 'Tu dirección está ubicada en el mapa: los recorridos de tus pedidos usan el punto exacto.'
       : 'Tu dirección todavía no está ubicada en el mapa: los recorridos usan la capital de tu provincia. Se ubica sola al guardar el perfil.')+'</p>'+
-    '<p style="font-size:.78rem; color:var(--texto-suave); margin-top:14px;">Para cambiar tu contraseña, cerrá sesión y usá el enlace «¿Olvidaste tu contraseña?» de la pantalla de ingreso.</p>'+
+    '<p style="font-size:.78rem; color:var(--texto-suave); margin-top:14px;">La contraseña, la accesibilidad y los avisos se cambian desde <button class="btn-ficha" data-ir-config>Configuración</button>.</p>'+
   '</div>';
 }
 
@@ -4729,6 +4885,81 @@ function bloqueMeta(mios){
     '<div class="meta-fila" style="margin-top:10px;"><input type="number" min="0" step="1000" id="metaMonto" placeholder="Meta en $" value="'+(meta || '')+'"><button class="btn btn-ghost btn-sm" id="metaGuardar" type="button">Guardar meta</button></div>'+
     '<small style="color:var(--texto-suave);">Cuenta los pedidos confirmados del mes, sin los cancelados.</small>'+
   '</div>';
+}
+
+/* ============================================================
+   CONFIGURACIÓN — apariencia, accesibilidad, avisos y cuenta
+   ============================================================ */
+function prefs(){ try { return JSON.parse(localStorage.getItem('cc-prefs') || '{}'); } catch(_){ return {}; } }
+function guardarPref(k, v){
+  const p = prefs(); p[k] = v;
+  try { localStorage.setItem('cc-prefs', JSON.stringify(p)); } catch(_){}
+  aplicarPrefs();
+}
+function aplicarPrefs(){
+  const p = prefs(), h = document.documentElement;
+  h.style.fontSize = p.letra ? p.letra + '%' : '';
+  h.classList.toggle('pref-contraste', !!p.contraste);
+  h.classList.toggle('pref-sin-movimiento', !!p.movimiento);
+  h.classList.toggle('pref-subrayar', !!p.subrayar);
+  h.classList.toggle('pref-foco', !!p.foco);
+}
+function temaActual(){ try { return localStorage.getItem('cc-theme') || 'sistema'; } catch(_){ return 'sistema'; } }
+function viewConfig(){
+  const p = prefs();
+  const sw = function(id, on, titulo, ayuda){
+    return '<div class="cfg-fila"><div>'+titulo+(ayuda ? '<small>'+ayuda+'</small>' : '')+'</div>'+
+      '<label class="cfg-switch"><input type="checkbox" data-pref="'+id+'"'+(on ? ' checked' : '')+' aria-label="'+esc(titulo)+'"><span></span></label></div>';
+  };
+  const seg = function(nombre, opciones, actual){
+    return '<div class="cfg-seg" role="group">'+opciones.map(function(o){ return '<button type="button" data-'+nombre+'="'+o[0]+'" class="'+(String(actual) === String(o[0]) ? 'on' : '')+'">'+o[1]+'</button>'; }).join('')+'</div>';
+  };
+  const u = currentUser;
+  return '<div class="panel"><div class="panel-head"><h2>Configuración</h2><p>Ajustá cómo se ve y se comporta CitrusCode. La apariencia y la accesibilidad se guardan en este dispositivo.</p></div><div class="cfg-grid">'+
+    '<div class="cfg-card"><h3>👤 Mi cuenta</h3><p>'+esc(u.email || '')+' · '+esc(u.rol)+'</p>'+
+      '<div class="cfg-fila"><div>Perfil<small>Foto o logo, datos de la empresa, dirección y redes.</small></div><button class="btn btn-ghost btn-sm" data-ir="perfil">Editar mi perfil</button></div>'+
+      '<div class="cfg-fila"><div>Contraseña<small>Te mandamos un correo con el enlace para cambiarla.</small></div><button class="btn btn-ghost btn-sm" id="cfgClave">Cambiar contraseña</button></div>'+
+      '<div class="cfg-fila"><div>Mis datos<small>Descargá tu perfil y tus pedidos en un archivo.</small></div><button class="btn btn-ghost btn-sm" id="cfgExportar">Descargar</button></div>'+
+    '</div>'+
+    '<div class="cfg-card"><h3>🎨 Apariencia</h3><p>El tema también se cambia con el botón de la luna, arriba a la derecha.</p>'+
+      '<div class="cfg-fila"><div>Tema</div>'+seg('tema', [['light','Claro'],['dark','Oscuro'],['sistema','Del sistema']], temaActual())+'</div>'+
+      '<div class="cfg-fila"><div>Tamaño de letra<small>Agranda o achica todo el sistema.</small></div>'+seg('letra', [[90,'A−'],[100,'A'],[115,'A+'],[130,'A++']], p.letra || 100)+'</div>'+
+    '</div>'+
+    '<div class="cfg-card"><h3>♿ Accesibilidad</h3><p>Pensado para leer mejor y usar el sistema solo con el teclado.</p>'+
+      sw('contraste', p.contraste, 'Alto contraste', 'Textos más oscuros y bordes más marcados.')+
+      sw('movimiento', p.movimiento, 'Reducir animaciones', 'Quita los movimientos y transiciones.')+
+      sw('subrayar', p.subrayar, 'Subrayar enlaces', 'Distingue los enlaces sin depender del color.')+
+      sw('foco', p.foco, 'Foco bien visible', 'Marca con un borde azul dónde estás al navegar con Tab.')+
+    '</div>'+
+    '<div class="cfg-card"><h3>🔔 Avisos</h3><p>Lo pendiente siempre queda en la campanita.</p>'+
+      sw('avisosChat', p.avisosChat !== false, 'Avisos emergentes de mensajes', 'Muestra un aviso abajo cuando te escriben.')+
+      sw('sonido', p.sonido, 'Sonido al recibir un mensaje', 'Un tono corto, solo con el sistema abierto.')+
+    '</div>'+
+    '<div class="cfg-card cfg-atajos"><h3>⌨️ Atajos de teclado</h3>'+
+      '<div class="cfg-fila"><div>Buscar en el catálogo</div><kbd>/</kbd></div>'+
+      '<div class="cfg-fila"><div>Cerrar ventanas y menús</div><kbd>Esc</kbd></div>'+
+      '<div class="cfg-fila"><div>Moverse por los botones</div><span><kbd>Tab</kbd> <kbd>Shift</kbd>+<kbd>Tab</kbd></span></div>'+
+      '<div class="cfg-fila"><div>Restablecer todo como venía</div><button class="btn btn-ghost btn-sm" id="cfgReset">Restablecer</button></div>'+
+    '</div>'+
+  '</div></div>';
+}
+
+/* ---------- Deshacer: aviso con botón durante unos segundos ---------- */
+var undoTimer = null;
+function avisoDeshacer(msg, deshacer){
+  const t = document.getElementById('toast');
+  t.innerHTML = esc(msg) + '<button class="toast-undo" type="button">Deshacer</button>';
+  t.classList.add('con-undo');
+  t.classList.toggle('alt');
+  t.classList.add('show');
+  clearTimeout(toastTimer); clearTimeout(undoTimer);
+  const cerrar = function(){ t.classList.remove('show'); t.classList.remove('con-undo'); };
+  t.querySelector('.toast-undo').addEventListener('click', function(){
+    clearTimeout(undoTimer); cerrar();
+    Promise.resolve(deshacer()).then(function(){ setTimeout(function(){ showToast('Listo, se deshizo'); }, 350); })
+      .catch(function(err){ showToast('No se pudo deshacer: ' + err.message); });
+  });
+  undoTimer = setTimeout(cerrar, 6000);
 }
 
 /* ============================================================
@@ -5080,7 +5311,7 @@ function abrirFicha(uid){
     const g = document.getElementById('fichaGaleria');
     if(!g || !fotos.length) return;
     g.innerHTML = '<h4 style="margin-bottom:8px;">La finca</h4><div class="pf-galeria">'+fotos.map(function(f, i){
-      return '<a class="gal-item" href="'+esc(f)+'" target="_blank" rel="noopener"><img src="'+esc(f)+'" alt="Foto '+(i+1)+' de '+esc(nombre)+'"></a>';
+      return '<button type="button" class="gal-item" style="padding:0; cursor:zoom-in;" data-ver-img="'+esc(f)+'"><img src="'+esc(f)+'" alt="Foto '+(i+1)+' de '+esc(nombre)+'"></button>';
     }).join('')+'</div>';
   });
 }
@@ -5747,11 +5978,12 @@ function descripcionCot(c){
     (c.origen === 'cosecha' ? ' (reserva para ' + MESES[c.mes] + ')' : '');
 }
 /* Envía un mensaje de texto al chat con otra persona (crea la conversación si hace falta). */
-function enviarTextoA(otroUid, texto){
+function enviarTextoA(otroUid, texto, adjunto){
   const id = convIdCon(otroUid);
   const ref = db.collection('conversaciones').doc(id);
   const ahora = FieldValue.serverTimestamp();
   const resumen = { ultimoMensaje: texto.slice(0, 120), ultimoAutorUid: currentUser.uid, actualizado: ahora };
+  resumen[currentUser.rol === 'mayorista' ? 'escribiendoMayorista' : 'escribiendoProductor'] = 0;
   resumen[campoVisto()] = ahora;
   const batch = db.batch();
   const nueva = !S.convs.some(function(c){ return c.id === id; });
@@ -5770,13 +6002,15 @@ function enviarTextoA(otroUid, texto){
       creado: ahora
     }, resumen));
   }
-  batch.set(ref.collection('mensajes').doc(), {
+  const msg = {
     autorUid: currentUser.uid,
     autorNombre: currentUser.entidad || currentUser.nombre,
     rol: currentUser.rol,
     texto: texto.slice(0, 500),
     fecha: ahora
-  });
+  };
+  if(adjunto) msg.adjunto = adjunto;
+  batch.set(ref.collection('mensajes').doc(), msg);
   return batch.commit().then(function(){
     if(nueva) registrar('Chat iniciado', 'Con ' + (nombreContacto(contactoPorUid(otroUid)) || 'un contacto'));
   });
@@ -6466,6 +6700,35 @@ function bindMainEvents(){
     e.preventDefault();
     enviarMensajeDirecto(document.getElementById('convInput'));
   });
+  const convInput = document.getElementById('convInput');
+  if(convInput) convInput.addEventListener('input', avisarEscribiendo);
+  const convAdjunto = document.getElementById('convAdjunto');
+  if(convAdjunto) convAdjunto.addEventListener('change', function(){
+    const f = convAdjunto.files && convAdjunto.files[0];
+    convAdjunto.value = '';
+    if(!f || !convOtro) return;
+    const otro = convOtro;
+    let tarea;
+    if(/^image\//.test(f.type)){
+      showToast('Preparando la foto…');
+      tarea = procesarFoto(f, { tamanos: [1000, 800, 640], limite: 200000 }).then(function(data){ return { tipo: 'imagen', nombre: f.name.slice(0, 80), data: data }; });
+    } else if(f.type === 'application/pdf'){
+      if(f.size > 500 * 1024){ showToast('El PDF pesa más de 500 KB. Probá con uno más liviano.'); return; }
+      tarea = new Promise(function(ok, mal){
+        const r = new FileReader();
+        r.onload = function(){ ok({ tipo: 'pdf', nombre: f.name.slice(0, 80), data: r.result }); };
+        r.onerror = function(){ mal(new Error('No se pudo leer el PDF')); };
+        r.readAsDataURL(f);
+      });
+    } else { showToast('Solo se pueden adjuntar fotos o PDF'); return; }
+    tarea.then(function(adj){
+      const leyenda = (document.getElementById('convInput') || {}).value || '';
+      const texto = leyenda.trim() ? leyenda.trim() : '📎 ' + (adj.tipo === 'imagen' ? 'Foto' : adj.nombre);
+      if(leyenda.trim()) document.getElementById('convInput').value = '';
+      return enviarTextoA(otro, texto, adj);
+    }).then(function(){ showToast('Archivo enviado'); })
+      .catch(function(err){ showToast(err.code === 'permission-denied' ? 'Firestore rechazó el archivo: publicá las reglas nuevas.' : (err.message || 'No se pudo enviar el archivo')); });
+  });
   main.querySelectorAll('[data-map]').forEach(function(b){
     b.addEventListener('click', function(){
       const otro = mapaAbierto !== b.dataset.map;
@@ -6671,6 +6934,48 @@ function bindMainEvents(){
     });
   }
 
+  // Configuración
+  main.querySelectorAll('[data-pref]').forEach(function(inp){
+    inp.addEventListener('change', function(){ guardarPref(inp.dataset.pref, inp.checked); });
+  });
+  main.querySelectorAll('[data-letra]').forEach(function(b){
+    b.addEventListener('click', function(){ guardarPref('letra', Number(b.dataset.letra)); renderMain(); });
+  });
+  main.querySelectorAll('[data-tema]').forEach(function(b){
+    b.addEventListener('click', function(){
+      let t = b.dataset.tema;
+      try { if(t === 'sistema') localStorage.removeItem('cc-theme'); else localStorage.setItem('cc-theme', t); } catch(_){}
+      if(t === 'sistema') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+      renderMain();
+    });
+  });
+  main.querySelectorAll('[data-ir]').forEach(function(b){
+    b.addEventListener('click', function(){ view[currentUser.rol] = b.dataset.ir; renderSubnav(); renderMain(); });
+  });
+  const cfgClave = document.getElementById('cfgClave');
+  if(cfgClave) cfgClave.addEventListener('click', function(){
+    auth.sendPasswordResetEmail(currentUser.email).then(function(){ showToast('Te mandamos un correo a ' + currentUser.email + ' para cambiar la contraseña'); })
+      .catch(function(err){ showToast('No se pudo enviar el correo: ' + err.message); });
+  });
+  const cfgExportar = document.getElementById('cfgExportar');
+  if(cfgExportar) cfgExportar.addEventListener('click', function(){
+    const perfil = Object.assign({}, currentUser); delete perfil.foto;
+    const campo = currentUser.rol === 'mayorista' ? 'mayoristaUid' : (currentUser.rol === 'productor' ? 'productorUid' : 'transportistaUid');
+    const datos = { exportado: new Date().toISOString(), perfil: perfil,
+      pedidos: S.orders.filter(function(o){ return o[campo] === currentUser.uid; }).map(function(o){ return { numero: o.numero, cantidad: o.qty, unidad: unitOf(o), precio: o.price, estado: o.cancelado ? 'Cancelado' : STATUSES[o.statusIdx], fecha: fechaCorta(o.createdAt) }; }) };
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' }));
+    a.download = 'CitrusCode_mis_datos.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    registrar('Datos exportados', '');
+  });
+  const cfgReset = document.getElementById('cfgReset');
+  if(cfgReset) cfgReset.addEventListener('click', function(){
+    try { localStorage.removeItem('cc-prefs'); } catch(_){}
+    aplicarPrefs(); renderMain(); showToast('Preferencias restablecidas');
+  });
+
   // Licitaciones
   const licPublicar = document.getElementById('licPublicar');
   if(licPublicar){
@@ -6737,7 +7042,8 @@ function bindMainEvents(){
   main.querySelectorAll('[data-cancelar-licit]').forEach(function(b){
     b.addEventListener('click', function(){
       if(!confirm('¿Cancelar esta licitación?')) return;
-      db.collection('licitaciones').doc(b.dataset.cancelarLicit).update({ estado: 'cancelada' }).then(function(){ showToast('Licitación cancelada'); }).catch(function(err){ showToast(err.message); });
+      const idLi = b.dataset.cancelarLicit;
+      db.collection('licitaciones').doc(idLi).update({ estado: 'cancelada' }).then(function(){ avisoDeshacer('Licitación cancelada', function(){ return db.collection('licitaciones').doc(idLi).update({ estado: 'abierta' }); }); }).catch(function(err){ showToast(err.message); });
     });
   });
 
@@ -6812,8 +7118,9 @@ function bindMainEvents(){
   }
   main.querySelectorAll('[data-fin-oferta]').forEach(function(b){
     b.addEventListener('click', function(){
+      const lo = lotById(b.dataset.finOferta), anterior = lo && lo.oferta;
       db.collection('lotes').doc(b.dataset.finOferta).update({ oferta: firebase.firestore.FieldValue.delete() })
-        .then(function(){ showToast('Oferta terminada'); })
+        .then(function(){ avisoDeshacer('Oferta terminada', function(){ return db.collection('lotes').doc(lo.id).update({ oferta: anterior }); }); })
         .catch(function(err){ showToast(err.message); });
     });
   });
@@ -6871,8 +7178,9 @@ function bindMainEvents(){
       const listas = (currentUser.listas || []).slice();
       const l = listas[i];
       if(!l || !confirm('¿Borrar la lista «' + l.nombre + '»?')) return;
+      const previas = (currentUser.listas || []).slice();
       listas.splice(i, 1);
-      guardarListas(listas, 'Lista borrada');
+      guardarListas(listas, 'Lista borrada').then(function(){ avisoDeshacer('Lista «' + l.nombre + '» borrada', function(){ return guardarListas(previas, 'Lista recuperada'); }); });
     });
   }
 
@@ -6939,6 +7247,7 @@ function bindMainEvents(){
   }
   llenarClima(main);
 
+  main.querySelectorAll('[data-ir-config]').forEach(function(b){ b.addEventListener('click', function(){ view[currentUser.rol] = 'config'; renderSubnav(); renderMain(); }); });
   const pfFoto = document.getElementById('pfFoto');
   if(pfFoto){
     pfFoto.addEventListener('change', function(){
@@ -6959,9 +7268,10 @@ function bindMainEvents(){
   const pfQuitarFoto = document.getElementById('pfQuitarFoto');
   if(pfQuitarFoto){
     pfQuitarFoto.addEventListener('click', function(){
+      const fotoPrevia = currentUser.foto;
       db.collection('usuarios').doc(currentUser.uid).update({ foto: firebase.firestore.FieldValue.delete() }).then(function(){
         delete currentUser.foto;
-        showToast('Foto quitada');
+        avisoDeshacer('Foto quitada', function(){ return db.collection('usuarios').doc(currentUser.uid).update({ foto: fotoPrevia }).then(function(){ currentUser.foto = fotoPrevia; renderSideUser(); renderMain(); }); });
         renderSideUser(); renderMain();
       }).catch(function(err){ showToast('No se pudo quitar: ' + err.message); });
     });
@@ -6988,9 +7298,10 @@ function bindMainEvents(){
   }
   main.querySelectorAll('[data-quitar-galeria]').forEach(function(b){
     b.addEventListener('click', function(){
-      const fotos = (galerias[currentUser.uid] || []).slice();
+      const previas = (galerias[currentUser.uid] || []).slice();
+      const fotos = previas.slice();
       fotos.splice(parseInt(b.dataset.quitarGaleria, 10), 1);
-      guardarGaleria(fotos).then(function(){ showToast('Foto quitada'); }).catch(function(err){ showToast(err.message); });
+      guardarGaleria(fotos).then(function(){ avisoDeshacer('Foto quitada de la galería', function(){ return guardarGaleria(previas); }); }).catch(function(err){ showToast(err.message); });
     });
   });
 
@@ -7133,8 +7444,12 @@ function bindMainEvents(){
       if(!window.confirm('¿Eliminar esta publicación? Dejará de verse en el catálogo. Los pedidos ya realizados sobre este producto se conservan.')) return;
       b.disabled = true;
       const ld = lotById(b.dataset.deleteLot);
-      guardar(db.collection('lotes').doc(b.dataset.deleteLot).update({ archivado: true }))
-        .then(function(){ showToast('Publicación eliminada'); registrar('Publicación eliminada', ld ? ld.name : ''); })
+      const idL = b.dataset.deleteLot;
+      guardar(db.collection('lotes').doc(idL).update({ archivado: true }))
+        .then(function(){
+          registrar('Publicación eliminada', ld ? ld.name : '');
+          avisoDeshacer('Publicación eliminada', function(){ return db.collection('lotes').doc(idL).update({ archivado: false }); });
+        })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });
@@ -7298,11 +7613,15 @@ function bindMainEvents(){
 
   main.querySelectorAll('[data-cancel-order]').forEach(function(b){
     b.addEventListener('click', function(){
-      if(!window.confirm('¿Seguro que querés cancelar este pedido? Esta acción no se puede deshacer.')) return;
+      if(!window.confirm('¿Seguro que querés cancelar este pedido?')) return;
       b.disabled = true;
       const oc = S.orders.find(function(x){ return x.id === b.dataset.cancelOrder; });
-      guardar(db.collection('pedidos').doc(b.dataset.cancelOrder).update({ cancelado: true }))
-        .then(function(){ showToast('Pedido cancelado'); registrar('Pedido cancelado', oc ? 'CC-' + oc.numero : ''); })
+      const id = b.dataset.cancelOrder;
+      guardar(db.collection('pedidos').doc(id).update({ cancelado: true }))
+        .then(function(){
+          registrar('Pedido cancelado', oc ? 'CC-' + oc.numero : '');
+          avisoDeshacer('Pedido cancelado', function(){ return db.collection('pedidos').doc(id).update({ cancelado: false }).then(function(){ registrar('Cancelación deshecha', oc ? 'CC-' + oc.numero : ''); }); });
+        })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });
@@ -7311,8 +7630,9 @@ function bindMainEvents(){
     b.addEventListener('click', function(){
       if(!window.confirm('¿Quitar este pedido de tu lista? Solo se oculta de tu vista, el registro sigue guardado en el sistema.')) return;
       b.disabled = true;
-      guardar(db.collection('pedidos').doc(b.dataset.hideOrder).update({ ocultoMayorista: true }))
-        .then(function(){ showToast('Pedido quitado de la lista'); })
+      const idH = b.dataset.hideOrder;
+      guardar(db.collection('pedidos').doc(idH).update({ ocultoMayorista: true }))
+        .then(function(){ avisoDeshacer('Pedido quitado de la lista', function(){ return db.collection('pedidos').doc(idH).update({ ocultoMayorista: false }); }); })
         .catch(function(err){ showToast('Error: ' + err.message); b.disabled = false; });
     });
   });

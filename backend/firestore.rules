@@ -215,7 +215,7 @@ service cloud.firestore {
       // de leido; las partes y los nombres quedan fijos.
       allow update: if isSignedIn() && activo() && request.auth.uid in resource.data.participantes
                     && request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['ultimoMensaje', 'ultimoAutorUid', 'actualizado', 'vistoMayorista', 'vistoProductor'])
+                         .hasOnly(['ultimoMensaje', 'ultimoAutorUid', 'actualizado', 'vistoMayorista', 'vistoProductor', 'escribiendoMayorista', 'escribiendoProductor'])
                     && (request.resource.data.ultimoAutorUid == resource.data.ultimoAutorUid
                         || request.resource.data.ultimoAutorUid == request.auth.uid);
       allow delete: if false;
@@ -230,8 +230,17 @@ service cloud.firestore {
                       && request.resource.data.autorUid == request.auth.uid
                       && request.resource.data.texto is string
                       && request.resource.data.texto.size() > 0
-                      && request.resource.data.texto.size() <= 500;
-        allow update, delete: if false;
+                      && request.resource.data.texto.size() <= 500
+                      // Adjunto opcional: foto o PDF chico guardado dentro del mensaje.
+                      && (!('adjunto' in request.resource.data)
+                          || (request.resource.data.adjunto.data is string
+                              && request.resource.data.adjunto.data.size() <= 750000
+                              && request.resource.data.adjunto.tipo in ['imagen', 'pdf']));
+        // Cada parte puede poner o sacar su reaccion con emoji.
+        allow update: if isSignedIn() && activo()
+                      && request.auth.uid in convId.split('_')
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reacciones']);
+        allow delete: if false;
       }
     }
 
