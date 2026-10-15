@@ -1193,6 +1193,46 @@
   @media(prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
   }
+
+  /* ============================================================
+     PERFIL Y FICHA PÚBLICA DEL PRODUCTOR
+     ============================================================ */
+  .av-foto{padding:0 !important; overflow:hidden; background:var(--surface) !important;}
+  .av-foto img{width:100%; height:100%; object-fit:cover; display:block;}
+  .pf-cabecera{display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:18px;}
+  .pf-avatar{width:96px; height:96px; border-radius:24px; display:grid; place-items:center; font-family:'Poppins',sans-serif; font-weight:800; font-size:1.8rem; color:#22301E; background:linear-gradient(135deg,var(--c-limon),var(--c-verde-claro)); box-shadow:var(--sombra-sm); flex:none;}
+  .pf-cabecera b{display:block; font-size:1.1rem;}
+  .pf-cabecera small{color:var(--texto-suave);}
+  .pf-cabecera .order-actions{margin-top:10px;}
+  .pf-seccion{margin:22px 0 10px; font-size:.95rem;}
+  .pf-seccion small{display:block; font-weight:400; color:var(--texto-suave); font-size:.78rem; margin-top:2px;}
+  .pf-certs{display:flex; flex-wrap:wrap; gap:8px;}
+  .pf-certs label{display:flex; align-items:center; gap:6px; border:1px solid var(--borde); border-radius:20px; padding:6px 12px; font-size:.8rem; cursor:pointer; background:var(--surface);}
+  .pf-certs input{width:auto !important; padding:0 !important; accent-color:var(--c-verde-claro);}
+  .pf-galeria{display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;}
+  .pf-galeria .gal-item{position:relative; aspect-ratio:4/3; border-radius:12px; overflow:hidden; border:1px solid var(--borde); background:var(--surface-2);}
+  .pf-galeria .gal-item img{width:100%; height:100%; object-fit:cover; display:block;}
+  .pf-galeria .gal-quitar{position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:8px; border:0; background:rgba(10,18,12,.7); color:#fff; cursor:pointer;}
+  .pf-galeria .gal-add{display:grid; place-items:center; text-align:center; font-size:.78rem; color:var(--texto-suave); cursor:pointer; border-style:dashed;}
+  .btn-ficha{border:0; background:none; padding:0; color:inherit; font:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:5px; text-decoration:underline dotted; text-underline-offset:3px;}
+  .btn-ficha:hover{color:var(--acento);}
+  .mini-av{width:18px; height:18px; border-radius:6px; flex:none;}
+  .ficha-card{max-width:720px; max-height:calc(100vh - 32px); overflow-y:auto;}
+  .ficha-top{display:flex; gap:14px; align-items:center;}
+  .ficha-top .pf-avatar{width:72px; height:72px; font-size:1.4rem; border-radius:18px;}
+  .ficha-top h3{margin:0; font-size:1.15rem;}
+  .ficha-top small{color:var(--texto-suave); display:block;}
+  .ficha-desc{white-space:pre-wrap; line-height:1.55; font-size:.88rem; margin:0;}
+  .ficha-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .ficha-chips span{background:var(--surface-2); border:1px solid var(--borde); border-radius:20px; padding:4px 10px; font-size:.76rem;}
+  .ficha-chips .sello{background:var(--limon-bg); border-color:var(--limon-borde); font-weight:600;}
+  .ficha-redes{display:flex; flex-wrap:wrap; gap:8px;}
+  .ficha-redes a{font-size:.8rem;}
+  .ficha-card h4{margin:4px 0 0; font-size:.9rem;}
+  .ficha-mapa{width:100%; height:200px; border:0; border-radius:14px; display:block;}
+  .ficha-lotes{display:grid; gap:6px;}
+  .ficha-lotes div{display:flex; justify-content:space-between; gap:10px; font-size:.84rem; border-bottom:1px solid var(--borde); padding:6px 0;}
+  .ficha-lotes small{color:var(--texto-suave);}
 </style>
 </head>
 <body>
@@ -1518,7 +1558,8 @@ function fotoDe(p){ return p.fotoPropia || p.imagenUrl || urlFotoIA(p.name, p.ca
 
 /* Foto subida por el productor: se achica en el navegador (máx. ~900 px, JPEG)
    para que pese alrededor de 100 KB y entre cómodamente en el documento del lote. */
-function procesarFoto(file){
+function procesarFoto(file, op){
+  op = op || {};
   return new Promise(function(ok, mal){
     if(!file) return mal(new Error('No elegiste ninguna imagen'));
     if(!/^image\//.test(file.type)) return mal(new Error('El archivo no es una imagen'));
@@ -1527,16 +1568,20 @@ function procesarFoto(file){
     const img = new Image();
     img.onload = function(){
       URL.revokeObjectURL(url);
-      const LIMITE = 190000;   // caracteres del data URL (~140 KB)
+      const LIMITE = op.limite || 190000;   // caracteres del data URL (~140 KB)
       let data = '';
-      [900, 720, 560].some(function(max){
-        const esc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-        const w = Math.round(img.naturalWidth * esc), h = Math.round(img.naturalHeight * esc);
+      // Con op.cuadrada se recorta al centro (foto de perfil o logo).
+      const lado = Math.min(img.naturalWidth, img.naturalHeight);
+      const sx = op.cuadrada ? (img.naturalWidth - lado) / 2 : 0, sy = op.cuadrada ? (img.naturalHeight - lado) / 2 : 0;
+      const sw = op.cuadrada ? lado : img.naturalWidth, sh = op.cuadrada ? lado : img.naturalHeight;
+      (op.tamanos || [900, 720, 560]).some(function(max){
+        const esc = Math.min(1, max / Math.max(sw, sh));
+        const w = Math.round(sw * esc), h = Math.round(sh * esc);
         const c = document.createElement('canvas');
         c.width = w; c.height = h;
         const ctx = c.getContext('2d');
         ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(img, 0, 0, w, h);
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
         for(let q = 0.82; q >= 0.5; q -= 0.08){
           data = c.toDataURL('image/jpeg', q);
           if(data.length <= LIMITE) return true;
@@ -2511,7 +2556,7 @@ function suscribirChats(){
   unsubContactos = db.collection('usuarios').where('rol','==',otroRol).onSnapshot(function(snap){
     S.contactos = snap.docs.map(function(d){ return Object.assign({uid:d.id}, d.data()); })
       .filter(function(u){ return u.uid !== currentUser.uid; });
-    if(view[currentUser.rol] === 'chats') renderMain();
+    if(view[currentUser.rol] === 'chats' || view[currentUser.rol] === 'catalogo') renderMain();
   }, function(err){ console.warn('[CitrusCode] Contactos no disponibles:', err.message); });
 
   unsubConvs = db.collection('conversaciones').where('participantes','array-contains',currentUser.uid).onSnapshot(function(snap){
@@ -2652,7 +2697,7 @@ function renderSideUser(){
   const iniciales = String(currentUser.nombre || '?').trim().split(/\s+/).slice(0,2).map(function(p){ return p.charAt(0); }).join('').toUpperCase();
   const roles = { mayorista:'Mayorista', productor:'Productor', admin:'Administración' };
   el.innerHTML =
-    '<div class="su-avatar">'+esc(iniciales)+'</div>'+
+    (currentUser.foto ? '<div class="su-avatar av-foto"><img src="'+esc(currentUser.foto)+'" alt=""></div>' : '<div class="su-avatar">'+esc(iniciales)+'</div>')+
     '<div class="su-hola">'+saludo+',</div>'+
     '<div class="su-name">'+esc(currentUser.nombre)+'</div>'+
     (currentUser.entidad ? '<div class="su-ent">'+esc(currentUser.entidad)+'</div>' : '')+
@@ -2731,7 +2776,7 @@ function renderMain(){
   // Los formularios marcados con data-keep conservan lo cargado entre redibujos
   // (llegan mensajes o datos nuevos mientras el usuario completa el formulario).
   const guardados = {};
-  main.querySelectorAll('[data-keep] input[id], [data-keep] select[id]').forEach(function(el){ guardados[el.id] = el.value; });
+  main.querySelectorAll('[data-keep] input[id]:not([type=file]), [data-keep] select[id], [data-keep] textarea[id]').forEach(function(el){ guardados[el.id] = el.type === 'checkbox' ? el.checked : el.value; });
 
   // Las animaciones de entrada corren solo al cambiar de sección.
   const clave = currentUser.rol + ':' + view[currentUser.rol];
@@ -2793,8 +2838,9 @@ function renderMain(){
     else main.innerHTML = viewAdminMedida();
   }
   if(mismaVista){
-    main.querySelectorAll('[data-keep] input[id], [data-keep] select[id]').forEach(function(el){
+    main.querySelectorAll('[data-keep] input[id]:not([type=file]), [data-keep] select[id], [data-keep] textarea[id]').forEach(function(el){
       if(guardados[el.id] === undefined) return;
+      if(el.type === 'checkbox'){ el.checked = guardados[el.id]; return; }
       if(el.tagName === 'SELECT' && !Array.prototype.some.call(el.options, function(o){ return o.value === guardados[el.id]; })) return;
       el.value = guardados[el.id];
     });
@@ -3050,7 +3096,8 @@ function viewMayoristaCatalogo(){
       '</div>'+
       '<div class="product-info">'+
         '<h4>'+esc(p.name)+'</h4>'+
-        '<div class="origin">'+icono('ubicacion')+esc(p.productorNombre)+
+        '<div class="origin">'+(function(){ const pu = contactoPorUid(p.productorUid); return pu && pu.foto ? avatarDe(pu, '', 'mini-av') : icono('ubicacion'); })()+
+          '<button class="btn-ficha" data-ficha="'+esc(p.productorUid)+'" title="Ver la ficha de '+esc(p.productorNombre)+'">'+esc(p.productorNombre)+'</button>'+
           (rep[p.productorUid] && rep[p.productorUid].n ? '<span class="origin-rate" title="Calificación promedio del productor">'+estrellas(rep[p.productorUid].prom, 'sm')+' '+fmtProm(rep[p.productorUid].prom)+' <small>('+rep[p.productorUid].n+')</small></span>' : '')+
           '<button class="btn-contactar" data-contactar="'+esc(p.productorUid)+'" title="Escribirle a '+esc(p.productorNombre)+'">💬 Contactar</button>'+
           '<button class="btn-fav'+(esFavorito(p.id) ? ' on' : '')+'" data-fav="'+p.id+'" title="'+(esFavorito(p.id) ? 'Quitar de favoritos' : 'Agregar a favoritos y avisarme si baja el precio')+'" aria-label="Favorito">'+(esFavorito(p.id) ? '♥' : '♡')+'</button>'+
@@ -3385,6 +3432,15 @@ function horaCorta(ts){
 function inicialesDe(nombre){
   return String(nombre || '?').trim().split(/\s+/).slice(0, 2).map(function(w){ return w.charAt(0); }).join('').toUpperCase() || '?';
 }
+/* Avatar: la foto o logo de la cuenta si la subió; si no, sus iniciales. */
+function avatarDe(u, nombre, clase){
+  if(u && u.foto) return '<span class="'+clase+' av-foto"><img src="'+esc(u.foto)+'" alt=""></span>';
+  return '<span class="'+clase+'">'+esc(inicialesDe(nombre))+'</span>';
+}
+function perfilDe(uid){
+  if(currentUser && uid === currentUser.uid) return currentUser;
+  return contactoPorUid(uid) || S.users.find(function(u){ return u.uid === uid; }) || null;
+}
 function viewChats(){
   const esMay = currentUser.rol === 'mayorista';
   const otroRol = esMay ? 'productor' : 'mayorista';
@@ -3414,7 +3470,7 @@ function viewChats(){
     const nueva = convNoLeida(c);
     const prev = (c.ultimoAutorUid === currentUser.uid ? 'Vos: ' : '') + (c.ultimoMensaje || '');
     return '<button class="conv-item'+(c.id === convAbierta ? ' activa' : '')+(nueva ? ' nueva' : '')+'" data-conv-otro="'+esc(otroUid)+'">'+
-      '<span class="conv-av">'+esc(inicialesDe(nombre))+'</span>'+
+      avatarDe(contactoPorUid(otroUid), nombre, 'conv-av')+
       '<span class="conv-txt"><span class="conv-top"><span class="conv-nom">'+esc(nombre)+'</span><span class="conv-hora">'+horaCorta(c.actualizado)+'</span></span>'+
         '<span class="conv-prev">'+esc(prev)+'</span></span>'+
       (nueva ? '<span class="conv-dot" aria-label="Mensajes sin leer"></span>' : '')+
@@ -3439,8 +3495,8 @@ function viewChats(){
     }
     panel = '<div class="chats-head">'+
         '<button class="btn btn-ghost btn-sm chats-volver" id="chatsVolver" type="button" aria-label="Volver a la lista">←</button>'+
-        '<span class="conv-av">'+esc(inicialesDe(nombre))+'</span>'+
-        '<div><b>'+esc(nombre)+'</b><small>'+(esMay ? 'Productor' : 'Mayorista')+(sub ? ' · '+esc(sub) : '')+'</small></div>'+
+        avatarDe(u, nombre, 'conv-av')+
+        '<div><b>'+(esMay ? '<button class="btn-ficha" data-ficha="'+esc(convOtro)+'" title="Ver la ficha del productor">'+esc(nombre)+'</button>' : esc(nombre))+'</b><small>'+(esMay ? 'Productor' : 'Mayorista')+(sub ? ' · '+esc(sub) : '')+'</small></div>'+
         (esMay ? '<button class="btn btn-sm '+(sigoA(convOtro) ? 'btn-primary' : 'btn-ghost')+' chats-seguir" data-seguir-chat="'+esc(convOtro)+'">'+(sigoA(convOtro) ? '✓ Siguiendo' : '+ Seguir')+'</button>' : '')+
       '</div>'+
       cajaCotizaciones(convOtro)+
@@ -3503,7 +3559,7 @@ function viewRanking(){
     html += '<div class="podio">'+conVotos.slice(0,3).map(function(m, i){
       return '<div class="podio-card p'+(i+1)+(m.uid === currentUser.uid ? ' yo' : '')+'">'+
         '<div class="podio-pos">'+(i+1)+'</div>'+
-        '<div class="podio-name">'+esc(m.nombre)+'</div>'+
+        '<div class="podio-name"><button class="btn-ficha" data-ficha="'+esc(m.uid)+'">'+esc(m.nombre)+'</button></div>'+
         estrellas(m.prom, 'lg')+
         '<div class="podio-prom">'+fmtProm(m.prom)+'</div>'+
         '<div class="podio-n">'+m.n+' calificación'+(m.n>1?'es':'')+'</div>'+
@@ -3517,7 +3573,7 @@ function viewRanking(){
       const yo = m.uid === currentUser.uid;
       return '<div class="rk-row'+(yo ? ' yo' : '')+'">'+
         '<span class="rk-pos">'+(m.puesto || '–')+'</span>'+
-        '<span class="rk-name"><b>'+esc(m.nombre)+(yo ? '<span class="rk-tag">Vos</span>' : '')+'</b>'+
+        '<span class="rk-name"><b><button class="btn-ficha" data-ficha="'+esc(m.uid)+'">'+esc(m.nombre)+'</button>'+(yo ? '<span class="rk-tag">Vos</span>' : '')+'</b>'+
           (m.opiniones.length ? '<small>'+m.opiniones.length+' comentario'+(m.opiniones.length>1?'s':'')+'</small>' : '')+'</span>'+
         (m.n ? estrellas(m.prom) : '<span class="rk-sin">Sin calificaciones aún</span>')+
         '<span class="rk-prom">'+(m.n ? fmtProm(m.prom) : '—')+'</span>'+
@@ -4157,16 +4213,57 @@ function imprimirEtiqueta(o){
 /* ============================================================
    VISTA COMÚN — MI PERFIL
    ============================================================ */
+const CERTIFICACIONES = ['GlobalGAP', 'Orgánico certificado', 'SENASA / RENSPA', 'Buenas Prácticas Agrícolas', 'Comercio justo'];
+const MAX_GALERIA = 4;
+const galerias = {};   // uid -> lista de fotos (se piden recién cuando hacen falta)
+function cargarGaleria(uid){
+  if(galerias[uid]) return Promise.resolve(galerias[uid]);
+  return db.collection('galerias').doc(uid).get().then(function(d){
+    galerias[uid] = (d.exists && Array.isArray(d.data().fotos)) ? d.data().fotos : [];
+    return galerias[uid];
+  }).catch(function(){ return []; });
+}
+function linkInstagram(v){ return 'https://instagram.com/' + encodeURIComponent(v); }
+function linkWhatsapp(v){ const d = String(v).replace(/\D/g, '').replace(/^0/, ''); return 'https://wa.me/' + (d.indexOf('54') === 0 ? d : '549' + d); }
+
 function viewPerfil(){
   const u = currentUser;
   const roleLabel = { mayorista:'Empresa / distribuidora', productor:'Finca o cooperativa', admin:'Área / cargo' };
   const val = function(c){ return esc(u[c] != null ? String(u[c]) : ''); };
   const falta = !u.dni || !u.calle || !u.provincia;
+  const esProd = u.rol === 'productor';
+  const certs = Array.isArray(u.certificaciones) ? u.certificaciones : [];
+
+  let galeriaHtml = '';
+  if(esProd){
+    const fotos = galerias[u.uid];
+    if(!fotos){
+      cargarGaleria(u.uid).then(function(){ if(view[currentUser.rol] === 'perfil') renderMain(); });
+      galeriaHtml = '<p style="font-size:.8rem; color:var(--texto-suave);">Cargando galería…</p>';
+    } else {
+      galeriaHtml = '<div class="pf-galeria">'+
+        fotos.map(function(f, i){
+          return '<div class="gal-item"><img src="'+esc(f)+'" alt="Foto '+(i+1)+' de la finca"><button type="button" class="gal-quitar" data-quitar-galeria="'+i+'" title="Quitar esta foto">✕</button></div>';
+        }).join('')+
+        (fotos.length < MAX_GALERIA ? '<label class="gal-item gal-add">📷<br>Agregar foto<input type="file" accept="image/*" id="pfGaleria" multiple hidden></label>' : '')+
+      '</div>';
+    }
+  }
 
   return '<div class="panel">'+
-    '<div class="panel-head"><h2>Mi perfil</h2><p>Estos datos identifican tu cuenta. La dirección es la que ve el productor para saber adónde enviar tus pedidos.</p></div>'+
+    '<div class="panel-head"><h2>Mi perfil</h2><p>Estos datos identifican tu cuenta. La dirección es la que ve el productor para saber adónde enviar tus pedidos.'+(esProd ? ' Lo que cargues en «Tu finca» lo ven los mayoristas en tu ficha pública.' : '')+'</p></div>'+
     (falta ? '<div class="envio-box envio-falta" style="margin-bottom:18px;">Tu cuenta se creó antes de que pidiéramos estos datos. Completalos para que los productores sepan adónde enviarte la mercadería.</div>' : '')+
-    '<div class="form-card">'+
+    '<div class="form-card" data-keep>'+
+      '<div class="pf-cabecera">'+
+        avatarDe(u, u.entidad || u.nombre, 'pf-avatar')+
+        '<div><b>'+esc(u.entidad || u.nombre)+'</b><small>'+(u.foto ? 'Tu foto o logo aparece en la barra lateral, en los chats'+(esProd ? ', en el catálogo y en tu ficha.' : '.') : 'Subí una foto o el logo de tu empresa.')+'</small>'+
+          '<div class="order-actions">'+
+            '<label class="btn btn-ghost btn-sm" style="cursor:pointer;">📷 '+(u.foto ? 'Cambiar foto o logo' : 'Subir foto o logo')+'<input type="file" accept="image/*" id="pfFoto" hidden></label>'+
+            (u.foto ? '<button type="button" class="btn btn-ghost btn-sm" id="pfQuitarFoto">Quitar</button>' : '')+
+            (esProd ? '<button type="button" class="btn btn-ghost btn-sm" data-ficha="'+esc(u.uid)+'">👁 Ver mi ficha pública</button>' : '')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
       '<div class="form-grid">'+
         '<div class="form-row"><label>Correo electrónico</label><input type="email" value="'+esc(u.email||'')+'" disabled title="El correo no se puede cambiar"></div>'+
         '<div class="form-row"><label>Rol</label><input type="text" value="'+esc(u.rol)+'" disabled title="El rol no se puede cambiar"></div>'+
@@ -4182,6 +4279,27 @@ function viewPerfil(){
           PROVINCIAS.map(function(p){ return '<option value="'+p+'"'+(u.provincia===p?' selected':'')+'>'+p+'</option>'; }).join('')+
         '</select></div>'+
       '</div>'+
+      '<h4 class="pf-seccion">Redes y contacto<small>Opcional. '+(esProd ? 'Aparecen como botones en tu ficha pública.' : 'Las ven los productores con los que trabajás.')+'</small></h4>'+
+      '<div class="form-grid">'+
+        '<div class="form-row"><label>Instagram</label><input type="text" id="pfInstagram" value="'+val('instagram')+'" placeholder="@mifinca" maxlength="40"></div>'+
+        '<div class="form-row"><label>WhatsApp</label><input type="tel" id="pfWhatsapp" value="'+val('whatsapp')+'" placeholder="3815123456" maxlength="20"></div>'+
+        '<div class="form-row" style="grid-column:1/-1;"><label>Sitio web</label><input type="url" id="pfWeb" value="'+val('web')+'" placeholder="https://mifinca.com.ar" maxlength="120"></div>'+
+      '</div>'+
+      (esProd ?
+        '<h4 class="pf-seccion">Tu finca<small>Contale a los mayoristas quiénes son y qué producen.</small></h4>'+
+        '<div class="form-grid">'+
+          '<div class="form-row" style="grid-column:1/-1;"><label>Descripción de la empresa</label><textarea id="pfDescripcion" maxlength="800" placeholder="Somos una finca familiar de Famaillá con tres generaciones en el rubro. Cosechamos a mano y empacamos en el día…">'+val('descripcion')+'</textarea></div>'+
+          '<div class="form-row"><label>Hectáreas cultivadas</label><input type="number" id="pfHectareas" min="0" step="1" value="'+val('hectareas')+'" placeholder="120"></div>'+
+          '<div class="form-row"><label>Años en el rubro</label><input type="number" id="pfAnios" min="0" step="1" value="'+val('aniosRubro')+'" placeholder="25"></div>'+
+          '<div class="form-row" style="grid-column:1/-1;"><label>Variedades que cultiva</label><input type="text" id="pfVariedades" maxlength="200" value="'+val('variedades')+'" placeholder="Limón Eureka, Lisboa, naranja Valencia"></div>'+
+        '</div>'+
+        '<div class="form-row"><label>Certificaciones</label><div class="pf-certs">'+
+          CERTIFICACIONES.map(function(c, i){
+            return '<label><input type="checkbox" id="pfCert'+i+'" value="'+esc(c)+'"'+(certs.indexOf(c) >= 0 ? ' checked' : '')+'> '+esc(c)+'</label>';
+          }).join('')+
+        '</div></div>'+
+        '<div class="form-row"><label>Galería de la finca <small style="font-weight:400; color:var(--texto-suave);">(hasta '+MAX_GALERIA+' fotos, se guardan al elegirlas)</small></label>'+galeriaHtml+'</div>'
+      : '')+
       '<div class="order-actions" style="margin-top:18px;">'+
         '<button class="btn btn-primary btn-sm" id="savePerfilBtn">Guardar cambios</button>'+
         '<button class="btn btn-ghost btn-sm" id="volverPerfilBtn">Volver</button>'+
@@ -4193,6 +4311,89 @@ function viewPerfil(){
     '<p style="font-size:.78rem; color:var(--texto-suave); margin-top:14px;">Para cambiar tu contraseña, cerrá sesión y usá el enlace «¿Olvidaste tu contraseña?» de la pantalla de ingreso.</p>'+
   '</div>';
 }
+
+/* ============================================================
+   FICHA PÚBLICA DEL PRODUCTOR
+   ============================================================ */
+function abrirFicha(uid){
+  cerrarFicha();
+  const u = perfilDe(uid);
+  const rep = reputacion().porUid[uid];
+  const nombre = u ? nombreContacto(u) : ((rep && rep.nombre) || 'Productor');
+  const lugar = u ? [u.ciudad, u.provincia].filter(Boolean).join(', ') : '';
+  const lotes = S.lots.filter(function(l){ return l.productorUid === uid && !l.archivado && l.stock > 0; });
+  const certs = u && Array.isArray(u.certificaciones) ? u.certificaciones : [];
+  const datos = [];
+  if(u && u.hectareas) datos.push(Number(u.hectareas).toLocaleString('es-AR') + ' ha cultivadas');
+  if(u && u.aniosRubro) datos.push(u.aniosRubro + ' años en el rubro');
+  if(u && u.variedades) datos.push(u.variedades);
+  const redes = [];
+  if(u && u.instagram) redes.push('<a class="btn btn-ghost btn-sm" href="'+esc(linkInstagram(u.instagram))+'" target="_blank" rel="noopener">📸 @'+esc(u.instagram)+'</a>');
+  if(u && u.whatsapp) redes.push('<a class="btn btn-ghost btn-sm" href="'+esc(linkWhatsapp(u.whatsapp))+'" target="_blank" rel="noopener">🟢 WhatsApp</a>');
+  if(u && u.web && /^https?:\/\//i.test(u.web)) redes.push('<a class="btn btn-ghost btn-sm" href="'+esc(u.web)+'" target="_blank" rel="noopener">🌐 Sitio web</a>');
+  const esYo = currentUser && uid === currentUser.uid;
+  const tieneMapa = u && typeof u.lat === 'number' && typeof u.lng === 'number';
+
+  const caja = document.createElement('div');
+  caja.className = 'qr-modal';
+  caja.id = 'fichaModal';
+  caja.innerHTML =
+    '<div class="qr-modal-card ficha-card" role="dialog" aria-modal="true" aria-label="Ficha de '+esc(nombre)+'">'+
+      '<div class="qr-modal-head">'+
+        '<div class="ficha-top">'+avatarDe(u, nombre, 'pf-avatar')+
+          '<div><h3>'+esc(nombre)+'</h3>'+
+            '<small>'+(u && u.entidad && u.nombre && u.entidad !== u.nombre ? esc(u.nombre)+' · ' : '')+(lugar ? '📍 '+esc(lugar) : 'Productor')+'</small>'+
+            (rep && rep.n ? '<small>'+estrellas(rep.prom, 'sm')+' '+fmtProm(rep.prom)+' ('+rep.n+' opiniones)'+(rep.puesto ? ' · #'+rep.puesto+' del ranking' : '')+'</small>' : '<small>Todavía sin calificaciones</small>')+
+          '</div>'+
+        '</div>'+
+        '<button type="button" class="qr-cerrar" id="fichaCerrar" aria-label="Cerrar">✕</button>'+
+      '</div>'+
+      (u && u.descripcion ? '<p class="ficha-desc">'+esc(u.descripcion)+'</p>' : (esYo ? '<p class="ficha-desc" style="color:var(--texto-suave);">Todavía no cargaste una descripción. Hacelo desde Mi perfil.</p>' : ''))+
+      (datos.length || certs.length ? '<div class="ficha-chips">'+
+        certs.map(function(c){ return '<span class="sello">✔ '+esc(c)+'</span>'; }).join('')+
+        datos.map(function(d){ return '<span>'+esc(d)+'</span>'; }).join('')+
+      '</div>' : '')+
+      (redes.length ? '<div class="ficha-redes">'+redes.join('')+'</div>' : '')+
+      '<div id="fichaGaleria"></div>'+
+      (tieneMapa ? '<h4>Ubicación</h4><iframe class="ficha-mapa" loading="lazy" title="Ubicación de '+esc(nombre)+'" src="https://www.openstreetmap.org/export/embed.html?bbox='+(u.lng-0.06)+','+(u.lat-0.035)+','+(u.lng+0.06)+','+(u.lat+0.035)+'&layer=mapnik&marker='+u.lat+','+u.lng+'"></iframe>' : '')+
+      '<h4>Publicaciones activas ('+lotes.length+')</h4>'+
+      (lotes.length ? '<div class="ficha-lotes">'+lotes.slice(0, 8).map(function(l){
+        return '<div><span>'+esc(l.name)+' <small>· '+esc(l.cat || '')+'</small></span><span><b>'+money(l.price)+'</b> / '+esc(l.unit)+' <small>· stock '+l.stock.toLocaleString('es-AR')+'</small></span></div>';
+      }).join('')+'</div>' : '<p style="font-size:.82rem; color:var(--texto-suave); margin:0;">No tiene productos publicados en este momento.</p>')+
+      (currentUser && currentUser.rol === 'mayorista' ? '<div class="order-actions"><button type="button" class="btn btn-primary btn-sm" id="fichaContactar">💬 Contactar</button></div>' : '')+
+    '</div>';
+  document.body.appendChild(caja);
+  document.body.classList.add('modal-abierto');
+  caja.addEventListener('click', function(e){ if(e.target === caja) cerrarFicha(); });
+  document.getElementById('fichaCerrar').addEventListener('click', cerrarFicha);
+  const contactar = document.getElementById('fichaContactar');
+  if(contactar) contactar.addEventListener('click', function(){
+    cerrarFicha();
+    view[currentUser.rol] = 'chats';
+    renderSubnav(); renderMain();
+    abrirConversacion(uid);
+  });
+  cargarGaleria(uid).then(function(fotos){
+    const g = document.getElementById('fichaGaleria');
+    if(!g || !fotos.length) return;
+    g.innerHTML = '<h4 style="margin-bottom:8px;">La finca</h4><div class="pf-galeria">'+fotos.map(function(f, i){
+      return '<a class="gal-item" href="'+esc(f)+'" target="_blank" rel="noopener"><img src="'+esc(f)+'" alt="Foto '+(i+1)+' de '+esc(nombre)+'"></a>';
+    }).join('')+'</div>';
+  });
+}
+function cerrarFicha(){
+  const m = document.getElementById('fichaModal');
+  if(!m) return;
+  m.remove();
+  document.body.classList.remove('modal-abierto');
+}
+document.addEventListener('click', function(e){
+  const b = e.target.closest && e.target.closest('[data-ficha]');
+  if(!b || !currentUser) return;
+  e.preventDefault(); e.stopPropagation();
+  abrirFicha(b.dataset.ficha);
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') cerrarFicha(); });
 
 /* ============================================================
    VISTA ADMIN — PADRÓN DE USUARIOS
@@ -5762,6 +5963,61 @@ function bindMainEvents(){
     });
   }
 
+  const pfFoto = document.getElementById('pfFoto');
+  if(pfFoto){
+    pfFoto.addEventListener('change', function(){
+      const f = pfFoto.files && pfFoto.files[0];
+      pfFoto.value = '';
+      if(!f) return;
+      showToast('Procesando la imagen…');
+      procesarFoto(f, { cuadrada: true, tamanos: [320, 256, 200], limite: 60000 }).then(function(data){
+        return db.collection('usuarios').doc(currentUser.uid).update({ foto: data }).then(function(){
+          currentUser.foto = data;
+          registrar('Foto de perfil actualizada', '');
+          showToast('Foto actualizada');
+          renderSideUser(); renderMain();
+        });
+      }).catch(function(err){ showToast(err.code === 'permission-denied' ? 'Firestore rechazó la foto: publicá las reglas nuevas.' : err.message); });
+    });
+  }
+  const pfQuitarFoto = document.getElementById('pfQuitarFoto');
+  if(pfQuitarFoto){
+    pfQuitarFoto.addEventListener('click', function(){
+      db.collection('usuarios').doc(currentUser.uid).update({ foto: firebase.firestore.FieldValue.delete() }).then(function(){
+        delete currentUser.foto;
+        showToast('Foto quitada');
+        renderSideUser(); renderMain();
+      }).catch(function(err){ showToast('No se pudo quitar: ' + err.message); });
+    });
+  }
+  const guardarGaleria = function(fotos){
+    return db.collection('galerias').doc(currentUser.uid).set({ fotos: fotos, actualizado: firebase.firestore.FieldValue.serverTimestamp() }).then(function(){
+      galerias[currentUser.uid] = fotos;
+      renderMain();
+    });
+  };
+  const pfGaleria = document.getElementById('pfGaleria');
+  if(pfGaleria){
+    pfGaleria.addEventListener('change', function(){
+      const actuales = galerias[currentUser.uid] || [];
+      const files = Array.prototype.slice.call(pfGaleria.files || [], 0, MAX_GALERIA - actuales.length);
+      pfGaleria.value = '';
+      if(!files.length) return;
+      showToast('Subiendo ' + files.length + (files.length === 1 ? ' foto…' : ' fotos…'));
+      Promise.all(files.map(function(f){ return procesarFoto(f, { tamanos: [800, 640, 520], limite: 150000 }); })).then(function(nuevas){
+        return guardarGaleria(actuales.concat(nuevas).slice(0, MAX_GALERIA));
+      }).then(function(){ showToast('Galería actualizada'); })
+        .catch(function(err){ showToast(err.code === 'permission-denied' ? 'Firestore rechazó la galería: publicá las reglas nuevas.' : err.message); });
+    });
+  }
+  main.querySelectorAll('[data-quitar-galeria]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const fotos = (galerias[currentUser.uid] || []).slice();
+      fotos.splice(parseInt(b.dataset.quitarGaleria, 10), 1);
+      guardarGaleria(fotos).then(function(){ showToast('Foto quitada'); }).catch(function(err){ showToast(err.message); });
+    });
+  });
+
   const savePerfilBtn = document.getElementById('savePerfilBtn');
   if(savePerfilBtn){
     savePerfilBtn.addEventListener('click', function(){
@@ -5773,17 +6029,33 @@ function bindMainEvents(){
       };
       const error = validarRegistro(datos);
       if(error){ showToast(error); return; }
+      // Redes y datos de la finca (opcionales).
+      const extra = {
+        instagram: val('pfInstagram').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/^@/, '').replace(/[\/?#].*$/, ''),
+        whatsapp: val('pfWhatsapp').replace(/[^\d+]/g, ''),
+        web: val('pfWeb')
+      };
+      if(extra.web && !/^https?:\/\//i.test(extra.web)) extra.web = 'https://' + extra.web;
+      if(extra.instagram && !/^[\w.]{1,30}$/.test(extra.instagram)){ showToast('El usuario de Instagram no es válido'); return; }
+      if(currentUser.rol === 'productor'){
+        extra.descripcion = val('pfDescripcion').slice(0, 800);
+        extra.variedades = val('pfVariedades').slice(0, 200);
+        extra.hectareas = val('pfHectareas') === '' ? null : Math.max(0, Math.round(Number(val('pfHectareas')) || 0));
+        extra.aniosRubro = val('pfAnios') === '' ? null : Math.max(0, Math.round(Number(val('pfAnios')) || 0));
+        extra.certificaciones = CERTIFICACIONES.filter(function(c, i){ const el = document.getElementById('pfCert' + i); return el && el.checked; });
+      }
 
       savePerfilBtn.disabled = true;
       savePerfilBtn.textContent = 'Guardando…';
-      db.collection('usuarios').doc(currentUser.uid).update({
+      db.collection('usuarios').doc(currentUser.uid).update(Object.assign({
         nombre: datos.nombre, entidad: datos.entidad,
         dni: datos.dni.replace(/[.\s-]/g,''), telefono: datos.telefono,
         calle: datos.calle, numero: datos.numero,
         ciudad: datos.ciudad, provincia: datos.provincia
-      }).then(function(){
+      }, extra)).then(function(){
         // Mantenemos la copia local en memoria al día, sin recargar la sesión.
         Object.keys(datos).forEach(function(k){ currentUser[k] = datos[k]; });
+        Object.keys(extra).forEach(function(k){ currentUser[k] = extra[k]; });
         currentUser.dni = datos.dni.replace(/[.\s-]/g,'');
         registrar('Perfil actualizado', direccionDe(datos) || '');
         guardarUbicacion(currentUser.uid, datos).then(function(){ if(view[currentUser.rol] === 'perfil') renderMain(); });

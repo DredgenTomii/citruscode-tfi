@@ -41,6 +41,7 @@ service cloud.firestore {
       allow update: if isSignedIn() && request.auth.uid == uid
                     && request.resource.data.rol == resource.data.rol // el rol no se puede cambiar despues de creado
                     && !request.resource.data.diff(resource.data).affectedKeys().hasAny(camposSuspension())
+                    && fotoPerfilValida()
                     && activo();
       // La administracion suspende o reactiva cuentas de mayoristas y productores (nunca de otro admin
       // ni la propia), tocando solo los campos de la suspension.
@@ -51,6 +52,24 @@ service cloud.firestore {
                     && request.resource.data.get('suspendido', false) is bool
                     && (!('motivoSuspension' in request.resource.data) || request.resource.data.motivoSuspension.size() <= 200);
       allow delete: if false;
+    }
+
+    // Foto o logo del perfil: es un data URL chico (se achica en el navegador a ~40 KB).
+    function fotoPerfilValida() {
+      return !('foto' in request.resource.data)
+             || (request.resource.data.foto is string
+                 && request.resource.data.foto.size() <= 70000
+                 && request.resource.data.foto.matches('^data:image/.*'));
+    }
+
+    // Galeria de fotos de la finca (ficha publica del productor). Va aparte del
+    // perfil para que la lista de contactos no descargue las fotos de todos.
+    match /galerias/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid && activo()
+                   && getRole() == 'productor'
+                   && request.resource.data.fotos is list
+                   && request.resource.data.fotos.size() <= 4;
     }
 
     // Productos publicados por productores.
