@@ -298,6 +298,13 @@
   .step-card p{font-size:.87rem; color:var(--texto-suave);}
   .step-arrow{position:absolute; top:34px; right:-26px; color:var(--borde); font-size:1.4rem;}
   @media(max-width:1000px){.step-arrow{display:none;}}
+  .feat-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px;}
+  .feat-card{background:var(--blanco); border:1px solid var(--borde); border-radius:18px; padding:24px 22px; transition:transform .3s var(--easing), box-shadow .3s;}
+  .feat-card:hover{transform:translateY(-4px); box-shadow:var(--sombra);}
+  .feat-card .fe{font-size:1.6rem; margin-bottom:10px; display:block;}
+  .feat-card h4{font-size:1rem; margin-bottom:6px; color:var(--verde-oscuro);}
+  .feat-card p{font-size:.86rem; color:var(--texto-suave);}
+  .feat-card .rol{display:inline-block; margin-top:10px; font-size:.72rem; font-weight:700; color:var(--verde-med); text-transform:uppercase; letter-spacing:.04em;}
 
   /* ---- CATALOGO ---- */
   .cat-filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;}
@@ -546,7 +553,7 @@
   .btn-ghost:hover{border-color:#D8CB99; color:var(--texto); background:var(--crema-2);}
 
   /* Superficies */
-  .mock-window, .id-card, .market-card, .step-card, .product-card,
+  .mock-window, .id-card, .market-card, .step-card, .feat-card, .product-card,
   .accordion-item, .org-head, table.compare, .flow-item{
     background:var(--blanco); border-color:var(--borde);
   }
@@ -960,6 +967,7 @@
   <nav class="desktop-nav">
     <a href="#inicio">Inicio</a>
     <a href="#empresa">La Empresa</a>
+    <a href="#funciones">Funciones</a>
     <a href="#catalogo">Productos</a>
     <a href="#problematica">Problemática</a>
     <a href="#prototipo">Prototipo</a>
@@ -977,6 +985,7 @@
 <div class="mobile-nav" id="mobileNav">
   <a href="#inicio">Inicio</a>
   <a href="#empresa">La Empresa</a>
+  <a href="#funciones">Funciones de la plataforma</a>
   <a href="#catalogo">Productos y servicios</a>
   <a href="#problematica">Problemática y solución</a>
   <a href="#trazabilidad">Trazabilidad</a>
@@ -1000,6 +1009,7 @@
       <div><span class="dot"></span>Pedidos por volumen mayorista</div>
       <div><span class="dot"></span>Trazabilidad QR de cosecha</div>
       <div><span class="dot"></span>Facturación automática AFIP</div>
+      <div><span class="dot"></span>App para celular y escritorio</div>
     </div>
   </div>
   <div class="hero-visual reveal">
@@ -1195,14 +1205,39 @@
       <div class="step-card reveal">
         <div class="step-num">03</div>
         <h4>Confirmá y trackeá</h4>
-        <p>Cada pedido genera un código QR de trazabilidad que sigue la cosecha desde la finca hasta el empaque y el despacho.</p>
+        <p>Cada pedido genera un código QR de trazabilidad. Un transportista toma el viaje y el estado avanza en cada escaneo, desde la finca hasta tu depósito.</p>
         <div class="step-arrow">→</div>
       </div>
       <div class="step-card reveal">
         <div class="step-num">04</div>
         <h4>Recibí tu factura</h4>
-        <p>La facturación se integra automáticamente vía API con AFIP, sin gestión manual de comprobantes.</p>
+        <p>Al entregarse el pedido se emite la factura sola. Podés pagar al contado o en cuenta corriente a 30 días.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNCIONES DE LA PLATAFORMA -->
+<section id="funciones">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Funciones de la plataforma</div>
+      <h2>Todo lo que hoy hace CitrusCode</h2>
+      <p>El sistema creció de un catálogo con pedidos a una plataforma completa para toda la cadena: productores, mayoristas, transportistas y la administración trabajan sobre los mismos datos en tiempo real.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card reveal"><span class="fe">👤</span><h4>Perfil y ficha del productor</h4><p>Foto o logo, descripción de la finca, hectáreas, variedades, certificaciones, galería y redes. El mayorista lo ve antes de comprar.</p><span class="rol">Productores</span></div>
+      <div class="feat-card reveal"><span class="fe">✅</span><h4>Productores verificados</h4><p>La administración revisa cada finca y le otorga la insignia de verificado, visible en el catálogo y en la ficha.</p><span class="rol">Administración</span></div>
+      <div class="feat-card reveal"><span class="fe">⏱️</span><h4>Ofertas por tiempo limitado</h4><p>El productor pone un descuento con fecha de fin y el catálogo muestra la cuenta regresiva.</p><span class="rol">Productores</span></div>
+      <div class="feat-card reveal"><span class="fe">💬</span><h4>Chat y cotizaciones</h4><p>Mensajes en tiempo real con fotos y PDF, visto, reacciones y cotizaciones con contraoferta dentro del mismo chat.</p><span class="rol">Mayoristas y productores</span></div>
+      <div class="feat-card reveal"><span class="fe">🚚</span><h4>Rol transportista</h4><p>Los transportistas toman viajes disponibles, ven la ruta y el flete estimado y marcan cada etapa escaneando el QR.</p><span class="rol">Transportistas</span></div>
+      <div class="feat-card reveal"><span class="fe">📒</span><h4>Cuenta corriente</h4><p>Pedidos a 30 días, registro de pagos parciales, saldos vencidos y estado de cuenta en PDF.</p><span class="rol">Mayoristas y productores</span></div>
+      <div class="feat-card reveal"><span class="fe">🔎</span><h4>Trazabilidad para el consumidor</h4><p>Cualquiera que escanee el QR de la caja ve el origen del lote, la finca y las fechas, sin crear una cuenta.</p><span class="rol">Público</span></div>
+      <div class="feat-card reveal"><span class="fe">🌦️</span><h4>Clima en la finca</h4><p>Pronóstico de la zona de cada productor para planificar cosecha y despacho.</p><span class="rol">Productores y mayoristas</span></div>
+      <div class="feat-card reveal"><span class="fe">📅</span><h4>Calendario de cosecha</h4><p>Los productores anuncian sus próximas cosechas y los mayoristas reservan volumen por adelantado.</p><span class="rol">Mayoristas y productores</span></div>
+      <div class="feat-card reveal"><span class="fe">🔔</span><h4>Notificaciones</h4><p>Campanita con pedidos nuevos, mensajes, ofertas y alertas de precio y de stock bajo.</p><span class="rol">Todos los roles</span></div>
+      <div class="feat-card reveal"><span class="fe">📶</span><h4>Funciona sin conexión</h4><p>La carga de datos sigue andando sin señal en el campo y se sincroniza sola al volver la red.</p><span class="rol">Productores</span></div>
+      <div class="feat-card reveal"><span class="fe">⚙️</span><h4>Configuración y accesibilidad</h4><p>Modo oscuro, texto grande, alto contraste, menos animaciones, cambio de contraseña y opción de deshacer.</p><span class="rol">Todos los roles</span></div>
     </div>
   </div>
 </section>
@@ -1334,15 +1369,22 @@
     <div class="proto-card reveal">
       <div class="eyebrow" style="color:var(--lima);">Demostración funcional</div>
       <h2>Mirá el sistema en funcionamiento</h2>
-      <p>Construimos un simulador interactivo con los tres roles del sistema —Mayorista, Productor y Administración de CitrusCode— para evidenciar sus funcionalidades principales: pedidos, confirmación, trazabilidad, facturación automática y KPIs de operación.</p>
+      <p>El sistema está publicado y funcionando, con cuatro roles: Mayorista, Productor, Transportista y Administración de CitrusCode. Se usa desde el navegador o con las apps de Android y Windows, todas con la misma cuenta.</p>
       <div class="proto-pills">
         <span>Catálogo y pedidos mayoristas</span>
         <span>Confirmación y trazabilidad QR</span>
         <span>Facturación automática</span>
         <span>Dashboard de KPIs</span>
+        <span>Chat con cotizaciones</span>
+        <span>Rol transportista</span>
+        <span>Cuenta corriente</span>
+        <span>Perfil y productor verificado</span>
+        <span>Ofertas y calendario de cosecha</span>
+        <span>Modo sin conexión</span>
         <span>Kanban de software a medida</span>
       </div>
-      <a href="https://citruscode.netlify.app/" target="_blank" class="btn btn-primary">Abrir el prototipo funcional →</a>
+      <a href="https://citruscode.netlify.app/" target="_blank" class="btn btn-primary">Abrir el sistema →</a>
+      <a href="https://github.com/DredgenTomii/citruscode-tfi/releases/latest" target="_blank" class="btn btn-ghost" style="margin-left:8px;">Descargar las apps</a>
     </div>
   </div>
 </section>

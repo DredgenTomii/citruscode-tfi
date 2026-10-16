@@ -93,36 +93,6 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Licitaciones: el mayorista publica lo que necesita y elige la mejor oferta.
-    match /licitaciones/{id} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && getRole() == 'mayorista' && activo()
-                    && request.resource.data.mayoristaUid == request.auth.uid
-                    && request.resource.data.estado == 'abierta';
-      allow update: if isSignedIn() && activo() && resource.data.mayoristaUid == request.auth.uid
-                    && request.resource.data.mayoristaUid == resource.data.mayoristaUid;
-      allow delete: if false;
-    }
-    // Ofertas a una licitacion: cada productor ve las suyas y el mayorista las que recibio.
-    match /ofertasLicit/{id} {
-      function licit(lid) { return get(/databases/$(database)/documents/licitaciones/$(lid)).data; }
-      allow read: if isSignedIn() && (resource.data.productorUid == request.auth.uid
-                    || resource.data.mayoristaUid == request.auth.uid || getRole() == 'admin');
-      allow create: if isSignedIn() && getRole() == 'productor' && activo()
-                    && request.resource.data.productorUid == request.auth.uid
-                    && licit(request.resource.data.licitacionId).estado == 'abierta'
-                    && licit(request.resource.data.licitacionId).cierre > request.time.toMillis()
-                    && licit(request.resource.data.licitacionId).mayoristaUid == request.resource.data.mayoristaUid
-                    && request.resource.data.precio is number && request.resource.data.precio > 0;
-      allow update: if isSignedIn() && activo() && (
-                      (resource.data.productorUid == request.auth.uid
-                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['precio', 'cantidad', 'comentario', 'actualizado', 'vistaGanadora'])
-                        && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['vistaGanadora'])
-                            || (licit(resource.data.licitacionId).estado == 'abierta' && licit(resource.data.licitacionId).cierre > request.time.toMillis())))
-                      || (resource.data.mayoristaUid == request.auth.uid
-                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado'])));
-      allow delete: if false;
-    }
     // Trazabilidad publica: la lee cualquiera que escanee la caja (sin cuenta).
     // Solo escriben el productor o el transportista del pedido.
     match /trazas/{orderId} {

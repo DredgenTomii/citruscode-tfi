@@ -1272,6 +1272,8 @@
   .campana-item:hover{background:var(--surface-2);}
   .campana-item b{min-width:26px; height:26px; border-radius:8px; background:var(--limon-bg); display:grid; place-items:center; font-size:.78rem;}
   .campana-vacia{padding:14px 8px; font-size:.8rem; color:var(--texto-suave);}
+  .campana-panel{max-height:70vh; overflow-y:auto;}
+  @media(max-width:640px){ .campana-panel{position:fixed; left:12px; right:12px; top:62px; width:auto; max-width:none;} .campana-item{font-size:.86rem; padding:11px 8px;} }
   .flete-box, .listas-box{margin-top:14px; padding-top:12px; border-top:1px dashed var(--borde); font-size:.8rem;}
   .flete-box h5, .listas-box h5{margin:0 0 6px; font-size:.82rem;}
   .flete-linea{display:flex; justify-content:space-between; gap:8px; color:var(--texto-suave);}
@@ -1291,22 +1293,12 @@
   @media (max-width:700px){ .oferta-box .form-grid{grid-template-columns:1fr 1fr;} .clima{grid-template-columns:repeat(4,1fr);} }
 
   /* ============================================================
-     LICITACIONES, TRANSPORTISTA Y CUENTA CORRIENTE
+     TRANSPORTISTA Y CUENTA CORRIENTE
      ============================================================ */
-  .lic-card, .viaje-card, .cc-card{background:var(--surface); border:1px solid var(--borde); border-radius:16px; padding:16px 18px; margin-bottom:12px; box-shadow:var(--sombra-sm);}
-  .lic-top, .viaje-top, .cc-top{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap;}
-  .lic-top h4, .viaje-top h4, .cc-top h4{margin:0; font-size:1rem;}
+  .viaje-card, .cc-card{background:var(--surface); border:1px solid var(--borde); border-radius:16px; padding:16px 18px; margin-bottom:12px; box-shadow:var(--sombra-sm);}
+  .viaje-top, .cc-top{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap;}
+  .viaje-top h4, .cc-top h4{margin:0; font-size:1rem;}
   .lic-meta, .viaje-meta{font-size:.8rem; color:var(--texto-suave); margin-top:4px; line-height:1.5;}
-  .lic-estado{font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px; background:var(--surface-2); border:1px solid var(--borde); white-space:nowrap;}
-  .lic-estado.abierta{background:var(--limon-bg); border-color:var(--limon-borde);}
-  .lic-estado.adjudicada{background:#e3f4e6; border-color:#9fd3a8; color:#1f6b2e;}
-  .lic-ofertas{margin-top:12px; display:grid; gap:6px;}
-  .lic-oferta{display:flex; justify-content:space-between; gap:10px; align-items:center; font-size:.84rem; padding:8px 10px; border-radius:10px; background:var(--surface-2);}
-  .lic-oferta.mejor{outline:2px solid var(--c-limon);}
-  .lic-oferta.ganadora{background:#e3f4e6;}
-  .lic-form{display:grid; grid-template-columns:1fr 1fr 2fr auto; gap:8px; margin-top:12px; align-items:end;}
-  .lic-form input{width:100%; padding:8px 10px; border:1px solid var(--borde); border-radius:10px; background:var(--input-bg); color:var(--texto);}
-  .lic-form label{font-size:.72rem; color:var(--texto-suave); display:block; margin-bottom:3px;}
   .viaje-ruta{display:flex; gap:8px; align-items:center; font-size:.84rem; margin-top:8px; flex-wrap:wrap;}
   .viaje-ruta b{background:var(--surface-2); border-radius:8px; padding:3px 8px; font-weight:600;}
   .transporte-linea{font-size:.78rem; color:var(--texto-suave); margin:6px 0;}
@@ -1316,7 +1308,6 @@
   .cc-num{text-align:right !important; white-space:nowrap;}
   .cc-vencido{color:#d9381e; font-weight:700;}
   .cc-ok{color:#1f6b2e; font-weight:700;}
-  @media (max-width:700px){ .lic-form{grid-template-columns:1fr 1fr;} }
 
   /* Trazabilidad pública (consumidor final) */
   .traza-pub{max-width:640px; margin:30px auto; padding:0 16px;}
@@ -1518,12 +1509,12 @@ function direccionDe(u){
 let currentUser = null;   // {uid, nombre, email, rol, entidad}
 let avisoSuspension = null;   // se muestra en la pantalla de ingreso al cerrar la sesión de una cuenta suspendida
 let unsubYo = null;
-let unsubDenuncias = null, unsubLicit = null, unsubOfLicit = null;
+let unsubDenuncias = null;
 function textoSuspension(d){
   return 'Tu cuenta está suspendida por la administración de CitrusCode' + (d && d.motivoSuspension ? ': ' + d.motivoSuspension : '') +
     '. Tu historial se conserva. Escribinos para revisarlo.';
 }
-let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [], denuncias: [], licitaciones: [], ofertasLicit: [] };
+let S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [], denuncias: [], };
 let califDisponible = true;  // false si Firestore todavía no tiene las reglas de calificaciones
 let editandoLote = null;   // id del lote que se está editando, o null
 let catFilter = 'todos';
@@ -1567,7 +1558,6 @@ function fruitSVG(color){
 /* Íconos de línea (estilo uniforme en toda la interfaz). */
 const ICONOS = {
   config:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68 1.65 1.65 0 0 0 10 3.17V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
-  licitaciones:'<path d="M14 3l7 7"/><path d="M11 6l7 7"/><path d="M12.5 4.5l-6 6 3 3 6-6"/><path d="M8 12l-5 5 3 3 5-5"/><path d="M14 21h7"/>',
   cuenta:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/>',
   misviajes:'<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M6 11l2 2 4-4"/>',
   viajes:'<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
@@ -2727,7 +2717,6 @@ function subscribeData(){
   if(currentUser.rol === 'mayorista' || currentUser.rol === 'productor') suscribirChats();
   if(currentUser.rol === 'transportista') suscribirProductores();
   suscribirExtras();
-  suscribirLicitaciones();
 
   // Si la administración suspende la cuenta mientras está abierta, se cierra la sesión.
   unsubYo = db.collection('usuarios').doc(currentUser.uid).onSnapshot(function(d){
@@ -2850,8 +2839,6 @@ function unsubscribeData(){
   unsubLotes = unsubPedidos = unsubProyectos = unsubUsuarios = unsubCalif = null;
   if(unsubYo){ unsubYo(); unsubYo = null; }
   if(unsubDenuncias){ unsubDenuncias(); unsubDenuncias = null; }
-  if(unsubLicit){ unsubLicit(); unsubLicit = null; }
-  if(unsubOfLicit){ unsubOfLicit(); unsubOfLicit = null; }
   campanaAbierta = false;
   editandoLote = null;
   catFilter = prodFilter = itemFilter = 'todos';
@@ -2871,7 +2858,7 @@ function unsubscribeData(){
   catMapa = false; provFilter = 'todos';
   cotizFormAbierto = false; reservaAbierta = null; cosechaCat = 'todos'; novedadesAvisadas = false;
   bitFiltro = { rol: 'todos', accion: 'todas', q: '' };
-  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [], denuncias: [], licitaciones: [], ofertasLicit: [] };
+  S = { lots: [], orders: [], projects: [], users: [], cart: {}, ratings: [], convs: [], contactos: [], cotizaciones: [], cosechas: [], bitacora: [], programados: [], denuncias: [], };
 }
 
 /* ============================================================
@@ -2974,7 +2961,6 @@ function renderSubnav(){
       {k:'catalogo', label:'Catálogo y nuevo pedido'},
       {k:'pedidos', label:'Mis pedidos', badge: S.orders.filter(function(o){return o.mayoristaUid===currentUser.uid && !o.cancelado && !o.ocultoMayorista;}).length || null},
       {k:'chats', label:'Chats', badge: (chatsNoLeidos() + cotizacionesPorAtender().length) || null},
-      {k:'licitaciones', label:'Licitaciones', badge: licitacionesPorAdjudicar().length || null},
       {k:'cuenta', label:'Cuenta corriente'},
       {k:'cosecha', label:'Calendario de cosecha'},
       {k:'alertas', label:'Seguimiento y alertas', badge: novedades().length || null},
@@ -2992,7 +2978,6 @@ function renderSubnav(){
       {k:'publicaciones', label:'Mis publicaciones', badge: lotesStockBajo().length || null},
       {k:'recibidos', label:'Pedidos recibidos', badge: pendCount || null},
       {k:'chats', label:'Chats', badge: (chatsNoLeidos() + cotizacionesPorAtender().length) || null},
-      {k:'licitaciones', label:'Licitaciones', badge: licitacionesParaOfertar().length || null},
       {k:'cuenta', label:'Cuenta corriente', badge: cuentasVencidas().length || null},
       {k:'cosecha', label:'Calendario de cosecha'},
       {k:'trazabilidad', label:'Trazabilidad de lotes'},
@@ -3089,8 +3074,6 @@ function renderMain(){
     main.innerHTML = viewPrecios();
   } else if(view[currentUser.rol] === 'config'){
     main.innerHTML = viewConfig();
-  } else if(view[currentUser.rol] === 'licitaciones'){
-    main.innerHTML = viewLicitaciones();
   } else if(view[currentUser.rol] === 'cuenta'){
     main.innerHTML = viewCuentaCorriente();
   } else if(currentUser.rol === 'transportista'){
@@ -3821,13 +3804,10 @@ function itemsCampana(){
   if(r === 'mayorista'){
     add(novedades().length, 'novedad(es) de productores que seguís', 'alertas');
     add(ofertasNuevas().length, 'oferta(s) por tiempo limitado en el catálogo', 'catalogo');
-    add(licitacionesPorAdjudicar().length, 'licitación(es) cerrada(s) para elegir ganador', 'licitaciones');
     add(cuentasVencidas().length, 'pedido(s) con pago vencido', 'cuenta');
   } else if(r === 'productor'){
     add(S.orders.filter(function(o){ return o.statusIdx === 0 && !o.cancelado && !o.ocultoProductor && o.productorUid === currentUser.uid; }).length, 'pedido(s) esperando tu confirmación', 'recibidos');
     add(lotesStockBajo().length, 'publicación(es) con stock bajo', 'publicaciones');
-    add(licitacionesParaOfertar().length, 'licitación(es) abiertas para ofertar', 'licitaciones');
-    add(S.ofertasLicit.filter(function(x){ return x.estado === 'ganadora' && !x.vistaGanadora; }).length, 'licitación(es) ganada(s)', 'licitaciones');
     add(cuentasVencidas().length, 'cobro(s) vencido(s)', 'cuenta');
   } else if(r === 'transportista'){
     add(viajesDisponibles().length, 'viaje(s) disponible(s) para tomar', 'viajes');
@@ -3852,6 +3832,9 @@ function actualizarCampana(){
     panel.innerHTML = '<h5>Notificaciones</h5>' + (items.length ? items.map(function(x){
       return '<button class="campana-item" data-campana-ir="'+x.vista+'"><b>'+x.n+'</b><span>'+x.txt+'</span></button>';
     }).join('') : '<div class="campana-vacia">Estás al día. No hay nada nuevo.</div>');
+    // En el celular el panel ocupa el ancho de la pantalla, justo debajo de la campanita.
+    const btn = document.getElementById('campanaBtn');
+    panel.style.top = (campanaAbierta && btn && window.innerWidth <= 640) ? Math.round(btn.getBoundingClientRect().bottom + 8) + 'px' : '';
   }
 }
 document.addEventListener('click', function(e){
@@ -4962,113 +4945,6 @@ function avisoDeshacer(msg, deshacer){
       .catch(function(err){ showToast('No se pudo deshacer: ' + err.message); });
   });
   undoTimer = setTimeout(cerrar, 6000);
-}
-
-/* ============================================================
-   LICITACIONES — el mayorista pide, los productores ofertan
-   ============================================================ */
-let licitDisponible = true;
-function suscribirLicitaciones(){
-  const r = currentUser.rol;
-  if(r === 'transportista') return;
-  const q = r === 'mayorista' ? db.collection('licitaciones').where('mayoristaUid','==',currentUser.uid) : db.collection('licitaciones');
-  unsubLicit = q.onSnapshot(function(snap){
-    S.licitaciones = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); })
-      .sort(function(a, b){ return msDe(b.createdAt) - msDe(a.createdAt); });
-    licitDisponible = true;
-    renderSubnav();
-    if(view[r] === 'licitaciones') renderMain();
-  }, function(err){ licitDisponible = false; console.warn('[CitrusCode] Licitaciones no disponibles:', err.message); });
-  const qo = r === 'admin' ? db.collection('ofertasLicit')
-    : db.collection('ofertasLicit').where(r === 'mayorista' ? 'mayoristaUid' : 'productorUid', '==', currentUser.uid);
-  unsubOfLicit = qo.onSnapshot(function(snap){
-    S.ofertasLicit = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data({ serverTimestamps:'estimate' })); });
-    renderSubnav();
-    if(view[r] === 'licitaciones') renderMain();
-  }, function(err){ console.warn('[CitrusCode] Ofertas de licitación no disponibles:', err.message); });
-}
-function licitAbierta(l){ return l.estado === 'abierta' && l.cierre > Date.now(); }
-function ofertasDeLicit(id){ return S.ofertasLicit.filter(function(o){ return o.licitacionId === id; }).sort(function(a, b){ return a.precio - b.precio; }); }
-function licitacionesPorAdjudicar(){
-  if(!currentUser || currentUser.rol !== 'mayorista') return [];
-  return S.licitaciones.filter(function(l){ return l.estado === 'abierta' && l.cierre <= Date.now() && ofertasDeLicit(l.id).length; });
-}
-function licitacionesParaOfertar(){
-  if(!currentUser || currentUser.rol !== 'productor') return [];
-  return S.licitaciones.filter(function(l){ return licitAbierta(l) && !S.ofertasLicit.some(function(o){ return o.licitacionId === l.id; }); });
-}
-function textoCierre(l){
-  if(l.estado === 'adjudicada') return 'Adjudicada a ' + esc(l.ganadoraNombre || '—');
-  if(l.estado === 'cancelada') return 'Cancelada';
-  if(l.cierre > Date.now()) return 'Cierra en <span data-cuenta="'+l.cierre+'">'+restanteTxt(l.cierre - Date.now())+'</span>';
-  return 'Cerrada · falta elegir ganador';
-}
-function viewLicitaciones(){
-  const r = currentUser.rol;
-  let html = '<div class="panel"><div class="panel-head"><h2>Licitaciones</h2><p>'+
-    (r === 'mayorista' ? 'Publicá lo que necesitás comprar y recibí ofertas de varios productores. Al cerrar, elegís la mejor y seguís por el chat.'
-      : r === 'productor' ? 'Pedidos que publicaron los mayoristas. Ofertá tu precio antes del cierre: cada mayorista ve solo las ofertas que recibió.'
-      : 'Todas las licitaciones del marketplace y sus ofertas.')+'</p></div>';
-  if(!licitDisponible) html += '<div class="envio-box" style="margin-bottom:16px;"><b>Falta un paso de configuración</b>Publicá las reglas nuevas de Firestore para usar las licitaciones.</div>';
-
-  if(r === 'mayorista'){
-    html += '<div class="form-card" data-keep style="margin-bottom:20px;"><h3 style="margin-top:0;">Nueva licitación</h3><div class="form-grid">'+
-      '<div class="form-row"><label>Producto</label><input type="text" id="licProducto" maxlength="60" placeholder="Limón Eureka calibre 100"></div>'+
-      '<div class="form-row"><label>Categoría</label><select id="licCat">'+['Limon','Naranja','Mandarina','Pomelo','Subproductos'].map(function(c){ return '<option>'+c+'</option>'; }).join('')+'</select></div>'+
-      '<div class="form-row"><label>Cantidad</label><input type="number" id="licCantidad" min="1" step="1" placeholder="20000"></div>'+
-      '<div class="form-row"><label>Unidad</label><select id="licUnit">'+UNIDADES.map(function(u){ return '<option>'+u+'</option>'; }).join('')+'</select></div>'+
-      '<div class="form-row"><label>Precio máximo por unidad (opcional)</label><input type="number" id="licPrecioMax" min="1" step="1" placeholder="600"></div>'+
-      '<div class="form-row"><label>Recibe ofertas durante</label><select id="licDias"><option value="1">1 día</option><option value="3" selected>3 días</option><option value="7">7 días</option><option value="14">14 días</option></select></div>'+
-      '<div class="form-row"><label>Entrega</label><input type="text" id="licEntrega" maxlength="60" placeholder="Primera semana de noviembre"></div>'+
-      '<div class="form-row"><label>Notas (opcional)</label><input type="text" id="licNotas" maxlength="200" placeholder="Calidad exportación, embalaje en bins"></div>'+
-    '</div><button class="btn btn-primary btn-sm" id="licPublicar" style="margin-top:14px;">Publicar licitación</button></div>';
-  }
-
-  const lista = r === 'productor'
-    ? S.licitaciones.filter(function(l){ return licitAbierta(l) || S.ofertasLicit.some(function(o){ return o.licitacionId === l.id; }); })
-    : S.licitaciones;
-  if(!lista.length){
-    html += '<div class="empty-state"><div class="ee-icon">📣</div>'+(r === 'mayorista' ? 'Todavía no publicaste licitaciones.' : 'No hay licitaciones abiertas en este momento.')+'</div>';
-    return html + '</div>';
-  }
-  html += lista.map(function(l){
-    const ofertas = ofertasDeLicit(l.id);
-    const mia = r === 'productor' ? ofertas.find(function(o){ return o.productorUid === currentUser.uid; }) : null;
-    let cuerpo = '';
-    if(r !== 'productor'){
-      cuerpo = ofertas.length ? '<div class="lic-ofertas">'+ofertas.map(function(o, i){
-        const puedeElegir = r === 'mayorista' && l.estado === 'abierta';
-        return '<div class="lic-oferta'+(o.estado === 'ganadora' ? ' ganadora' : (i === 0 && l.estado === 'abierta' ? ' mejor' : ''))+'">'+
-          '<span><button class="btn-ficha" data-ficha="'+esc(o.productorUid)+'">'+esc(o.productorNombre)+'</button>'+verifDeUid(o.productorUid)+
-            ' · <b>'+money(o.precio)+'</b>/'+esc(l.unit)+' · '+Number(o.cantidad).toLocaleString('es-AR')+' '+esc(l.unit)+
-            (o.comentario ? '<br><small>'+esc(o.comentario)+'</small>' : '')+'</span>'+
-          (o.estado === 'ganadora' ? '<span class="cc-ok">✓ Ganadora</span>' : (puedeElegir ? '<button class="btn btn-primary btn-sm" data-adjudicar="'+o.id+'">Elegir</button>' : ''))+
-        '</div>';
-      }).join('')+'</div>' : '<p class="lic-meta">Todavía no llegaron ofertas.</p>';
-      if(r === 'mayorista' && l.estado === 'abierta') cuerpo += '<div class="order-actions" style="margin-top:10px;"><button class="btn btn-ghost btn-sm cancel-btn" data-cancelar-licit="'+l.id+'">Cancelar licitación</button></div>';
-    } else {
-      if(mia){
-        cuerpo = '<div class="lic-oferta'+(mia.estado === 'ganadora' ? ' ganadora' : '')+'"><span>Tu oferta: <b>'+money(mia.precio)+'</b>/'+esc(l.unit)+' · '+Number(mia.cantidad).toLocaleString('es-AR')+' '+esc(l.unit)+'</span><span>'+
-          (mia.estado === 'ganadora' ? '<span class="cc-ok">🏆 ¡Ganaste! Coordiná por el chat.</span>' : (mia.estado === 'no elegida' ? 'No fue elegida' : 'Esperando el cierre'))+'</span></div>';
-      }
-      if(licitAbierta(l)){
-        cuerpo += '<div class="lic-form" data-keep>'+
-          '<div><label>Precio por '+esc(l.unit)+'</label><input type="number" min="1" step="1" id="licPrecio-'+l.id+'" value="'+(mia ? mia.precio : '')+'"></div>'+
-          '<div><label>Cantidad</label><input type="number" min="1" step="1" id="licCant-'+l.id+'" value="'+(mia ? mia.cantidad : l.cantidad)+'"></div>'+
-          '<div><label>Comentario (opcional)</label><input type="text" maxlength="200" id="licCom-'+l.id+'" value="'+(mia ? esc(mia.comentario || '') : '')+'"></div>'+
-          '<button class="btn btn-primary btn-sm" data-ofertar="'+l.id+'">'+(mia ? 'Actualizar oferta' : 'Ofertar')+'</button>'+
-        '</div>';
-      }
-    }
-    return '<div class="lic-card"><div class="lic-top"><div><h4>'+esc(l.producto)+' · '+Number(l.cantidad).toLocaleString('es-AR')+' '+esc(l.unit)+'</h4>'+
-        '<div class="lic-meta">'+(r !== 'mayorista' ? esc(l.mayoristaNombre)+(l.provincia ? ' · 📍 '+esc(l.provincia) : '')+' · ' : '')+
-          'Entrega: '+esc(l.entrega || 'a convenir')+(l.precioMax ? ' · Precio máximo '+money(l.precioMax)+'/'+esc(l.unit) : '')+
-          (r !== 'productor' ? ' · '+ofertas.length+' oferta(s)' : '')+
-          (l.notas ? '<br>'+esc(l.notas) : '')+'</div></div>'+
-        '<span class="lic-estado '+(licitAbierta(l) ? 'abierta' : esc(l.estado))+'">'+textoCierre(l)+'</span></div>'+
-      cuerpo+'</div>';
-  }).join('');
-  return html + '</div>';
 }
 
 /* ============================================================
@@ -6978,77 +6854,6 @@ function bindMainEvents(){
     aplicarPrefs(); renderMain(); showToast('Preferencias restablecidas');
   });
 
-  // Licitaciones
-  const licPublicar = document.getElementById('licPublicar');
-  if(licPublicar){
-    licPublicar.addEventListener('click', function(){
-      const v = function(id){ return document.getElementById(id).value.trim(); };
-      const cantidad = Math.round(Number(v('licCantidad')));
-      if(!v('licProducto')){ showToast('Escribí qué producto necesitás'); return; }
-      if(!(cantidad > 0)){ showToast('Indicá una cantidad válida'); return; }
-      const datos = {
-        mayoristaUid: currentUser.uid, mayoristaNombre: currentUser.entidad || currentUser.nombre, provincia: currentUser.provincia || '',
-        producto: v('licProducto').slice(0, 60), cat: v('licCat'), cantidad: cantidad, unit: v('licUnit'),
-        precioMax: Math.round(Number(v('licPrecioMax'))) || null, entrega: v('licEntrega').slice(0, 60), notas: v('licNotas').slice(0, 200),
-        cierre: Date.now() + Number(v('licDias')) * 86400000, estado: 'abierta',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      licPublicar.disabled = true;
-      db.collection('licitaciones').add(datos).then(function(){
-        registrar('Licitación publicada', datos.producto + ' · ' + cantidad.toLocaleString('es-AR') + ' ' + datos.unit);
-        showToast('Licitación publicada: los productores ya pueden ofertar');
-        ['licProducto','licCantidad','licPrecioMax','licEntrega','licNotas'].forEach(function(id){ document.getElementById(id).value = ''; });
-        licPublicar.disabled = false;
-      }).catch(function(err){ licPublicar.disabled = false; showToast(err.code === 'permission-denied' ? 'Firestore rechazó la licitación: publicá las reglas nuevas.' : err.message); });
-    });
-  }
-  main.querySelectorAll('[data-ofertar]').forEach(function(b){
-    b.addEventListener('click', function(){
-      const l = S.licitaciones.find(function(x){ return x.id === b.dataset.ofertar; });
-      if(!l || !licitAbierta(l)){ showToast('La licitación ya cerró'); return; }
-      const precio = Math.round(Number(document.getElementById('licPrecio-' + l.id).value));
-      const cantidad = Math.round(Number(document.getElementById('licCant-' + l.id).value));
-      const comentario = document.getElementById('licCom-' + l.id).value.trim().slice(0, 200);
-      if(!(precio > 0) || !(cantidad > 0)){ showToast('Completá precio y cantidad'); return; }
-      if(l.precioMax && precio > l.precioMax){ showToast('El precio supera el máximo de ' + money(l.precioMax)); return; }
-      const mia = S.ofertasLicit.find(function(o){ return o.licitacionId === l.id && o.productorUid === currentUser.uid; });
-      const ref = mia ? db.collection('ofertasLicit').doc(mia.id) : db.collection('ofertasLicit').doc();
-      const datos = mia ? { precio: precio, cantidad: cantidad, comentario: comentario, actualizado: firebase.firestore.FieldValue.serverTimestamp() }
-        : { licitacionId: l.id, mayoristaUid: l.mayoristaUid, productorUid: currentUser.uid, productorNombre: currentUser.entidad || currentUser.nombre,
-            precio: precio, cantidad: cantidad, comentario: comentario, estado: 'enviada', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-      b.disabled = true;
-      (mia ? ref.update(datos) : ref.set(datos)).then(function(){
-        registrar(mia ? 'Oferta de licitación actualizada' : 'Oferta en licitación', l.producto + ' · ' + money(precio) + '/' + l.unit);
-        showToast(mia ? 'Oferta actualizada' : 'Oferta enviada al mayorista');
-      }).catch(function(err){ b.disabled = false; showToast(err.code === 'permission-denied' ? 'Firestore rechazó la oferta: publicá las reglas nuevas.' : err.message); });
-    });
-  });
-  main.querySelectorAll('[data-adjudicar]').forEach(function(b){
-    b.addEventListener('click', function(){
-      const o = S.ofertasLicit.find(function(x){ return x.id === b.dataset.adjudicar; });
-      const l = o && S.licitaciones.find(function(x){ return x.id === o.licitacionId; });
-      if(!o || !l) return;
-      if(!confirm('¿Elegir la oferta de ' + o.productorNombre + ' a ' + money(o.precio) + '/' + l.unit + '? La licitación se cierra.')) return;
-      const batch = db.batch();
-      batch.update(db.collection('licitaciones').doc(l.id), { estado: 'adjudicada', ganadoraId: o.id, ganadoraProductorUid: o.productorUid, ganadoraNombre: o.productorNombre, precioGanador: o.precio });
-      ofertasDeLicit(l.id).forEach(function(x){ batch.update(db.collection('ofertasLicit').doc(x.id), { estado: x.id === o.id ? 'ganadora' : 'no elegida' }); });
-      batch.commit().then(function(){
-        registrar('Licitación adjudicada', l.producto + ' → ' + o.productorNombre + ' a ' + money(o.precio) + '/' + l.unit);
-        showToast('Elegiste a ' + o.productorNombre + '. Coordiná la entrega por el chat.');
-        view.mayorista = 'chats';
-        renderSubnav(); renderMain();
-        abrirConversacion(o.productorUid);
-      }).catch(function(err){ showToast(err.message); });
-    });
-  });
-  main.querySelectorAll('[data-cancelar-licit]').forEach(function(b){
-    b.addEventListener('click', function(){
-      if(!confirm('¿Cancelar esta licitación?')) return;
-      const idLi = b.dataset.cancelarLicit;
-      db.collection('licitaciones').doc(idLi).update({ estado: 'cancelada' }).then(function(){ avisoDeshacer('Licitación cancelada', function(){ return db.collection('licitaciones').doc(idLi).update({ estado: 'abierta' }); }); }).catch(function(err){ showToast(err.message); });
-    });
-  });
-
   // Transportista
   main.querySelectorAll('[data-tomar-viaje]').forEach(function(b){
     b.addEventListener('click', function(){
@@ -7094,14 +6899,6 @@ function bindMainEvents(){
   main.querySelectorAll('[data-estado-cuenta]').forEach(function(b){
     b.addEventListener('click', function(){ descargarEstadoCuenta(b.dataset.estadoCuenta); });
   });
-  if(currentUser.rol === 'productor' && view.productor === 'licitaciones'){
-    // Al ver las licitaciones, las ganadas dejan de avisar en la campanita.
-    S.ofertasLicit.filter(function(x){ return x.estado === 'ganadora' && !x.vistaGanadora; }).forEach(function(x){
-      x.vistaGanadora = true;
-      db.collection('ofertasLicit').doc(x.id).update({ vistaGanadora: true }).catch(function(){});
-    });
-  }
-
   // Ofertas por tiempo limitado
   const ofLanzar = document.getElementById('ofLanzar');
   if(ofLanzar){
